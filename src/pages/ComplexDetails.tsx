@@ -18,6 +18,7 @@ import { useClients } from "@/hooks/useClients";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { importComplex1Data } from "@/utils/importComplex1Data";
+import { importViilor33Data } from "@/utils/importViilor33Data";
 import { toast } from "sonner";
 
 const ComplexDetails = () => {
@@ -66,6 +67,23 @@ const ComplexDetails = () => {
     try {
       await importComplex1Data();
       toast.success("Importul a fost finalizat cu succes! 119 proprietăți au fost încărcate.");
+      // Refresh properties
+      window.location.reload();
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error("Eroare la importul datelor");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleImportViilor33Data = async () => {
+    if (complexId !== "complex-viilor33") return;
+    
+    setIsImporting(true);
+    try {
+      const result = await importViilor33Data();
+      toast.success(`Importul a fost finalizat cu succes! ${result.count} proprietăți au fost încărcate.`);
       // Refresh properties
       window.location.reload();
     } catch (error) {
@@ -334,6 +352,17 @@ const ComplexDetails = () => {
               >
                 <FileUp className="h-4 w-4" />
                 {isImporting ? "Se importă..." : "Import complet"}
+              </Button>
+            )}
+            {complexId === "complex-viilor33" && (
+              <Button
+                variant="outline"
+                onClick={handleImportViilor33Data}
+                disabled={isImporting}
+                className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+              >
+                <FileUp className="h-4 w-4" />
+                {isImporting ? "Se importă..." : "Import date"}
               </Button>
             )}
             <Button
