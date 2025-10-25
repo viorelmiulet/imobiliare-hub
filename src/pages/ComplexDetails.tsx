@@ -3,18 +3,22 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Plus, Search, Filter, ArrowLeft } from "lucide-react";
+import { Building2, Plus, Search, Filter, ArrowLeft, Settings } from "lucide-react";
 import { PropertyTable } from "@/components/PropertyTable";
 import { PropertyDialog } from "@/components/PropertyDialog";
 import { PropertyFilters } from "@/components/PropertyFilters";
+import { ComplexEditDialog } from "@/components/ComplexEditDialog";
 import { Property } from "@/types/property";
+import { Complex } from "@/types/complex";
 import { initialProperties } from "@/data/initialProperties";
 import { complexes } from "@/data/complexes";
 
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
   const navigate = useNavigate();
-  const complex = complexes.find((c) => c.id === complexId);
+  const [currentComplex, setCurrentComplex] = useState<Complex | undefined>(
+    complexes.find((c) => c.id === complexId)
+  );
 
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,9 +26,10 @@ const ComplexDetails = () => {
   const [selectedType, setSelectedType] = useState<string>("toate");
   const [selectedStatus, setSelectedStatus] = useState<string>("toate");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isComplexEditOpen, setIsComplexEditOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
 
-  if (!complex) {
+  if (!currentComplex) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
         <Card>
@@ -38,6 +43,11 @@ const ComplexDetails = () => {
       </div>
     );
   }
+
+  const handleComplexUpdate = (updatedComplex: Complex) => {
+    setCurrentComplex(updatedComplex);
+    // In a real app, this would update the complex in a database or global state
+  };
 
   const filteredProperties = properties.filter((property) => {
     const matchesSearch =
@@ -106,21 +116,31 @@ const ComplexDetails = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
-                {complex.name}
+                {currentComplex.name}
               </h1>
-              <p className="text-muted-foreground">{complex.location}</p>
+              <p className="text-muted-foreground">{currentComplex.location}</p>
             </div>
           </div>
-          <Button
-            onClick={() => {
-              setEditingProperty(null);
-              setIsDialogOpen(true);
-            }}
-            className="gap-2 shadow-md hover:shadow-lg transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            Adaugă Proprietate
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsComplexEditOpen(true)}
+              className="gap-2 shadow-md hover:shadow-lg transition-all"
+            >
+              <Settings className="h-4 w-4" />
+              Editează Complex
+            </Button>
+            <Button
+              onClick={() => {
+                setEditingProperty(null);
+                setIsDialogOpen(true);
+              }}
+              className="gap-2 shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              Adaugă Proprietate
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -220,7 +240,7 @@ const ComplexDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Add/Edit Dialog */}
+        {/* Add/Edit Property Dialog */}
         <PropertyDialog
           open={isDialogOpen}
           onOpenChange={(open) => {
@@ -233,6 +253,14 @@ const ComplexDetails = () => {
               : (handleAddProperty as any)
           }
           property={editingProperty}
+        />
+
+        {/* Edit Complex Dialog */}
+        <ComplexEditDialog
+          open={isComplexEditOpen}
+          onOpenChange={setIsComplexEditOpen}
+          onSubmit={handleComplexUpdate}
+          complex={currentComplex}
         />
       </div>
     </div>
