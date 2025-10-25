@@ -10,7 +10,7 @@ interface ExcelImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   complexId: string;
-  onImport: (properties: Property[]) => void;
+  onImport: (properties: Property[], columns: string[]) => void;
 }
 
 export const ExcelImportDialog = ({
@@ -69,56 +69,34 @@ export const ExcelImportDialog = ({
       const jsonData = XLSX.utils.sheet_to_json<any>(firstSheet);
 
       console.log(`Parsed ${jsonData.length} rows from Excel`);
-      console.log('First row sample:', jsonData[0]);
-      console.log('Column names:', Object.keys(jsonData[0] || {}));
+      
+      if (jsonData.length === 0) {
+        throw new Error('Fișierul Excel nu conține date valide');
+      }
 
-      // Transform the data to match Property interface
-      const determineStatus = (nume: string = '', observatii: string = ''): 'disponibil' | 'rezervat' | 'vandut' => {
-        const numeText = (nume || '').toLowerCase();
-        const obsText = (observatii || '').toLowerCase();
-        
-        if (numeText.includes('rezervat') || obsText.includes('rezervat')) {
-          return 'rezervat';
-        }
-        if (nume && nume.trim() && !numeText.includes('rezervat')) {
-          return 'vandut';
-        }
-        return 'disponibil';
-      };
+      // Extract column names from the first row
+      const columns = Object.keys(jsonData[0]);
+      console.log('Column names from Excel:', columns);
 
+      // Transform the data - keep all columns as-is from Excel
       const properties: Property[] = jsonData
         .filter(row => {
-          // Check multiple possible column names for apartment number
-          const hasApartment = row['NR AP'] || row['NR. AP'] || row['Nr. Ap'] || row['NR.AP'];
-          console.log('Row has apartment:', hasApartment, 'Row:', row);
-          return hasApartment;
+          // Filter out completely empty rows
+          return Object.values(row).some(val => val !== null && val !== undefined && val !== '');
         })
         .map((row, index) => ({
           id: `${complexId}-${index}-${Date.now()}`,
-          corp: row.CORP || row.Corp || '',
-          etaj: row.ETAJ || row.Etaj || '',
-          nrAp: row['NR AP'] || row['NR. AP'] || row['Nr. Ap'] || row['NR.AP'] || '',
-          tipCom: row['TIP COM'] || row['Tip Com'] || '',
-          mpUtili: Number(row['MP UTILI'] || row['Mp Utili']) || 0,
-          pretCuTva: Number(row['PRET CU TVA 21%'] || row['Pret cu TVA 21%']) || 0,
-          avans50: Number(row['AVANS 50%'] || row['Avans 50%']) || 0,
-          avans80: Number(row['AVANS 80%'] || row['Avans 80%']) || 0,
-          nume: row.NUME || row.Nume || '',
-          contact: row.CONTACT || row.Contact || '',
-          agent: row.AGENT || row.Agent || '',
-          finisaje: row.FINISAJE || row.Finisaje || '',
-          observatii: row.OBSERVATII || row.Observatii || '',
-          status: determineStatus(row.NUME || row.Nume || '', row.OBSERVATII || row.Observatii || ''),
+          ...row, // Spread all Excel columns
         }));
 
       console.log(`Successfully transformed ${properties.length} properties`);
       console.log('Sample property:', properties[0]);
 
-      onImport(properties);
+      onImport(properties, columns);
       
       toast({
         title: "Import reușit!",
-        description: `Am importat ${properties.length} proprietăți din fișierul Excel.`,
+        description: `Am importat ${properties.length} proprietăți cu ${columns.length} coloane din fișierul Excel.`,
       });
 
       setFile(null);

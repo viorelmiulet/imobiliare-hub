@@ -22,6 +22,10 @@ const ComplexDetails = () => {
   const [currentComplex, setCurrentComplex] = useState<Complex | undefined>(
     complexes.find((c) => c.id === complexId)
   );
+  const [columns, setColumns] = useState<string[]>([
+    'ETAJ', 'NR AP', 'TIP COM', 'MP UTILI', 'PRET CU TVA 21%', 
+    'AVANS 50%', 'AVANS 80%', 'NUME', 'CONTACT', 'AGENT', 'OBSERVATII'
+  ]);
 
   // Load properties based on complex ID
   const getPropertiesForComplex = (id: string): Property[] => {
@@ -129,8 +133,9 @@ const ComplexDetails = () => {
     setIsDialogOpen(true);
   };
 
-  const handleExcelImport = (importedProperties: Property[]) => {
+  const handleExcelImport = (importedProperties: Property[], importedColumns: string[]) => {
     setProperties([...properties, ...importedProperties]);
+    setColumns(importedColumns);
   };
 
   return (
@@ -290,26 +295,29 @@ const ComplexDetails = () => {
                     Corp 2 ({filteredProperties.filter(p => p.corp === "CORP 2").length})
                   </TabsTrigger>
                 </TabsList>
-                <TabsContent value="corp1">
-                  <PropertyTable
-                    properties={filteredProperties.filter(p => p.corp === "CORP 1")}
-                    onEdit={openEditDialog}
-                    onDelete={handleDeleteProperty}
-                    onStatusChange={handleStatusChange}
-                  />
-                </TabsContent>
-                <TabsContent value="corp2">
-                  <PropertyTable
-                    properties={filteredProperties.filter(p => p.corp === "CORP 2")}
-                    onEdit={openEditDialog}
-                    onDelete={handleDeleteProperty}
-                    onStatusChange={handleStatusChange}
-                  />
-                </TabsContent>
+              <TabsContent value="corp1">
+                <PropertyTable
+                  properties={filteredProperties.filter(p => p.corp === "CORP 1")}
+                  columns={columns}
+                  onEdit={openEditDialog}
+                  onDelete={handleDeleteProperty}
+                  onStatusChange={handleStatusChange}
+                />
+              </TabsContent>
+              <TabsContent value="corp2">
+                <PropertyTable
+                  properties={filteredProperties.filter(p => p.corp === "CORP 2")}
+                  columns={columns}
+                  onEdit={openEditDialog}
+                  onDelete={handleDeleteProperty}
+                  onStatusChange={handleStatusChange}
+                />
+              </TabsContent>
               </Tabs>
             ) : (
               <PropertyTable
                 properties={filteredProperties}
+                columns={columns}
                 onEdit={openEditDialog}
                 onDelete={handleDeleteProperty}
                 onStatusChange={handleStatusChange}

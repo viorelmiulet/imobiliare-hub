@@ -6,4 +6,5 @@ export interface Complex {
   totalProperties: number;
   availableProperties: number;
   image?: string;
+  columns?: string[];
 }

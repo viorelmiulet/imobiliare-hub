@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import {
   Select,
@@ -20,47 +19,42 @@ import { Property } from "@/types/property";
 
 interface PropertyTableProps {
   properties: Property[];
+  columns: string[];
   onEdit: (property: Property) => void;
   onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: string) => void;
+  onStatusChange?: (id: string, status: string) => void;
 }
 
 export const PropertyTable = ({
   properties,
+  columns,
   onEdit,
   onDelete,
   onStatusChange,
 }: PropertyTableProps) => {
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "disponibil":
-        return (
-          <Badge className="bg-success text-success-foreground">
-            Disponibil
-          </Badge>
-        );
-      case "rezervat":
-        return (
-          <Badge className="bg-warning text-warning-foreground">
-            Rezervat
-          </Badge>
-        );
-      case "vandut":
-        return (
-          <Badge className="bg-info text-info-foreground">Vândut</Badge>
-        );
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+  const formatValue = (value: any, columnName: string): string => {
+    if (value === null || value === undefined || value === '') return '-';
+    
+    // Format prices (columns containing "pret", "avans", "price")
+    if (typeof value === 'number' && 
+        (columnName.toLowerCase().includes('pret') || 
+         columnName.toLowerCase().includes('avans') ||
+         columnName.toLowerCase().includes('price'))) {
+      return new Intl.NumberFormat('ro-RO', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+      }).format(value);
     }
-  };
-
-  const formatPrice = (price: number) => {
-    if (!price) return "-";
-    return new Intl.NumberFormat("ro-RO", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 0,
-    }).format(price);
+    
+    // Format numbers with 2 decimals (for MP, surface area, etc)
+    if (typeof value === 'number' && 
+        (columnName.toLowerCase().includes('mp') || 
+         columnName.toLowerCase().includes('suprafata'))) {
+      return value.toFixed(2);
+    }
+    
+    return String(value);
   };
 
   return (
@@ -68,24 +62,11 @@ export const PropertyTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            <TableHead className="font-semibold">Etaj</TableHead>
-            <TableHead className="font-semibold">Nr. Ap</TableHead>
-            <TableHead className="font-semibold">Tip Com</TableHead>
-            <TableHead className="font-semibold text-right">MP Utili</TableHead>
-            <TableHead className="font-semibold text-right">
-              Preț cu TVA 21%
-            </TableHead>
-            <TableHead className="font-semibold text-right">
-              Avans 50%
-            </TableHead>
-            <TableHead className="font-semibold text-right">
-              Avans 80%
-            </TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold">Nume</TableHead>
-            <TableHead className="font-semibold">Contact</TableHead>
-            <TableHead className="font-semibold">Agent</TableHead>
-            <TableHead className="font-semibold">Observații</TableHead>
+            {columns.filter(col => col !== 'id').map((column) => (
+              <TableHead key={column} className="font-semibold">
+                {column}
+              </TableHead>
+            ))}
             <TableHead className="font-semibold text-right">Acțiuni</TableHead>
           </TableRow>
         </TableHeader>
@@ -93,7 +74,7 @@ export const PropertyTable = ({
           {properties.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={13}
+                colSpan={columns.length + 1}
                 className="text-center text-muted-foreground py-8"
               >
                 Nu există proprietăți de afișat
@@ -105,55 +86,42 @@ export const PropertyTable = ({
                 key={property.id}
                 className="hover:bg-muted/30 transition-colors"
               >
-                <TableCell className="font-medium">{property.etaj}</TableCell>
-                <TableCell className="font-medium">{property.nrAp}</TableCell>
-                <TableCell>{property.tipCom}</TableCell>
-                <TableCell className="text-right">
-                  {property.mpUtili.toFixed(2)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatPrice(property.pretCuTva)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatPrice(property.avans50)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatPrice(property.avans80)}
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={property.status}
-                    onValueChange={(value) => onStatusChange(property.id, value)}
-                  >
-                    <SelectTrigger className="w-[130px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="disponibil">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-success" />
-                          Disponibil
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="rezervat">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-warning" />
-                          Rezervat
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="vandut">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-info" />
-                          Vândut
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>{property.nume || "-"}</TableCell>
-                <TableCell className="text-sm">{property.contact || "-"}</TableCell>
-                <TableCell>{property.agent || "-"}</TableCell>
-                <TableCell className="text-sm">{property.observatii || "-"}</TableCell>
+                {columns.filter(col => col !== 'id').map((column) => (
+                  <TableCell key={`${property.id}-${column}`}>
+                    {column.toLowerCase().includes('status') && onStatusChange ? (
+                      <Select
+                        value={property[column] || 'disponibil'}
+                        onValueChange={(value) => onStatusChange(property.id, value)}
+                      >
+                        <SelectTrigger className="w-[130px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="disponibil">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-success" />
+                              Disponibil
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="rezervat">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-warning" />
+                              Rezervat
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="vandut">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-info" />
+                              Vândut
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      formatValue(property[column], column)
+                    )}
+                  </TableCell>
+                ))}
                 <TableCell className="text-right">
                   <div className="flex gap-2 justify-end">
                     <Button
