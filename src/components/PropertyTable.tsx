@@ -112,10 +112,10 @@ export const PropertyTable = ({
     // If commission already exists and is not empty, just display it
     if (currentCommission && String(currentCommission).trim() !== '') {
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <span className="font-medium text-success text-xs">{currentCommission}</span>
           <Button
-            variant="destructive"
+            variant="outline"
             size="sm"
             onClick={() => {
               if (onEdit) {
@@ -125,10 +125,10 @@ export const PropertyTable = ({
                 });
               }
             }}
-            className="h-7 w-7 p-0"
+            className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
             title="Șterge comision"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3" />
           </Button>
         </div>
       );
