@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Property } from "@/types/property";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Client } from "@/hooks/useClients";
@@ -27,6 +28,7 @@ interface PropertyTableProps {
   onStatusChange?: (id: string, status: string) => void;
   onClientChange?: (id: string, clientId: string | null) => void;
   onCommissionChange?: (id: string, commission: string) => void;
+  onObservatiiChange?: (id: string, observatii: string) => void;
   clients?: Client[];
 }
 
@@ -37,6 +39,7 @@ export const PropertyTable = ({
   onStatusChange,
   onClientChange,
   onCommissionChange,
+  onObservatiiChange,
   clients = [],
 }: PropertyTableProps) => {
   const isMobile = useIsMobile();
@@ -250,8 +253,15 @@ export const PropertyTable = ({
                             ))}
                           </SelectContent>
                         </Select>
-                      ) : column.toLowerCase().includes('comision') ? (
+                       ) : column.toLowerCase().includes('comision') ? (
                         renderCommissionCell(property, column)
+                      ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
+                        <Input
+                          value={getValue(property, column) || ''}
+                          onChange={(e) => onObservatiiChange(property.id, e.target.value)}
+                          placeholder="Adaugă observații..."
+                          className="h-8 text-xs"
+                        />
                       ) : (
                         formatValue(getValue(property, column), column)
                       )}
@@ -351,6 +361,13 @@ export const PropertyTable = ({
                       </Select>
                     ) : column.toLowerCase().includes('comision') ? (
                       renderCommissionCell(property, column)
+                    ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
+                      <Input
+                        value={getValue(property, column) || ''}
+                        onChange={(e) => onObservatiiChange(property.id, e.target.value)}
+                        placeholder="Adaugă observații..."
+                        className="h-7 text-xs"
+                      />
                     ) : (
                       <span className="whitespace-nowrap">{formatValue(getValue(property, column), column)}</span>
                     )}

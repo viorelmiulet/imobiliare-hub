@@ -208,6 +208,18 @@ const ComplexDetails = () => {
     }
   };
 
+  const handleObservatiiChange = async (id: string, observatii: string) => {
+    const property = properties.find(p => p.id === id);
+    if (property) {
+      const updatedProperty = {
+        ...property,
+        Observatii: observatii,
+        observatii: observatii
+      };
+      await updateProperty(updatedProperty);
+    }
+  };
+
   const openEditDialog = (property: Property) => {
     setEditingProperty(property);
     setIsDialogOpen(true);
@@ -387,6 +399,7 @@ const ComplexDetails = () => {
                   onStatusChange={handleStatusChange}
                   onClientChange={handleClientChange}
                   onCommissionChange={handleCommissionChange}
+                  onObservatiiChange={handleObservatiiChange}
                   clients={clients}
                 />
               </TabsContent>
@@ -398,6 +411,7 @@ const ComplexDetails = () => {
                   onStatusChange={handleStatusChange}
                   onClientChange={handleClientChange}
                   onCommissionChange={handleCommissionChange}
+                  onObservatiiChange={handleObservatiiChange}
                   clients={clients}
                 />
               </TabsContent>
@@ -410,6 +424,7 @@ const ComplexDetails = () => {
                 onStatusChange={handleStatusChange}
                 onClientChange={handleClientChange}
                 onCommissionChange={handleCommissionChange}
+                onObservatiiChange={handleObservatiiChange}
                 clients={clients}
               />
             )}
