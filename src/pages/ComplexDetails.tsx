@@ -245,21 +245,42 @@ const ComplexDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Properties Table */}
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>
-              Proprietăți ({filteredProperties.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PropertyTable
-              properties={filteredProperties}
-              onEdit={openEditDialog}
-              onDelete={handleDeleteProperty}
-            />
-          </CardContent>
-        </Card>
+        {/* Properties Tables - Separated by Corp */}
+        <div className="space-y-6">
+          {/* Corp 1 Table */}
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Corp 1 ({filteredProperties.filter(p => p.corp === "CORP 1").length} proprietăți)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PropertyTable
+                properties={filteredProperties.filter(p => p.corp === "CORP 1")}
+                onEdit={openEditDialog}
+                onDelete={handleDeleteProperty}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Corp 2 Table */}
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Corp 2 ({filteredProperties.filter(p => p.corp === "CORP 2").length} proprietăți)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PropertyTable
+                properties={filteredProperties.filter(p => p.corp === "CORP 2")}
+                onEdit={openEditDialog}
+                onDelete={handleDeleteProperty}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Add/Edit Property Dialog */}
         <PropertyDialog
