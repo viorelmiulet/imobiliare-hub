@@ -112,7 +112,7 @@ export const PropertyTable = ({
     
     return (
       <Select
-        value={hasCommission ? 'current' : undefined}
+        value={hasCommission ? 'current' : ''}
         onValueChange={(value) => {
           if (value === 'remove') {
             if (onEdit) {
