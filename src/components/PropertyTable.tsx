@@ -32,12 +32,35 @@ export const PropertyTable = ({
   onDelete,
   onStatusChange,
 }: PropertyTableProps) => {
+  // Resolve values for both old (label-based) and new (key-based) datasets
+  const getValue = (property: Property, columnName: string): any => {
+    const map: Record<string, string[]> = {
+      'Etaj': ['Etaj', 'etaj', 'ETAJ'],
+      'Nr. ap.': ['Nr. ap.', 'nrAp', 'nr_ap', 'Nr Ap', 'nr ap'],
+      'Tip Apartament': ['Tip Apartament', 'tipCom', 'TIP COM', 'tip_apartament'],
+      'Suprafata': ['Suprafata', 'mpUtili', 'suprafata', 'mp'],
+      'Pret Credit': ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit'],
+      'Pret Cash': ['Pret Cash', 'pretCash', 'pret_cash', 'avans80'],
+      'Client': ['Client', 'nume'],
+      'Agent': ['Agent', 'agent'],
+      'Comision': ['Comision', 'comision'],
+      'Observatii': ['Observatii', 'observatii'],
+      'Status': ['Status', 'status', 'STATUS'],
+      'Corp': ['Corp', 'corp', 'CORP'],
+    };
+    const synonyms = map[columnName] || [columnName];
+    for (const key of synonyms) {
+      const v = (property as any)[key];
+      if (v !== undefined && v !== null && String(v) !== '') return v;
+    }
+    return '';
+  };
+
   const formatValue = (value: any, columnName: string): string => {
     if (value === null || value === undefined || value === '') return '-';
-    
-    // Format prices (columns containing "pret", "avans", "price")
-    if (typeof value === 'number' && 
-        (columnName.toLowerCase().includes('pret') || 
+
+    if (typeof value === 'number' &&
+        (columnName.toLowerCase().includes('pret') ||
          columnName.toLowerCase().includes('avans') ||
          columnName.toLowerCase().includes('price'))) {
       return new Intl.NumberFormat('ro-RO', {
@@ -46,27 +69,28 @@ export const PropertyTable = ({
         minimumFractionDigits: 0,
       }).format(value);
     }
-    
-    // Format numbers with 2 decimals (for MP, surface area, etc)
-    if (typeof value === 'number' && 
-        (columnName.toLowerCase().includes('mp') || 
+
+    if (typeof value === 'number' &&
+        (columnName.toLowerCase().includes('mp') ||
          columnName.toLowerCase().includes('suprafata'))) {
       return value.toFixed(2);
     }
-    
+
     return String(value);
   };
 
-  const parsePrice = (priceStr: string): number => {
-    if (!priceStr) return 0;
-    // Remove currency symbols, spaces, and convert commas to dots
-    const cleanStr = priceStr.replace(/[€\s]/g, '').replace(/,/g, '');
+  const parsePrice = (price: any): number => {
+    if (!price && price !== 0) return 0;
+    if (typeof price === 'number') return price;
+    const cleanStr = String(price).replace(/[€\s]/g, '').replace(/,/g, '');
     return parseFloat(cleanStr) || 0;
   };
 
   const calculateCommission = (property: Property, priceType: 'credit' | 'cash'): string => {
-    const priceColumn = priceType === 'credit' ? 'Pret Credit' : 'Pret Cash';
-    const price = parsePrice(property[priceColumn]);
+    const priceValue = priceType === 'credit'
+      ? getValue(property, 'Pret Credit')
+      : getValue(property, 'Pret Cash');
+    const price = parsePrice(priceValue);
     const commission = price * 0.02;
     return new Intl.NumberFormat('ro-RO', {
       style: 'currency',
@@ -76,7 +100,7 @@ export const PropertyTable = ({
   };
 
   const renderCommissionCell = (property: Property, columnName: string) => {
-    const currentCommission = property[columnName];
+    const currentCommission = getValue(property, columnName);
     
     // If commission already exists and is not empty, just display it
     if (currentCommission && String(currentCommission).trim() !== '') {
@@ -174,7 +198,7 @@ export const PropertyTable = ({
                   <TableCell key={`${property.id}-${column}`}>
                     {column.toLowerCase().includes('status') && onStatusChange ? (
                       <Select
-                        value={property[column] || 'disponibil'}
+                        value={getValue(property, column) || 'disponibil'}
                         onValueChange={(value) => onStatusChange(property.id, value)}
                       >
                         <SelectTrigger className="w-[130px]">
@@ -204,7 +228,7 @@ export const PropertyTable = ({
                     ) : column.toLowerCase().includes('comision') ? (
                       renderCommissionCell(property, column)
                     ) : (
-                      formatValue(property[column], column)
+                      formatValue(getValue(property, column), column)
                     )}
                   </TableCell>
                 ))}
