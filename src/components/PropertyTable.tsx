@@ -57,6 +57,75 @@ export const PropertyTable = ({
     return String(value);
   };
 
+  const parsePrice = (priceStr: string): number => {
+    if (!priceStr) return 0;
+    // Remove currency symbols, spaces, and convert commas to dots
+    const cleanStr = priceStr.replace(/[€\s]/g, '').replace(/,/g, '');
+    return parseFloat(cleanStr) || 0;
+  };
+
+  const calculateCommission = (property: Property, priceType: 'credit' | 'cash'): string => {
+    const priceColumn = priceType === 'credit' ? 'Pret Credit' : 'Pret Cash';
+    const price = parsePrice(property[priceColumn]);
+    const commission = price * 0.02;
+    return new Intl.NumberFormat('ro-RO', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(commission);
+  };
+
+  const renderCommissionCell = (property: Property, columnName: string) => {
+    const currentCommission = property[columnName];
+    
+    // If commission already exists and is not empty, just display it
+    if (currentCommission && String(currentCommission).trim() !== '') {
+      return (
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-success">{currentCommission}</span>
+        </div>
+      );
+    }
+
+    // If commission is empty, show calculator
+    return (
+      <Select
+        onValueChange={(value) => {
+          const commission = calculateCommission(property, value as 'credit' | 'cash');
+          // Update property with calculated commission
+          if (onEdit) {
+            onEdit({
+              ...property,
+              [columnName]: commission
+            });
+          }
+        }}
+      >
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Calculează..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="credit">
+            <div className="flex flex-col">
+              <span className="font-medium">Din Credit</span>
+              <span className="text-xs text-muted-foreground">
+                2% = {calculateCommission(property, 'credit')}
+              </span>
+            </div>
+          </SelectItem>
+          <SelectItem value="cash">
+            <div className="flex flex-col">
+              <span className="font-medium">Din Cash</span>
+              <span className="text-xs text-muted-foreground">
+                2% = {calculateCommission(property, 'cash')}
+              </span>
+            </div>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    );
+  };
+
   return (
     <div className="rounded-md border overflow-x-auto">
       <Table>
@@ -117,6 +186,8 @@ export const PropertyTable = ({
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                    ) : column.toLowerCase().includes('comision') ? (
+                      renderCommissionCell(property, column)
                     ) : (
                       formatValue(property[column], column)
                     )}
