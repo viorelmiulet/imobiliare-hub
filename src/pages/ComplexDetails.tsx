@@ -17,6 +17,8 @@ import { useComplexes } from "@/hooks/useComplexes";
 import { useClients } from "@/hooks/useClients";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { importComplex1Data } from "@/utils/importComplex1Data";
+import { toast } from "sonner";
 
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
@@ -55,6 +57,24 @@ const ComplexDetails = () => {
   const [isComplexEditOpen, setIsComplexEditOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleImportComplex1Data = async () => {
+    if (complexId !== "complex-1") return;
+    
+    setIsImporting(true);
+    try {
+      await importComplex1Data();
+      toast.success("Importul a fost finalizat cu succes! 119 proprietăți au fost încărcate.");
+      // Refresh properties
+      window.location.reload();
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error("Eroare la importul datelor");
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   if (!currentComplex) {
     return (
@@ -305,6 +325,17 @@ const ComplexDetails = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch sm:items-center">
             <ThemeToggle />
+            {complexId === "complex-1" && (
+              <Button
+                variant="outline"
+                onClick={handleImportComplex1Data}
+                disabled={isImporting}
+                className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+              >
+                <FileUp className="h-4 w-4" />
+                {isImporting ? "Se importă..." : "Import complet"}
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => setIsComplexEditOpen(true)}
