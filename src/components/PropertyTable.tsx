@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import { Property } from "@/types/property";
 
@@ -22,29 +21,6 @@ export const PropertyTable = ({
   onEdit,
   onDelete,
 }: PropertyTableProps) => {
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "disponibil":
-        return (
-          <Badge className="bg-success text-success-foreground">
-            Disponibil
-          </Badge>
-        );
-      case "rezervat":
-        return (
-          <Badge className="bg-warning text-warning-foreground">
-            Rezervat
-          </Badge>
-        );
-      case "vandut":
-        return (
-          <Badge className="bg-info text-info-foreground">Vândut</Badge>
-        );
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
-
   const formatPrice = (price: number) => {
     if (!price) return "-";
     return new Intl.NumberFormat("ro-RO", {
@@ -59,11 +35,10 @@ export const PropertyTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            <TableHead className="font-semibold">Corp</TableHead>
             <TableHead className="font-semibold">Etaj</TableHead>
             <TableHead className="font-semibold">Nr. Ap</TableHead>
-            <TableHead className="font-semibold">Tip</TableHead>
-            <TableHead className="font-semibold text-right">MP</TableHead>
+            <TableHead className="font-semibold">Tip Com</TableHead>
+            <TableHead className="font-semibold text-right">MP Utili</TableHead>
             <TableHead className="font-semibold text-right">
               Preț cu TVA 21%
             </TableHead>
@@ -73,9 +48,10 @@ export const PropertyTable = ({
             <TableHead className="font-semibold text-right">
               Avans 80%
             </TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold">Cumpărător</TableHead>
+            <TableHead className="font-semibold">Nume</TableHead>
+            <TableHead className="font-semibold">Contact</TableHead>
             <TableHead className="font-semibold">Agent</TableHead>
+            <TableHead className="font-semibold">Observații</TableHead>
             <TableHead className="font-semibold text-right">Acțiuni</TableHead>
           </TableRow>
         </TableHeader>
@@ -95,10 +71,6 @@ export const PropertyTable = ({
                 key={property.id}
                 className="hover:bg-muted/30 transition-colors"
               >
-                {property.corp && (
-                  <TableCell className="font-medium">{property.corp}</TableCell>
-                )}
-                {!property.corp && <TableCell className="font-medium">-</TableCell>}
                 <TableCell className="font-medium">{property.etaj}</TableCell>
                 <TableCell className="font-medium">{property.nrAp}</TableCell>
                 <TableCell>{property.tipCom}</TableCell>
@@ -114,20 +86,10 @@ export const PropertyTable = ({
                 <TableCell className="text-right font-medium">
                   {formatPrice(property.avans80)}
                 </TableCell>
-                <TableCell>{getStatusBadge(property.status)}</TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">
-                      {property.nume || "-"}
-                    </div>
-                    {property.contact && (
-                      <div className="text-sm text-muted-foreground">
-                        {property.contact}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
+                <TableCell>{property.nume || "-"}</TableCell>
+                <TableCell className="text-sm">{property.contact || "-"}</TableCell>
                 <TableCell>{property.agent || "-"}</TableCell>
+                <TableCell className="text-sm">{property.observatii || "-"}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex gap-2 justify-end">
                     <Button
