@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import { Property } from "@/types/property";
 
@@ -21,6 +22,29 @@ export const PropertyTable = ({
   onEdit,
   onDelete,
 }: PropertyTableProps) => {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "disponibil":
+        return (
+          <Badge className="bg-success text-success-foreground">
+            Disponibil
+          </Badge>
+        );
+      case "rezervat":
+        return (
+          <Badge className="bg-warning text-warning-foreground">
+            Rezervat
+          </Badge>
+        );
+      case "vandut":
+        return (
+          <Badge className="bg-info text-info-foreground">Vândut</Badge>
+        );
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
   const formatPrice = (price: number) => {
     if (!price) return "-";
     return new Intl.NumberFormat("ro-RO", {
@@ -48,6 +72,7 @@ export const PropertyTable = ({
             <TableHead className="font-semibold text-right">
               Avans 80%
             </TableHead>
+            <TableHead className="font-semibold">Status</TableHead>
             <TableHead className="font-semibold">Nume</TableHead>
             <TableHead className="font-semibold">Contact</TableHead>
             <TableHead className="font-semibold">Agent</TableHead>
@@ -59,7 +84,7 @@ export const PropertyTable = ({
           {properties.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={12}
+                colSpan={13}
                 className="text-center text-muted-foreground py-8"
               >
                 Nu există proprietăți de afișat
@@ -86,6 +111,7 @@ export const PropertyTable = ({
                 <TableCell className="text-right font-medium">
                   {formatPrice(property.avans80)}
                 </TableCell>
+                <TableCell>{getStatusBadge(property.status)}</TableCell>
                 <TableCell>{property.nume || "-"}</TableCell>
                 <TableCell className="text-sm">{property.contact || "-"}</TableCell>
                 <TableCell>{property.agent || "-"}</TableCell>
