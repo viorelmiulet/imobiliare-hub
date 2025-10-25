@@ -84,8 +84,10 @@ const ComplexDetails = () => {
     try {
       const result = await importViilor33Data();
       toast.success(`Importul a fost finalizat cu succes! ${result.count} proprietăți au fost încărcate.`);
-      // Refresh properties
-      window.location.reload();
+      // Refresh the page to reload all data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Import error:", error);
       toast.error("Eroare la importul datelor");
