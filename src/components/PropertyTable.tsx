@@ -9,18 +9,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Property } from "@/types/property";
 
 interface PropertyTableProps {
   properties: Property[];
   onEdit: (property: Property) => void;
   onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: string) => void;
 }
 
 export const PropertyTable = ({
   properties,
   onEdit,
   onDelete,
+  onStatusChange,
 }: PropertyTableProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -111,7 +120,36 @@ export const PropertyTable = ({
                 <TableCell className="text-right font-medium">
                   {formatPrice(property.avans80)}
                 </TableCell>
-                <TableCell>{getStatusBadge(property.status)}</TableCell>
+                <TableCell>
+                  <Select
+                    value={property.status}
+                    onValueChange={(value) => onStatusChange(property.id, value)}
+                  >
+                    <SelectTrigger className="w-[130px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="disponibil">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-success" />
+                          Disponibil
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="rezervat">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-warning" />
+                          Rezervat
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="vandut">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-info" />
+                          Vândut
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
                 <TableCell>{property.nume || "-"}</TableCell>
                 <TableCell className="text-sm">{property.contact || "-"}</TableCell>
                 <TableCell>{property.agent || "-"}</TableCell>

@@ -112,6 +112,16 @@ const ComplexDetails = () => {
     setProperties(properties.filter((p) => p.id !== id));
   };
 
+  const handleStatusChange = (id: string, status: string) => {
+    setProperties(
+      properties.map((p) => 
+        p.id === id 
+          ? { ...p, status: status as "disponibil" | "rezervat" | "vandut" } 
+          : p
+      )
+    );
+  };
+
   const openEditDialog = (property: Property) => {
     setEditingProperty(property);
     setIsDialogOpen(true);
@@ -270,6 +280,7 @@ const ComplexDetails = () => {
                   properties={filteredProperties.filter(p => p.corp === "CORP 1")}
                   onEdit={openEditDialog}
                   onDelete={handleDeleteProperty}
+                  onStatusChange={handleStatusChange}
                 />
               </TabsContent>
               <TabsContent value="corp2">
@@ -277,6 +288,7 @@ const ComplexDetails = () => {
                   properties={filteredProperties.filter(p => p.corp === "CORP 2")}
                   onEdit={openEditDialog}
                   onDelete={handleDeleteProperty}
+                  onStatusChange={handleStatusChange}
                 />
               </TabsContent>
             </Tabs>
