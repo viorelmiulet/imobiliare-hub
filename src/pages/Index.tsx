@@ -8,61 +8,10 @@ import { PropertyTable } from "@/components/PropertyTable";
 import { PropertyDialog } from "@/components/PropertyDialog";
 import { PropertyFilters } from "@/components/PropertyFilters";
 import { Property } from "@/types/property";
+import { initialProperties } from "@/data/initialProperties";
 
 const Index = () => {
-  const [properties, setProperties] = useState<Property[]>([
-    {
-      id: "1",
-      etaj: "DEMISOL",
-      nrAp: "AP 1",
-      tipCom: "GARSONIERA",
-      mpUtili: 33.52,
-      pretFaraTva: 40500,
-      pretCuTva: 48700,
-      avans50: 47700,
-      avans80: 47000,
-      nume: "",
-      contact: "",
-      agent: "",
-      finisaje: "finisaje alb",
-      observatii: "",
-      status: "disponibil",
-    },
-    {
-      id: "2",
-      etaj: "DEMISOL",
-      nrAp: "AP 3",
-      tipCom: "GARSONIERA",
-      mpUtili: 28.29,
-      pretFaraTva: 34000,
-      pretCuTva: 41500,
-      avans50: 40500,
-      avans80: 40000,
-      nume: "",
-      contact: "",
-      agent: "mari popa",
-      finisaje: "finisaj alb",
-      observatii: "",
-      status: "rezervat",
-    },
-    {
-      id: "3",
-      etaj: "PARTER",
-      nrAp: "AP 22",
-      tipCom: "GARSONIERA",
-      mpUtili: 31.41,
-      pretFaraTva: 40900,
-      pretCuTva: 0,
-      avans50: 40000,
-      avans80: 39500,
-      nume: "Bicher lucia",
-      contact: "",
-      agent: "eurocasa",
-      finisaje: "finisaje albe",
-      observatii: "cumpara parcare",
-      status: "vandut",
-    },
-  ]);
+  const [properties, setProperties] = useState<Property[]>(initialProperties);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFloor, setSelectedFloor] = useState<string>("toate");
