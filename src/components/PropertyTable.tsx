@@ -184,13 +184,17 @@ export const PropertyTable = ({
             </CardContent>
           </Card>
         ) : (
-          properties.map((property) => (
-            <Card key={property.id} className="overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">
-                    Ap. {getValue(property, 'Nr. ap.')}
-                  </CardTitle>
+          properties.map((property) => {
+            const status = getValue(property, 'Status')?.toLowerCase();
+            const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-warning' : '';
+            
+            return (
+              <Card key={property.id} className={`overflow-hidden ${statusColorClass}`}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-lg">
+                      Ap. {getValue(property, 'Nr. ap.')}
+                    </CardTitle>
                   <Button
                     variant="outline"
                     size="sm"
@@ -262,7 +266,8 @@ export const PropertyTable = ({
                 ))}
               </CardContent>
             </Card>
-          ))
+            );
+          })
         )}
       </div>
     );
@@ -293,11 +298,15 @@ export const PropertyTable = ({
               </TableCell>
             </TableRow>
           ) : (
-            properties.map((property) => (
-              <TableRow
-                key={property.id}
-                className="hover:bg-muted/30 transition-colors"
-              >
+            properties.map((property) => {
+              const status = getValue(property, 'Status')?.toLowerCase();
+              const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-warning' : '';
+              
+              return (
+                <TableRow
+                  key={property.id}
+                  className={`hover:bg-muted/30 transition-colors ${statusColorClass}`}
+                >
                 {columns.filter(col => col !== 'id').map((column) => (
                   <TableCell key={`${property.id}-${column}`} className="px-2 py-2 text-xs">
                     {column.toLowerCase().includes('status') && onStatusChange ? (
@@ -364,7 +373,8 @@ export const PropertyTable = ({
                   </Button>
                 </TableCell>
               </TableRow>
-            ))
+              );
+            })
           )}
         </TableBody>
       </Table>
