@@ -10,6 +10,7 @@ import ComplexDetails from "./pages/ComplexDetails";
 import ImportEurocasaData from "./pages/ImportEurocasaData";
 import ImportComplex1Data from "./pages/ImportComplex1Data";
 import ImportViilor33Data from "./pages/ImportViilor33Data";
+import ClientsOverview from "./pages/ClientsOverview";
 import NotFound from "./pages/NotFound";
 import { initializeDatabase } from "./utils/initializeDatabase";
 
@@ -31,6 +32,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/complex/:complexId" element={<ComplexDetails />} />
+              <Route path="/clients" element={<ClientsOverview />} />
               <Route path="/import-eurocasa" element={<ImportEurocasaData />} />
               <Route path="/import-complex1" element={<ImportComplex1Data />} />
               <Route path="/import-viilor33" element={<ImportViilor33Data />} />

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, MapPin, Home, ArrowRight } from "lucide-react";
+import { Building2, MapPin, Home, ArrowRight, Users } from "lucide-react";
 import { useComplexes } from "@/hooks/useComplexes";
 import { ClientDialog } from "@/components/ClientDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -29,8 +29,16 @@ const Index = () => {
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Selectează un complex pentru a gestiona proprietățile și vânzările
           </p>
-          <div className="flex justify-center pt-2">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
             <ClientDialog />
+            <Button
+              onClick={() => navigate("/clients")}
+              variant="outline"
+              className="gap-2 shadow-md hover:shadow-lg transition-all"
+            >
+              <Users className="h-4 w-4" />
+              Vizualizare Clienți
+            </Button>
           </div>
         </div>
 
