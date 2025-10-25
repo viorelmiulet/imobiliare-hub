@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Property } from "@/types/property";
+import { useClients } from "@/hooks/useClients";
 
 interface PropertyDialogProps {
   open: boolean;
@@ -31,6 +32,7 @@ export const PropertyDialog = ({
   onSubmit,
   property,
 }: PropertyDialogProps) => {
+  const { clients } = useClients();
   const [formData, setFormData] = useState<{
     etaj: string;
     nrAp: string;
@@ -45,6 +47,7 @@ export const PropertyDialog = ({
     finisaje: string;
     observatii: string;
     status: "disponibil" | "rezervat" | "vandut";
+    client_id?: string;
   }>({
     etaj: "",
     nrAp: "",
@@ -59,6 +62,7 @@ export const PropertyDialog = ({
     finisaje: "",
     observatii: "",
     status: "disponibil",
+    client_id: undefined,
   });
 
   useEffect(() => {
@@ -77,6 +81,7 @@ export const PropertyDialog = ({
         finisaje: property.finisaje,
         observatii: property.observatii,
         status: property.status,
+        client_id: property.client_id,
       });
     } else {
       setFormData({
@@ -93,6 +98,7 @@ export const PropertyDialog = ({
         finisaje: "",
         observatii: "",
         status: "disponibil",
+        client_id: undefined,
       });
     }
   }, [property, open]);
@@ -254,6 +260,28 @@ export const PropertyDialog = ({
                   <SelectItem value="disponibil">Disponibil</SelectItem>
                   <SelectItem value="rezervat">Rezervat</SelectItem>
                   <SelectItem value="vandut">Vândut</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="client_id">Client</Label>
+              <Select
+                value={formData.client_id || "none"}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, client_id: value === "none" ? undefined : value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selectează clientul" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Fără client</SelectItem>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name} - {client.phone}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

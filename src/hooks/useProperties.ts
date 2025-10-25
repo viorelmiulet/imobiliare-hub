@@ -11,7 +11,12 @@ export const useProperties = (complexId: string) => {
     try {
       const { data, error } = await supabase
         .from('properties')
-        .select('*')
+        .select(`
+          *,
+          clients (
+            name
+          )
+        `)
         .eq('complex_id', complexId);
 
       if (error) throw error;
@@ -19,6 +24,8 @@ export const useProperties = (complexId: string) => {
       // Transform from database format to Property format
       const transformedData = (data || []).map(row => ({
         id: row.id,
+        client_id: row.client_id,
+        clientName: row.clients?.name,
         ...(row.data as Record<string, any>)
       }));
       
@@ -33,12 +40,13 @@ export const useProperties = (complexId: string) => {
 
   const addProperty = async (property: Property) => {
     try {
-      const { id, ...data } = property;
+      const { id, client_id, clientName, ...data } = property;
       
       const { error } = await supabase
         .from('properties')
         .insert({
           complex_id: complexId,
+          client_id: client_id || null,
           data: data
         });
 
@@ -55,11 +63,14 @@ export const useProperties = (complexId: string) => {
 
   const updateProperty = async (property: Property) => {
     try {
-      const { id, ...data } = property;
+      const { id, client_id, clientName, ...data } = property;
       
       const { error } = await supabase
         .from('properties')
-        .update({ data })
+        .update({ 
+          data,
+          client_id: client_id || null
+        })
         .eq('id', id);
 
       if (error) throw error;

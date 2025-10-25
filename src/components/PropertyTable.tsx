@@ -45,7 +45,7 @@ export const PropertyTable = ({
       'Suprafata': ['Suprafata', 'mpUtili', 'suprafata', 'mp'],
       'Pret Credit': ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit'],
       'Pret Cash': ['Pret Cash', 'pretCash', 'pret_cash', 'avans80'],
-      'Client': ['Client', 'nume'],
+      'Client': ['Client', 'clientName', 'nume'],
       'Agent': ['Agent', 'agent'],
       'Comision': ['Comision', 'comision'],
       'Observatii': ['Observatii', 'observatii'],

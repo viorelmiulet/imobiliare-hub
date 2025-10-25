@@ -79,6 +79,7 @@ export type Database = {
       }
       properties: {
         Row: {
+          client_id: string | null
           complex_id: string
           created_at: string | null
           data: Json
@@ -86,6 +87,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          client_id?: string | null
           complex_id: string
           created_at?: string | null
           data: Json
@@ -93,6 +95,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          client_id?: string | null
           complex_id?: string
           created_at?: string | null
           data?: Json
@@ -100,6 +103,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "properties_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "properties_complex_id_fkey"
             columns: ["complex_id"]
