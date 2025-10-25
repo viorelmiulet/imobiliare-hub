@@ -22,14 +22,7 @@ const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
   const navigate = useNavigate();
   const { complexes, updateComplex } = useComplexes();
-  const { properties, addProperty, updateProperty, deleteProperty, deleteParkingSpaces } = useProperties(complexId || "");
-  
-  // Delete parking spaces on mount (only once)
-  useEffect(() => {
-    if (complexId && deleteParkingSpaces) {
-      deleteParkingSpaces();
-    }
-  }, []);  // Empty dependency array to run only once
+  const { properties, addProperty, updateProperty, deleteProperty } = useProperties(complexId || "");
   const { clients } = useClients();
   const isMobile = useIsMobile();
   

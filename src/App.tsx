@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import ComplexDetails from "./pages/ComplexDetails";
 import ImportEurocasaData from "./pages/ImportEurocasaData";
+import ImportComplex1Data from "./pages/ImportComplex1Data";
 import NotFound from "./pages/NotFound";
 import { initializeDatabase } from "./utils/initializeDatabase";
 
@@ -30,6 +31,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/complex/:complexId" element={<ComplexDetails />} />
               <Route path="/import-eurocasa" element={<ImportEurocasaData />} />
+              <Route path="/import-complex1" element={<ImportComplex1Data />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
