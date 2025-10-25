@@ -71,25 +71,64 @@ const ComplexDetails = () => {
     // Update in database will be handled by useComplexes hook
   };
 
-  const filteredProperties = properties.filter((property) => {
-    const matchesSearch = searchTerm === "" || Object.values(property).some(value => 
-      value && String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filteredProperties = properties
+    .filter((property) => {
+      const matchesSearch = searchTerm === "" || Object.values(property).some(value => 
+        value && String(value).toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
-    const matchesFloor =
-      selectedFloor === "toate" || property.etaj === selectedFloor || property.ETAJ === selectedFloor;
+      const matchesFloor =
+        selectedFloor === "toate" || property.etaj === selectedFloor || property.ETAJ === selectedFloor;
 
-    const matchesType =
-      selectedType === "toate" || property.tipCom === selectedType || property['TIP COM'] === selectedType;
+      const matchesType =
+        selectedType === "toate" || property.tipCom === selectedType || property['TIP COM'] === selectedType;
 
-    const matchesStatus =
-      selectedStatus === "toate" || property.status === selectedStatus || property.STATUS === selectedStatus;
+      const matchesStatus =
+        selectedStatus === "toate" || property.status === selectedStatus || property.STATUS === selectedStatus;
 
-    const matchesCorp =
-      selectedCorp === "toate" || property.corp === selectedCorp || property.CORP === selectedCorp;
+      const matchesCorp =
+        selectedCorp === "toate" || property.corp === selectedCorp || property.CORP === selectedCorp;
 
-    return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
-  });
+      return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
+    })
+    .sort((a, b) => {
+      // Sort by floor order
+      const floorOrder: Record<string, number> = {
+        'DEMISOL': 0,
+        'PARTER': 1,
+        'P': 1,
+        'ETAJ 1': 2,
+        'E1': 2,
+        'ETAJ 2': 3,
+        'E2': 3,
+        'ETAJ 3': 4,
+        'E3': 4,
+        'ETAJ 4': 5,
+        'E4': 5,
+        'ETAJ 5': 6,
+        'E5': 6,
+        'ETAJ 6': 7,
+        'E6': 7,
+      };
+
+      const etajA = (a.etaj || a.ETAJ || a.Etaj || '').toUpperCase();
+      const etajB = (b.etaj || b.ETAJ || b.Etaj || '').toUpperCase();
+      const floorA = floorOrder[etajA] ?? 999;
+      const floorB = floorOrder[etajB] ?? 999;
+
+      if (floorA !== floorB) {
+        return floorA - floorB;
+      }
+
+      // Then sort by apartment number
+      const getApNumber = (prop: Property): number => {
+        const nrAp = prop.nrAp || prop['Nr. ap.'] || prop['nr_ap'] || '';
+        const match = String(nrAp).match(/\d+/);
+        return match ? parseInt(match[0]) : 0;
+      };
+
+      return getApNumber(a) - getApNumber(b);
+    });
 
   const getPropertyStatus = (property: Property): string => {
     return (property as any).status || (property as any).Status || (property as any).STATUS || 'disponibil';
