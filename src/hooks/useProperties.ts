@@ -21,13 +21,18 @@ export const useProperties = (complexId: string) => {
 
       if (error) throw error;
       
-      // Transform from database format to Property format
-      const transformedData = (data || []).map(row => ({
-        id: row.id,
-        client_id: row.client_id,
-        clientName: row.clients?.name,
-        ...(row.data as Record<string, any>)
-      }));
+      // Transform from database format to Property format and exclude parking spaces
+      const transformedData = (data || [])
+        .filter(row => {
+          const etaj = (row.data as any)?.etaj || (row.data as any)?.ETAJ;
+          return etaj !== 'LOC PARCARE';
+        })
+        .map(row => ({
+          id: row.id,
+          client_id: row.client_id,
+          clientName: row.clients?.name,
+          ...(row.data as Record<string, any>)
+        }));
       
       setProperties(transformedData);
     } catch (error) {
@@ -35,6 +40,41 @@ export const useProperties = (complexId: string) => {
       toast.error('Eroare la încărcarea proprietăților');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteParkingSpaces = async () => {
+    try {
+      // Get all parking spaces
+      const { data: parkingSpaces, error: fetchError } = await supabase
+        .from('properties')
+        .select('id, data')
+        .eq('complex_id', complexId);
+
+      if (fetchError) throw fetchError;
+
+      const parkingIds = parkingSpaces
+        ?.filter(row => {
+          const etaj = (row.data as any)?.etaj || (row.data as any)?.ETAJ;
+          return etaj === 'LOC PARCARE';
+        })
+        .map(row => row.id) || [];
+
+      if (parkingIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('properties')
+          .delete()
+          .in('id', parkingIds);
+
+        if (deleteError) throw deleteError;
+
+        await fetchProperties();
+        await updateComplexStats();
+        toast.success(`${parkingIds.length} locuri de parcare au fost șterse`);
+      }
+    } catch (error) {
+      console.error('Error deleting parking spaces:', error);
+      toast.error('Eroare la ștergerea locurilor de parcare');
     }
   };
 
@@ -104,7 +144,7 @@ export const useProperties = (complexId: string) => {
 
   const updateComplexStats = async () => {
     try {
-      // Fetch all properties to calculate stats
+      // Fetch all properties to calculate stats (exclude parking spaces)
       const { data, error } = await supabase
         .from('properties')
         .select('data')
@@ -112,12 +152,19 @@ export const useProperties = (complexId: string) => {
 
       if (error) throw error;
 
-      const total = data?.length || 0;
-      const available = data?.filter(p => {
+      // Filter out parking spaces
+      const propertiesWithoutParking = data?.filter(p => {
+        const propertyData = p.data as Record<string, any>;
+        const etaj = propertyData.etaj || propertyData.ETAJ;
+        return etaj !== 'LOC PARCARE';
+      }) || [];
+
+      const total = propertiesWithoutParking.length;
+      const available = propertiesWithoutParking.filter(p => {
         const propertyData = p.data as Record<string, any>;
         const status = propertyData.status || propertyData.Status || 'disponibil';
         return status.toLowerCase() === 'disponibil';
-      }).length || 0;
+      }).length;
 
       await supabase
         .from('complexes')
@@ -141,6 +188,7 @@ export const useProperties = (complexId: string) => {
     addProperty,
     updateProperty,
     deleteProperty,
+    deleteParkingSpaces,
     refetch: fetchProperties,
   };
 };
