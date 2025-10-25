@@ -3,12 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Plus, Search, Filter, ArrowLeft, Settings } from "lucide-react";
+import { Building2, Plus, Search, Filter, ArrowLeft, Settings, FileUp } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropertyTable } from "@/components/PropertyTable";
 import { PropertyDialog } from "@/components/PropertyDialog";
 import { PropertyFilters } from "@/components/PropertyFilters";
 import { ComplexEditDialog } from "@/components/ComplexEditDialog";
+import { ExcelImportDialog } from "@/components/ExcelImportDialog";
 import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
 import { initialProperties } from "@/data/initialProperties";
@@ -44,6 +45,7 @@ const ComplexDetails = () => {
   const [selectedCorp, setSelectedCorp] = useState<string>("toate");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isComplexEditOpen, setIsComplexEditOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
 
   if (!currentComplex) {
@@ -127,6 +129,10 @@ const ComplexDetails = () => {
     setIsDialogOpen(true);
   };
 
+  const handleExcelImport = (importedProperties: Property[]) => {
+    setProperties([...properties, ...importedProperties]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-6 space-y-6">
@@ -159,6 +165,14 @@ const ComplexDetails = () => {
             >
               <Settings className="h-4 w-4" />
               Editează Complex
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsImportDialogOpen(true)}
+              className="gap-2 shadow-md hover:shadow-lg transition-all"
+            >
+              <FileUp className="h-4 w-4" />
+              Importă Excel
             </Button>
             <Button
               onClick={() => {
@@ -325,6 +339,14 @@ const ComplexDetails = () => {
           onOpenChange={setIsComplexEditOpen}
           onSubmit={handleComplexUpdate}
           complex={currentComplex}
+        />
+
+        {/* Excel Import Dialog */}
+        <ExcelImportDialog
+          open={isImportDialogOpen}
+          onOpenChange={setIsImportDialogOpen}
+          complexId={complexId || ""}
+          onImport={handleExcelImport}
         />
       </div>
     </div>
