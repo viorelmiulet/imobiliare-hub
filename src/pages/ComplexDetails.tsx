@@ -256,7 +256,7 @@ const ComplexDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Properties Table with Corp Tabs */}
+        {/* Properties Table with Corps Tabs (conditional) */}
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle>
@@ -264,34 +264,43 @@ const ComplexDetails = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="corp1" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
-                <TabsTrigger value="corp1" className="gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Corp 1 ({filteredProperties.filter(p => p.corp === "CORP 1").length})
-                </TabsTrigger>
-                <TabsTrigger value="corp2" className="gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Corp 2 ({filteredProperties.filter(p => p.corp === "CORP 2").length})
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="corp1">
-                <PropertyTable
-                  properties={filteredProperties.filter(p => p.corp === "CORP 1")}
-                  onEdit={openEditDialog}
-                  onDelete={handleDeleteProperty}
-                  onStatusChange={handleStatusChange}
-                />
-              </TabsContent>
-              <TabsContent value="corp2">
-                <PropertyTable
-                  properties={filteredProperties.filter(p => p.corp === "CORP 2")}
-                  onEdit={openEditDialog}
-                  onDelete={handleDeleteProperty}
-                  onStatusChange={handleStatusChange}
-                />
-              </TabsContent>
-            </Tabs>
+            {properties.some(p => p.corp) ? (
+              <Tabs defaultValue="corp1" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="corp1" className="gap-2">
+                    <Building2 className="h-4 w-4" />
+                    Corp 1 ({filteredProperties.filter(p => p.corp === "CORP 1").length})
+                  </TabsTrigger>
+                  <TabsTrigger value="corp2" className="gap-2">
+                    <Building2 className="h-4 w-4" />
+                    Corp 2 ({filteredProperties.filter(p => p.corp === "CORP 2").length})
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="corp1">
+                  <PropertyTable
+                    properties={filteredProperties.filter(p => p.corp === "CORP 1")}
+                    onEdit={openEditDialog}
+                    onDelete={handleDeleteProperty}
+                    onStatusChange={handleStatusChange}
+                  />
+                </TabsContent>
+                <TabsContent value="corp2">
+                  <PropertyTable
+                    properties={filteredProperties.filter(p => p.corp === "CORP 2")}
+                    onEdit={openEditDialog}
+                    onDelete={handleDeleteProperty}
+                    onStatusChange={handleStatusChange}
+                  />
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <PropertyTable
+                properties={filteredProperties}
+                onEdit={openEditDialog}
+                onDelete={handleDeleteProperty}
+                onStatusChange={handleStatusChange}
+              />
+            )}
           </CardContent>
         </Card>
 
