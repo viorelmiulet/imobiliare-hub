@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, MapPin, Home, ArrowRight, Users } from "lucide-react";
+import { Building2, Home, ArrowRight, Users } from "lucide-react";
 import { useComplexes } from "@/hooks/useComplexes";
 import { ClientDialog } from "@/components/ClientDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -126,7 +126,7 @@ const Index = () => {
                         className="h-6 w-6 transition-all" 
                         style={{ color: `hsl(var(--complex-${colorIndex}))` }}
                       />
-                    </div>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -136,15 +136,8 @@ const Index = () => {
                   </Button>
                 </div>
                 <CardTitle className="text-xl mt-4">{complex.name}</CardTitle>
-                <CardDescription className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {complex.location}
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {complex.description}
-                </p>
                 <div className="flex justify-between items-center pt-4 border-t">
                   <div>
                     <p className="text-xs text-muted-foreground">Total</p>
