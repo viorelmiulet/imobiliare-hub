@@ -14,6 +14,7 @@ import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
 import { useProperties } from "@/hooks/useProperties";
 import { useComplexes } from "@/hooks/useComplexes";
+import { useClients } from "@/hooks/useClients";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const ComplexDetails = () => {
@@ -21,6 +22,8 @@ const ComplexDetails = () => {
   const navigate = useNavigate();
   const { complexes } = useComplexes();
   const { properties, addProperty, updateProperty, deleteProperty } = useProperties(complexId || "");
+  const { clients } = useClients();
+  const isMobile = useIsMobile();
   
   const [currentComplex, setCurrentComplex] = useState<Complex | undefined>();
   const [columns, setColumns] = useState<string[]>([
@@ -177,6 +180,17 @@ const ComplexDetails = () => {
       // Update all possible status field variations
       (updatedProperty as any)['Status'] = status;
       (updatedProperty as any)['STATUS'] = status;
+      await updateProperty(updatedProperty);
+    }
+  };
+
+  const handleClientChange = async (id: string, clientId: string | null) => {
+    const property = properties.find(p => p.id === id);
+    if (property) {
+      const updatedProperty = {
+        ...property,
+        client_id: clientId
+      };
       await updateProperty(updatedProperty);
     }
   };
@@ -358,6 +372,8 @@ const ComplexDetails = () => {
                   onEdit={openEditDialog}
                   onDelete={handleDeleteProperty}
                   onStatusChange={handleStatusChange}
+                  onClientChange={handleClientChange}
+                  clients={clients}
                 />
               </TabsContent>
               <TabsContent value="corp2">
@@ -367,6 +383,8 @@ const ComplexDetails = () => {
                   onEdit={openEditDialog}
                   onDelete={handleDeleteProperty}
                   onStatusChange={handleStatusChange}
+                  onClientChange={handleClientChange}
+                  clients={clients}
                 />
               </TabsContent>
               </Tabs>
@@ -377,6 +395,8 @@ const ComplexDetails = () => {
                 onEdit={openEditDialog}
                 onDelete={handleDeleteProperty}
                 onStatusChange={handleStatusChange}
+                onClientChange={handleClientChange}
+                clients={clients}
               />
             )}
           </CardContent>

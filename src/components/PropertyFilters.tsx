@@ -69,8 +69,8 @@ export const PropertyFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="toate">Toate etajele</SelectItem>
-            {uniqueFloors.map((floor) => (
-              <SelectItem key={floor} value={floor}>
+            {uniqueFloors.map((floor, index) => (
+              <SelectItem key={`floor-${floor}-${index}`} value={floor}>
                 {floor}
               </SelectItem>
             ))}
@@ -86,8 +86,8 @@ export const PropertyFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="toate">Toate tipurile</SelectItem>
-            {uniqueTypes.map((type) => (
-              <SelectItem key={type} value={type}>
+            {uniqueTypes.map((type, index) => (
+              <SelectItem key={`type-${type}-${index}`} value={type}>
                 {type}
               </SelectItem>
             ))}

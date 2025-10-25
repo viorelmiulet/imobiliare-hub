@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Property } from "@/types/property";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Client } from "@/hooks/useClients";
 
 interface PropertyTableProps {
   properties: Property[];
@@ -25,6 +26,8 @@ interface PropertyTableProps {
   onEdit: (property: Property) => void;
   onDelete: (id: string) => void;
   onStatusChange?: (id: string, status: string) => void;
+  onClientChange?: (id: string, clientId: string | null) => void;
+  clients?: Client[];
 }
 
 export const PropertyTable = ({
@@ -33,6 +36,8 @@ export const PropertyTable = ({
   onEdit,
   onDelete,
   onStatusChange,
+  onClientChange,
+  clients = [],
 }: PropertyTableProps) => {
   const isMobile = useIsMobile();
 
@@ -241,6 +246,23 @@ export const PropertyTable = ({
                             </SelectItem>
                           </SelectContent>
                         </Select>
+                      ) : column.toLowerCase() === 'client' && onClientChange ? (
+                        <Select
+                          value={property.client_id || 'none'}
+                          onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
+                        >
+                          <SelectTrigger className="w-[150px] h-8">
+                            <SelectValue placeholder="Selectează client" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Fără client</SelectItem>
+                            {clients.map((client) => (
+                              <SelectItem key={client.id} value={client.id}>
+                                {client.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : column.toLowerCase().includes('comision') ? (
                         renderCommissionCell(property, column)
                       ) : (
@@ -316,6 +338,23 @@ export const PropertyTable = ({
                               Vândut
                             </div>
                           </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : column.toLowerCase() === 'client' && onClientChange ? (
+                      <Select
+                        value={property.client_id || 'none'}
+                        onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
+                      >
+                        <SelectTrigger className="w-[150px]">
+                          <SelectValue placeholder="Selectează client" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Fără client</SelectItem>
+                          {clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id}>
+                              {client.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     ) : column.toLowerCase().includes('comision') ? (
