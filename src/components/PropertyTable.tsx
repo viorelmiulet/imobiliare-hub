@@ -83,6 +83,21 @@ export const PropertyTable = ({
       return (
         <div className="flex items-center gap-2">
           <span className="font-medium text-success">{currentCommission}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (onEdit) {
+                onEdit({
+                  ...property,
+                  [columnName]: ''
+                });
+              }
+            }}
+            className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
         </div>
       );
     }
