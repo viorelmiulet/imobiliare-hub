@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import ComplexDetails from "./pages/ComplexDetails";
+import ImportEurocasaData from "./pages/ImportEurocasaData";
 import NotFound from "./pages/NotFound";
 import { initializeDatabase } from "./utils/initializeDatabase";
 
@@ -26,6 +27,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/complex/:complexId" element={<ComplexDetails />} />
+            <Route path="/import-eurocasa" element={<ImportEurocasaData />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
