@@ -21,7 +21,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
   const navigate = useNavigate();
-  const { complexes } = useComplexes();
+  const { complexes, updateComplex } = useComplexes();
   const { properties, addProperty, updateProperty, deleteProperty } = useProperties(complexId || "");
   const { clients } = useClients();
   const isMobile = useIsMobile();
@@ -72,8 +72,12 @@ const ComplexDetails = () => {
   }
 
   const handleComplexUpdate = async (updatedComplex: Complex) => {
+    await updateComplex(updatedComplex.id, {
+      name: updatedComplex.name,
+      location: updatedComplex.location,
+      description: updatedComplex.description,
+    });
     setCurrentComplex(updatedComplex);
-    // Update in database will be handled by useComplexes hook
   };
 
   const filteredProperties = properties
