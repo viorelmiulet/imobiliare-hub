@@ -26,7 +26,10 @@ export const useAuth = () => {
         .eq('id', userId)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
 
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
@@ -34,14 +37,20 @@ export const useAuth = () => {
         .eq('user_id', userId)
         .single();
 
-      if (roleError) throw roleError;
+      if (roleError) {
+        console.error('Error fetching role:', roleError);
+        throw roleError;
+      }
 
-      setProfile({
+      const userProfile = {
         id: profileData.id,
         email: profileData.email,
         full_name: profileData.full_name,
         role: roleData.role as UserRole,
-      });
+      };
+      
+      console.log('User profile loaded:', { email: userProfile.email, role: userProfile.role });
+      setProfile(userProfile);
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
