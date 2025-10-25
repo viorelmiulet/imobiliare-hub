@@ -112,8 +112,8 @@ export const PropertyTable = ({
     // If commission already exists and is not empty, just display it
     if (currentCommission && String(currentCommission).trim() !== '') {
       return (
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-success">{currentCommission}</span>
+        <div className="flex items-center gap-1">
+          <span className="font-medium text-success text-xs">{currentCommission}</span>
           <Button
             variant="outline"
             size="sm"
@@ -125,10 +125,10 @@ export const PropertyTable = ({
                 });
               }
             }}
-            className="h-7 w-7 p-0 hover:bg-destructive hover:text-destructive-foreground"
+            className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
             title="Șterge comision"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-3 w-3" />
           </Button>
         </div>
       );
@@ -148,13 +148,13 @@ export const PropertyTable = ({
           }
         }}
       >
-        <SelectTrigger className="w-[140px]">
-          <SelectValue placeholder="Calculează..." />
+        <SelectTrigger className="w-[110px] h-7 text-xs">
+          <SelectValue placeholder="Calc..." />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="credit">
             <div className="flex flex-col">
-              <span className="font-medium">Din Credit</span>
+              <span className="font-medium text-xs">Din Credit</span>
               <span className="text-xs text-muted-foreground">
                 2% = {calculateCommission(property, 'credit')}
               </span>
@@ -162,7 +162,7 @@ export const PropertyTable = ({
           </SelectItem>
           <SelectItem value="cash">
             <div className="flex flex-col">
-              <span className="font-medium">Din Cash</span>
+              <span className="font-medium text-xs">Din Cash</span>
               <span className="text-xs text-muted-foreground">
                 2% = {calculateCommission(property, 'cash')}
               </span>
@@ -275,11 +275,11 @@ export const PropertyTable = ({
         <TableHeader>
           <TableRow className="bg-muted/50">
             {columns.filter(col => col !== 'id').map((column) => (
-              <TableHead key={column} className="font-semibold">
+              <TableHead key={column} className="font-semibold text-xs px-2 py-2 whitespace-nowrap">
                 {column}
               </TableHead>
             ))}
-            <TableHead className="font-semibold text-right">Acțiuni</TableHead>
+            <TableHead className="font-semibold text-xs text-right px-2 py-2">Acțiuni</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -299,13 +299,13 @@ export const PropertyTable = ({
                 className="hover:bg-muted/30 transition-colors"
               >
                 {columns.filter(col => col !== 'id').map((column) => (
-                  <TableCell key={`${property.id}-${column}`}>
+                  <TableCell key={`${property.id}-${column}`} className="px-2 py-2 text-xs">
                     {column.toLowerCase().includes('status') && onStatusChange ? (
                       <Select
                         value={getValue(property, column) || 'disponibil'}
                         onValueChange={(value) => onStatusChange(property.id, value)}
                       >
-                        <SelectTrigger className="w-[130px]">
+                        <SelectTrigger className="w-[110px] h-7 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -334,8 +334,8 @@ export const PropertyTable = ({
                         value={property.client_id || 'none'}
                         onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
                       >
-                        <SelectTrigger className="w-[150px]">
-                          <SelectValue placeholder="Selectează client" />
+                        <SelectTrigger className="w-[120px] h-7 text-xs">
+                          <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">Fără client</SelectItem>
@@ -349,18 +349,18 @@ export const PropertyTable = ({
                     ) : column.toLowerCase().includes('comision') ? (
                       renderCommissionCell(property, column)
                     ) : (
-                      formatValue(getValue(property, column), column)
+                      <span className="whitespace-nowrap">{formatValue(getValue(property, column), column)}</span>
                     )}
                   </TableCell>
                 ))}
-                <TableCell className="text-right">
+                <TableCell className="text-right px-2 py-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => onEdit(property)}
-                    className="hover:bg-primary hover:text-primary-foreground transition-all"
+                    className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
                 </TableCell>
               </TableRow>
