@@ -37,6 +37,12 @@ const Admin = () => {
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [selectedComplexes, setSelectedComplexes] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserFullName, setNewUserFullName] = useState('');
+  const [newUserRole, setNewUserRole] = useState<string>('user');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (!authLoading && profile?.role !== 'admin') {
@@ -177,6 +183,51 @@ const Admin = () => {
     }
   };
 
+  const handleCreateUser = async () => {
+    if (!newUserEmail || !newUserPassword) {
+      toast.error('Email și parola sunt obligatorii');
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({
+          email: newUserEmail,
+          password: newUserPassword,
+          fullName: newUserFullName,
+          role: newUserRole,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Eroare la crearea utilizatorului');
+      }
+
+      toast.success('Utilizator creat cu succes');
+      setCreateDialogOpen(false);
+      setNewUserEmail('');
+      setNewUserPassword('');
+      setNewUserFullName('');
+      setNewUserRole('user');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      toast.error(error instanceof Error ? error.message : 'Eroare la crearea utilizatorului');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   if (authLoading || loading) {
     return <div>Se încarcă...</div>;
   }
@@ -199,13 +250,20 @@ const Admin = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Utilizatori
-            </CardTitle>
-            <CardDescription>
-              Gestionează rolurile și accesul utilizatorilor la complexe
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Utilizatori
+                </CardTitle>
+                <CardDescription>
+                  Gestionează rolurile și accesul utilizatorilor la complexe
+                </CardDescription>
+              </div>
+              <Button onClick={() => setCreateDialogOpen(true)}>
+                Creează utilizator
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -242,6 +300,76 @@ const Admin = () => {
             </Table>
           </CardContent>
         </Card>
+
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Creează utilizator nou</DialogTitle>
+              <DialogDescription>
+                Adaugă un utilizator nou în sistem
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-email">Email *</Label>
+                <Input
+                  id="new-email"
+                  type="email"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder="email@exemplu.ro"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Parolă *</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newUserPassword}
+                  onChange={(e) => setNewUserPassword(e.target.value)}
+                  placeholder="Minimum 6 caractere"
+                  minLength={6}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-fullname">Nume complet</Label>
+                <Input
+                  id="new-fullname"
+                  type="text"
+                  value={newUserFullName}
+                  onChange={(e) => setNewUserFullName(e.target.value)}
+                  placeholder="Ion Popescu"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Rol</Label>
+                <Select value={newUserRole} onValueChange={setNewUserRole}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User (vizualizare)</SelectItem>
+                    <SelectItem value="manager">Manager (editare)</SelectItem>
+                    <SelectItem value="admin">Admin (acces complet)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                Anulează
+              </Button>
+              <Button onClick={handleCreateUser} disabled={creating}>
+                {creating ? 'Se creează...' : 'Creează'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
