@@ -73,22 +73,21 @@ const ComplexDetails = () => {
   };
 
   const filteredProperties = properties.filter((property) => {
-    const matchesSearch =
-      property.nrAp.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.nume?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.agent?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === "" || Object.values(property).some(value => 
+      value && String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const matchesFloor =
-      selectedFloor === "toate" || property.etaj === selectedFloor;
+      selectedFloor === "toate" || property.etaj === selectedFloor || property.ETAJ === selectedFloor;
 
     const matchesType =
-      selectedType === "toate" || property.tipCom === selectedType;
+      selectedType === "toate" || property.tipCom === selectedType || property['TIP COM'] === selectedType;
 
     const matchesStatus =
-      selectedStatus === "toate" || property.status === selectedStatus;
+      selectedStatus === "toate" || property.status === selectedStatus || property.STATUS === selectedStatus;
 
     const matchesCorp =
-      selectedCorp === "toate" || property.corp === selectedCorp;
+      selectedCorp === "toate" || property.corp === selectedCorp || property.CORP === selectedCorp;
 
     return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
   });
