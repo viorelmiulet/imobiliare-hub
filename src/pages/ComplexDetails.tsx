@@ -140,9 +140,8 @@ const ComplexDetails = () => {
   };
 
   const getPropertyCommission = (property: Property): number => {
-    // Use exact same logic as PropertyTable's getValue
+    // Extract commission from various possible keys and parse robustly
     const synonyms = ['Comision', 'comision'];
-    
     let commissionValue = '';
     for (const key of synonyms) {
       const v = (property as any)[key];
@@ -151,26 +150,33 @@ const ComplexDetails = () => {
         break;
       }
     }
-    
-    if (!commissionValue || commissionValue.trim() === '') return 0;
-    
-    // Parse commission - handle formats like "1.234,56 €" or "1234.56"
-    // Remove currency symbols and spaces
-    let cleanStr = commissionValue.replace(/[€\s]/g, '');
-    
-    // Check if using comma as decimal separator (European format)
-    const hasComma = cleanStr.includes(',');
-    const hasDot = cleanStr.includes('.');
-    
-    if (hasComma && hasDot) {
-      // Format: 1.234,56 (European with thousand separator)
-      cleanStr = cleanStr.replace(/\./g, '').replace(',', '.');
-    } else if (hasComma) {
-      // Format: 1234,56 (European decimal)
-      cleanStr = cleanStr.replace(',', '.');
-    }
-    // else: Format is already correct (1234.56)
-    
+    if (!commissionValue) return 0;
+
+    // Normalize: remove NBSP and keep only digits, separators and minus
+    let cleanStr = commissionValue
+      .replace(/\u00A0/g, '')
+      .replace(/[^0-9,.-]/g, '');
+
+    const lastComma = cleanStr.lastIndexOf(',');
+    const lastDot = cleanStr.lastIndexOf('.');
+
+    if (lastComma !== -1 && lastDot !== -1) {
+      // Decide decimal by the rightmost separator
+      if (lastComma > lastDot) {
+        // Comma is decimal: remove all dots (thousands), replace last comma with dot
+        cleanStr = cleanStr.replace(/\./g, '');
+        const parts = cleanStr.split(',');
+        const decimal = parts.pop();
+        cleanStr = parts.join('') + '.' + (decimal ?? '0');
+      } else {
+        // Dot is decimal: remove all commas (thousands)
+        cleanStr = cleanStr.replace(/,/g, '');
+      }
+    } else if (lastComma !== -1) {
+      // Only comma present: treat as decimal
+      cleanStr = cleanStr.replace(/,/g, '.');
+    } // else: only dot or integer
+
     const parsed = parseFloat(cleanStr);
     return isNaN(parsed) ? 0 : parsed;
   };
@@ -385,10 +391,10 @@ const ComplexDetails = () => {
             <CardContent>
               <div className="text-xl sm:text-2xl font-bold text-accent">
                 {new Intl.NumberFormat('ro-RO', {
-                  style: 'currency',
-                  currency: 'EUR',
                   minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(totalCommissions)}
+                {` EUR`}
               </div>
             </CardContent>
           </Card>
