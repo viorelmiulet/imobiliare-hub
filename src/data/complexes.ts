@@ -13,9 +13,9 @@ export const complexes: Complex[] = [
     id: "complex-2",
     name: "Eurocasa 65G",
     location: "Str. Drumul Gării Cățelu, București",
-    description: "Complex rezidențial modern cu 200+ apartamente, 2 corpuri (A și B), etaje P+6",
-    totalProperties: 144,
-    availableProperties: 141,
+    description: "Complex rezidențial modern cu 200 apartamente în 2 corpuri (Corp 1: 104 ap, Corp 2: 96 ap), P+6",
+    totalProperties: 200,
+    availableProperties: 197,
   },
   {
     id: "complex-3",

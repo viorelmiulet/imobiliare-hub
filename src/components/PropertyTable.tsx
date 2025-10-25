@@ -59,6 +59,7 @@ export const PropertyTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
+            <TableHead className="font-semibold">Corp</TableHead>
             <TableHead className="font-semibold">Etaj</TableHead>
             <TableHead className="font-semibold">Nr. Ap</TableHead>
             <TableHead className="font-semibold">Tip</TableHead>
@@ -82,7 +83,7 @@ export const PropertyTable = ({
           {properties.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={11}
+                colSpan={12}
                 className="text-center text-muted-foreground py-8"
               >
                 Nu există proprietăți de afișat
@@ -94,6 +95,10 @@ export const PropertyTable = ({
                 key={property.id}
                 className="hover:bg-muted/30 transition-colors"
               >
+                {property.corp && (
+                  <TableCell className="font-medium">{property.corp}</TableCell>
+                )}
+                {!property.corp && <TableCell className="font-medium">-</TableCell>}
                 <TableCell className="font-medium">{property.etaj}</TableCell>
                 <TableCell className="font-medium">{property.nrAp}</TableCell>
                 <TableCell>{property.tipCom}</TableCell>

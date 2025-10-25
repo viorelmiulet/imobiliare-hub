@@ -1,5 +1,6 @@
 export interface Property {
   id: string;
+  corp?: string;
   etaj: string;
   nrAp: string;
   tipCom: string;

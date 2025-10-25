@@ -12,9 +12,11 @@ interface PropertyFiltersProps {
   selectedFloor: string;
   selectedType: string;
   selectedStatus: string;
+  selectedCorp: string;
   onFloorChange: (value: string) => void;
   onTypeChange: (value: string) => void;
   onStatusChange: (value: string) => void;
+  onCorpChange: (value: string) => void;
   properties: Property[];
 }
 
@@ -22,16 +24,38 @@ export const PropertyFilters = ({
   selectedFloor,
   selectedType,
   selectedStatus,
+  selectedCorp,
   onFloorChange,
   onTypeChange,
   onStatusChange,
+  onCorpChange,
   properties,
 }: PropertyFiltersProps) => {
   const uniqueFloors = Array.from(new Set(properties.map((p) => p.etaj)));
   const uniqueTypes = Array.from(new Set(properties.map((p) => p.tipCom)));
+  const uniqueCorps = Array.from(new Set(properties.map((p) => p.corp).filter(Boolean))) as string[];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {uniqueCorps.length > 0 && (
+        <div className="space-y-2">
+          <Label>Corp</Label>
+          <Select value={selectedCorp} onValueChange={onCorpChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Toate corpurile" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="toate">Toate corpurile</SelectItem>
+              {uniqueCorps.map((corp) => (
+                <SelectItem key={corp} value={corp}>
+                  {corp}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label>Etaj</Label>
         <Select value={selectedFloor} onValueChange={onFloorChange}>

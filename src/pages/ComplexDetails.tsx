@@ -40,6 +40,7 @@ const ComplexDetails = () => {
   const [selectedFloor, setSelectedFloor] = useState<string>("toate");
   const [selectedType, setSelectedType] = useState<string>("toate");
   const [selectedStatus, setSelectedStatus] = useState<string>("toate");
+  const [selectedCorp, setSelectedCorp] = useState<string>("toate");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isComplexEditOpen, setIsComplexEditOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
@@ -79,7 +80,10 @@ const ComplexDetails = () => {
     const matchesStatus =
       selectedStatus === "toate" || property.status === selectedStatus;
 
-    return matchesSearch && matchesFloor && matchesType && matchesStatus;
+    const matchesCorp =
+      selectedCorp === "toate" || property.corp === selectedCorp;
+
+    return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
   });
 
   const availableCount = properties.filter((p) => p.status === "disponibil").length;
@@ -231,9 +235,11 @@ const ComplexDetails = () => {
               selectedFloor={selectedFloor}
               selectedType={selectedType}
               selectedStatus={selectedStatus}
+              selectedCorp={selectedCorp}
               onFloorChange={setSelectedFloor}
               onTypeChange={setSelectedType}
               onStatusChange={setSelectedStatus}
+              onCorpChange={setSelectedCorp}
               properties={properties}
             />
           </CardContent>
