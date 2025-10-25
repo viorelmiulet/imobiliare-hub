@@ -16,14 +16,42 @@ interface RawProperty {
 }
 
 const parsePrice = (value: string | number | undefined): number => {
-  if (!value) return 0;
-  const str = String(value).replace(/[€\s]/g, '').replace(/,/g, '');
+  if (value === undefined || value === null || value === '') return 0;
+  let str = String(value).trim();
+  // Remove currency symbols and spaces
+  str = str.replace(/[€\s]/g, '');
+  // Detect decimal separator by the rightmost separator
+  const lastComma = str.lastIndexOf(',');
+  const lastDot = str.lastIndexOf('.');
+  if (lastComma !== -1 && lastDot !== -1) {
+    if (lastComma > lastDot) {
+      // comma is decimal, dots are thousands
+      str = str.replace(/\./g, '');
+      const parts = str.split(',');
+      const dec = parts.pop();
+      str = parts.join('') + '.' + (dec ?? '0');
+    } else {
+      // dot is decimal, commas are thousands
+      str = str.replace(/,/g, '');
+    }
+  } else if (lastComma !== -1) {
+    // only comma present, treat as decimal
+    str = str.replace(/,/g, '.');
+  } else {
+    // only dots or plain number
+    // remove thousands separators if any ambiguous
+    const matches = str.match(/\./g);
+    if (matches && matches.length > 1) {
+      str = str.replace(/\./g, '');
+    }
+  }
   const num = parseFloat(str);
   return isNaN(num) ? 0 : num;
 };
 
 const parseArea = (value: string | number | undefined): number => {
-  if (!value) return 0;
+  if (value === undefined || value === null || value === '') return 0;
+  // replace comma decimal with dot
   const num = parseFloat(String(value).replace(/,/g, '.'));
   return isNaN(num) ? 0 : num;
 };
@@ -38,10 +66,47 @@ const normalizeFloor = (floor: string): string => {
   return upperFloor;
 };
 
+const extractPrice = (row: RawProperty): number => {
+  const knownKeys = [
+    'Pret', 'Preț', 'PRET', 'Pret EUR', 'Preț EUR', 'PRET EUR',
+    'Pret Credit', 'Pret Cash'
+  ];
+  for (const key of knownKeys) {
+    if (row[key] !== undefined) {
+      const v = parsePrice(row[key]);
+      if (v) return v;
+    }
+  }
+  for (const key in row) {
+    if (/pret/i.test(key)) {
+      const v = parsePrice((row as any)[key]);
+      if (v) return v;
+    }
+  }
+  return 0;
+};
+
+const extractArea = (row: RawProperty): number => {
+  const knownKeys = ['Suprafata Utila', 'Suprafață Utilă', 'mpUtili', 'mp', 'MP'];
+  for (const key of knownKeys) {
+    if (row[key] !== undefined) {
+      const v = parseArea(row[key]);
+      if (v) return v;
+    }
+  }
+  for (const key in row) {
+    if (/(supraf|mp)/i.test(key)) {
+      const v = parseArea((row as any)[key]);
+      if (v) return v;
+    }
+  }
+  return 0;
+};
+
 const determineStatus = (row: RawProperty): string => {
   const client = String(row.Client || '').trim().toLowerCase();
   const agent = String(row.Agent || '').trim().toLowerCase();
-  const observatii = String(row.Observatii || '').trim().toLowerCase();
+  const observatii = String((row as any).Observatii || (row as any)['Observații'] || '').trim().toLowerCase();
   
   if (client && client !== '' && !client.includes('disponibil')) {
     return 'vandut';
@@ -57,7 +122,7 @@ export const importViilor33Data = async () => {
     console.log('Starting Viilor 33 data import...');
     
     // Fetch Excel file
-    const response = await fetch('/src/data/viilor33-data.xlsx');
+    const response = await fetch('/data/viilor33-data.xlsx');
     const arrayBuffer = await response.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
     
@@ -86,16 +151,13 @@ export const importViilor33Data = async () => {
         // Skip rows without apartment number
         if (!nrAp || nrAp === '') return;
         
-        // Try multiple column name variations for area
-        const suprafata = parseArea(row['Suprafata Utila'] || row['Suprafață Utilă']);
-        
-        // Try multiple column name variations for price
-        const pret = parsePrice(row['Pret'] || row['Preț'] || row['PRET']);
+        const suprafata = extractArea(row);
+        const pret = extractPrice(row);
         
         console.log(`Processing AP ${nrAp}: suprafata=${suprafata}, pret=${pret}`);
         
-        // Skip if no valid data (must have at least area)
-        if (suprafata === 0) return;
+        // Skip only if both are missing
+        if (suprafata === 0 && pret === 0) return;
         
         const property = {
           corp: `BLOC ${corp}`,
