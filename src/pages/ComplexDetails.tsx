@@ -11,6 +11,7 @@ import { ComplexEditDialog } from "@/components/ComplexEditDialog";
 import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
 import { initialProperties } from "@/data/initialProperties";
+import { eurocasa65gProperties } from "@/data/eurocasa65g-properties";
 import { complexes } from "@/data/complexes";
 
 const ComplexDetails = () => {
@@ -20,7 +21,21 @@ const ComplexDetails = () => {
     complexes.find((c) => c.id === complexId)
   );
 
-  const [properties, setProperties] = useState<Property[]>(initialProperties);
+  // Load properties based on complex ID
+  const getPropertiesForComplex = (id: string): Property[] => {
+    switch (id) {
+      case "complex-1":
+        return initialProperties;
+      case "complex-2":
+        return eurocasa65gProperties;
+      default:
+        return [];
+    }
+  };
+
+  const [properties, setProperties] = useState<Property[]>(
+    getPropertiesForComplex(complexId || "")
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFloor, setSelectedFloor] = useState<string>("toate");
   const [selectedType, setSelectedType] = useState<string>("toate");

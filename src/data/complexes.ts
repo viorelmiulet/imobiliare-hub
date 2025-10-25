@@ -11,11 +11,11 @@ export const complexes: Complex[] = [
   },
   {
     id: "complex-2",
-    name: "Complex Rezidențial Sud",
-    location: "Sector 4, București",
-    description: "Ansamblu rezidențial cu spații verzi și parcare subterană",
-    totalProperties: 0,
-    availableProperties: 0,
+    name: "Eurocasa 65G",
+    location: "Str. Drumul Gării Cățelu, București",
+    description: "Complex rezidențial modern cu 200+ apartamente, 2 corpuri (A și B), etaje P+6",
+    totalProperties: 144,
+    availableProperties: 141,
   },
   {
     id: "complex-3",
