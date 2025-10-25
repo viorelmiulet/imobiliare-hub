@@ -108,36 +108,11 @@ export const PropertyTable = ({
 
   const renderCommissionCell = (property: Property, columnName: string) => {
     const currentCommission = getValue(property, columnName);
+    const hasCommission = currentCommission && String(currentCommission).trim() !== '';
     
-    // If commission already exists and is not empty, just display it
-    if (currentCommission && String(currentCommission).trim() !== '') {
-      return (
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-success text-xs">{currentCommission}</span>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => {
-              if (onEdit) {
-                onEdit({
-                  ...property,
-                  [columnName]: ''
-                });
-              }
-            }}
-            className="h-7 w-7 p-0"
-            title="Șterge comision"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      );
-    }
-
-    // If commission is empty, show calculator
     return (
       <Select
-        value={currentCommission || undefined}
+        value={hasCommission ? 'current' : undefined}
         onValueChange={(value) => {
           if (value === 'remove') {
             if (onEdit) {
@@ -146,7 +121,7 @@ export const PropertyTable = ({
                 [columnName]: ''
               });
             }
-          } else {
+          } else if (value === 'credit' || value === 'cash') {
             const commission = calculateCommission(property, value as 'credit' | 'cash');
             if (onEdit) {
               onEdit({
@@ -157,8 +132,14 @@ export const PropertyTable = ({
           }
         }}
       >
-        <SelectTrigger className="w-[110px] h-7 text-xs">
-          <SelectValue placeholder="Calc..." />
+        <SelectTrigger className="w-[130px] h-7 text-xs">
+          <SelectValue placeholder="Calc...">
+            {hasCommission ? (
+              <span className="font-medium text-success">{currentCommission}</span>
+            ) : (
+              "Calc..."
+            )}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="credit">
@@ -177,7 +158,7 @@ export const PropertyTable = ({
               </span>
             </div>
           </SelectItem>
-          {currentCommission && (
+          {hasCommission && (
             <SelectItem value="remove">
               <div className="flex items-center gap-2 text-destructive">
                 <X className="h-3 w-3" />
