@@ -69,6 +69,8 @@ export const ExcelImportDialog = ({
       const jsonData = XLSX.utils.sheet_to_json<any>(firstSheet);
 
       console.log(`Parsed ${jsonData.length} rows from Excel`);
+      console.log('First row sample:', jsonData[0]);
+      console.log('Column names:', Object.keys(jsonData[0] || {}));
 
       // Transform the data to match Property interface
       const determineStatus = (nume: string = '', observatii: string = ''): 'disponibil' | 'rezervat' | 'vandut' => {
@@ -85,26 +87,32 @@ export const ExcelImportDialog = ({
       };
 
       const properties: Property[] = jsonData
-        .filter(row => row['NR AP']) // Filter out empty rows
+        .filter(row => {
+          // Check multiple possible column names for apartment number
+          const hasApartment = row['NR AP'] || row['NR. AP'] || row['Nr. Ap'] || row['NR.AP'];
+          console.log('Row has apartment:', hasApartment, 'Row:', row);
+          return hasApartment;
+        })
         .map((row, index) => ({
           id: `${complexId}-${index}-${Date.now()}`,
-          corp: row.CORP || '',
-          etaj: row.ETAJ || '',
-          nrAp: row['NR AP'] || '',
-          tipCom: row['TIP COM'] || '',
-          mpUtili: Number(row['MP UTILI']) || 0,
-          pretCuTva: Number(row['PRET CU TVA 21%']) || 0,
-          avans50: Number(row['AVANS 50%']) || 0,
-          avans80: Number(row['AVANS 80%']) || 0,
-          nume: row.NUME || '',
-          contact: row.CONTACT || '',
-          agent: row.AGENT || '',
-          finisaje: row.FINISAJE || '',
-          observatii: row.OBSERVATII || '',
-          status: determineStatus(row.NUME || '', row.OBSERVATII || ''),
+          corp: row.CORP || row.Corp || '',
+          etaj: row.ETAJ || row.Etaj || '',
+          nrAp: row['NR AP'] || row['NR. AP'] || row['Nr. Ap'] || row['NR.AP'] || '',
+          tipCom: row['TIP COM'] || row['Tip Com'] || '',
+          mpUtili: Number(row['MP UTILI'] || row['Mp Utili']) || 0,
+          pretCuTva: Number(row['PRET CU TVA 21%'] || row['Pret cu TVA 21%']) || 0,
+          avans50: Number(row['AVANS 50%'] || row['Avans 50%']) || 0,
+          avans80: Number(row['AVANS 80%'] || row['Avans 80%']) || 0,
+          nume: row.NUME || row.Nume || '',
+          contact: row.CONTACT || row.Contact || '',
+          agent: row.AGENT || row.Agent || '',
+          finisaje: row.FINISAJE || row.Finisaje || '',
+          observatii: row.OBSERVATII || row.Observatii || '',
+          status: determineStatus(row.NUME || row.Nume || '', row.OBSERVATII || row.Observatii || ''),
         }));
 
       console.log(`Successfully transformed ${properties.length} properties`);
+      console.log('Sample property:', properties[0]);
 
       onImport(properties);
       
