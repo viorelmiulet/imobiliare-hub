@@ -25,7 +25,7 @@ const ComplexDetails = () => {
   );
   const [columns, setColumns] = useState<string[]>([
     'Etaj', 'Nr. ap.', 'Tip Apartament', 'Suprafata', 'Pret Credit', 
-    'Pret Cash', 'Pret FF', 'Client', 'Agent', 'Comision', 'Observatii'
+    'Pret Cash', 'Client', 'Agent', 'Comision', 'Observatii'
   ]);
 
   // Load properties based on complex ID
