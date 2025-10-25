@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Trash2 } from "lucide-react";
 import {
   Select,
@@ -16,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Property } from "@/types/property";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PropertyTableProps {
   properties: Property[];
@@ -32,6 +34,8 @@ export const PropertyTable = ({
   onDelete,
   onStatusChange,
 }: PropertyTableProps) => {
+  const isMobile = useIsMobile();
+
   // Resolve values for both old (label-based) and new (key-based) datasets
   const getValue = (property: Property, columnName: string): any => {
     const map: Record<string, string[]> = {
@@ -165,6 +169,95 @@ export const PropertyTable = ({
     );
   };
 
+  // Mobile card view
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        {properties.length === 0 ? (
+          <Card>
+            <CardContent className="text-center text-muted-foreground py-8">
+              Nu există proprietăți de afișat
+            </CardContent>
+          </Card>
+        ) : (
+          properties.map((property) => (
+            <Card key={property.id} className="overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <CardTitle className="text-lg">
+                    Ap. {getValue(property, 'Nr. ap.')}
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(property)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onDelete(property.id)}
+                      className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {columns.filter(col => col !== 'id' && col !== 'Nr. ap.').map((column) => (
+                  <div key={`${property.id}-${column}`} className="flex justify-between items-center py-1 border-b last:border-0">
+                    <span className="text-sm text-muted-foreground font-medium">{column}:</span>
+                    <span className="text-sm font-semibold">
+                      {column.toLowerCase().includes('status') && onStatusChange ? (
+                        <Select
+                          value={getValue(property, column) || 'disponibil'}
+                          onValueChange={(value) => onStatusChange(property.id, value)}
+                        >
+                          <SelectTrigger className="w-[130px] h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="disponibil">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-success" />
+                                Disponibil
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="rezervat">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-warning" />
+                                Rezervat
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="vandut">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-info" />
+                                Vândut
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : column.toLowerCase().includes('comision') ? (
+                        renderCommissionCell(property, column)
+                      ) : (
+                        formatValue(getValue(property, column), column)
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+    );
+  }
+
+  // Desktop table view
   return (
     <div className="rounded-md border overflow-x-auto">
       <Table>

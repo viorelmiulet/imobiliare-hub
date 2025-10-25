@@ -6,7 +6,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Filter } from "lucide-react";
 import { Property } from "@/types/property";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PropertyFiltersProps {
   selectedFloor: string;
@@ -31,12 +35,13 @@ export const PropertyFilters = ({
   onCorpChange,
   properties,
 }: PropertyFiltersProps) => {
+  const isMobile = useIsMobile();
   const uniqueFloors = Array.from(new Set(properties.map((p) => p.etaj)));
   const uniqueTypes = Array.from(new Set(properties.map((p) => p.tipCom)));
   const uniqueCorps = Array.from(new Set(properties.map((p) => p.corp).filter(Boolean))) as string[];
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+  const filterContent = (
+    <div className="grid grid-cols-1 gap-4">
       {uniqueCorps.length > 0 && (
         <div className="space-y-2">
           <Label>Corp</Label>
@@ -104,6 +109,33 @@ export const PropertyFilters = ({
           </SelectContent>
         </Select>
       </div>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline" className="w-full">
+            <Filter className="h-4 w-4 mr-2" />
+            Filtre
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="h-[85vh]">
+          <SheetHeader>
+            <SheetTitle>Filtrează Proprietăți</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            {filterContent}
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {filterContent}
     </div>
   );
 };

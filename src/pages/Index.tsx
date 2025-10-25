@@ -10,18 +10,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="container mx-auto p-3 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4 py-8">
+        <div className="text-center space-y-4 py-4 sm:py-8">
           <div className="flex justify-center">
-            <div className="p-4 bg-gradient-to-br from-primary to-info rounded-2xl shadow-xl">
-              <Building2 className="h-12 w-12 text-primary-foreground" />
+            <div className="p-3 sm:p-4 bg-gradient-to-br from-primary to-info rounded-2xl shadow-xl">
+              <Building2 className="h-10 w-10 sm:h-12 sm:w-12 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent px-4">
             Dashboard Complexe Rezidențiale
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Selectează un complex pentru a gestiona proprietățile și vânzările
           </p>
         </div>

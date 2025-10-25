@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Plus, Search, Filter, ArrowLeft, Settings, FileUp } from "lucide-react";
+import { Building2, Plus, Search, ArrowLeft, Settings, FileUp } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropertyTable } from "@/components/PropertyTable";
 import { PropertyDialog } from "@/components/PropertyDialog";
@@ -14,6 +14,7 @@ import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
 import { useProperties } from "@/hooks/useProperties";
 import { useComplexes } from "@/hooks/useComplexes";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
@@ -194,60 +195,62 @@ const ComplexDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header with Back Button */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="icon"
               onClick={() => navigate("/")}
-              className="hover:bg-primary hover:text-primary-foreground transition-all"
+              className="hover:bg-primary hover:text-primary-foreground transition-all shrink-0"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="p-3 bg-gradient-to-br from-primary to-info rounded-xl shadow-lg">
+            <div className="p-3 bg-gradient-to-br from-primary to-info rounded-xl shadow-lg shrink-0">
               <Building2 className="h-8 w-8 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent truncate">
                 {currentComplex.name}
               </h1>
-              <p className="text-muted-foreground">{currentComplex.location}</p>
+              <p className="text-sm text-muted-foreground truncate">{currentComplex.location}</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <Button
               variant="outline"
               onClick={() => setIsComplexEditOpen(true)}
-              className="gap-2 shadow-md hover:shadow-lg transition-all"
+              className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
             >
               <Settings className="h-4 w-4" />
-              Editează Complex
+              <span className="hidden sm:inline">Editează Complex</span>
+              <span className="sm:hidden">Complex</span>
             </Button>
             <Button
               variant="outline"
               onClick={() => setIsImportDialogOpen(true)}
-              className="gap-2 shadow-md hover:shadow-lg transition-all"
+              className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
             >
               <FileUp className="h-4 w-4" />
-              Importă Excel
+              <span className="hidden sm:inline">Importă Excel</span>
+              <span className="sm:hidden">Import</span>
             </Button>
             <Button
               onClick={() => {
                 setEditingProperty(null);
                 setIsDialogOpen(true);
               }}
-              className="gap-2 shadow-md hover:shadow-lg transition-all"
+              className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
             >
               <Plus className="h-4 w-4" />
-              Adaugă Proprietate
+              Adaugă
             </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="border-l-4 border-l-primary shadow-md hover:shadow-lg transition-all">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -255,7 +258,7 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{properties.length}</div>
+              <div className="text-2xl sm:text-3xl font-bold">{properties.length}</div>
             </CardContent>
           </Card>
 
@@ -266,7 +269,7 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-success">
+              <div className="text-2xl sm:text-3xl font-bold text-success">
                 {availableCount}
               </div>
             </CardContent>
@@ -279,7 +282,7 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-warning">
+              <div className="text-2xl sm:text-3xl font-bold text-warning">
                 {reservedCount}
               </div>
             </CardContent>
@@ -292,7 +295,7 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-info">{soldCount}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-info">{soldCount}</div>
             </CardContent>
           </Card>
         </div>
@@ -300,8 +303,7 @@ const ComplexDetails = () => {
         {/* Filters and Search */}
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
+            <CardTitle>
               Filtre și Căutare
             </CardTitle>
           </CardHeader>
