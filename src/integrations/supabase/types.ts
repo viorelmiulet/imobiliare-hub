@@ -202,6 +202,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      has_client_access: {
+        Args: { _client_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_complex_access: {
         Args: { _complex_id: string; _user_id: string }
         Returns: boolean
