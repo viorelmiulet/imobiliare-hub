@@ -140,28 +140,36 @@ const ComplexDetails = () => {
   };
 
   const getPropertyCommission = (property: Property): number => {
-    // Use the same getValue logic as PropertyTable
-    const map: Record<string, string[]> = {
-      'Comision': ['Comision', 'comision'],
-    };
-    const synonyms = map['Comision'] || ['Comision'];
+    // Use exact same logic as PropertyTable's getValue
+    const synonyms = ['Comision', 'comision'];
     
-    let commission = '';
+    let commissionValue = '';
     for (const key of synonyms) {
       const v = (property as any)[key];
       if (v !== undefined && v !== null && String(v).trim() !== '') {
-        commission = String(v);
+        commissionValue = String(v);
         break;
       }
     }
     
-    if (!commission) return 0;
+    if (!commissionValue || commissionValue.trim() === '') return 0;
     
-    // Parse commission value - handle formats like "1.234,56 €" or "1234.56" or "1234,56"
-    const cleanStr = commission
-      .replace(/[€\s]/g, '') // Remove currency symbol and spaces
-      .replace(/\./g, '')    // Remove thousand separators (dots)
-      .replace(/,/g, '.');   // Replace decimal comma with dot
+    // Parse commission - handle formats like "1.234,56 €" or "1234.56"
+    // Remove currency symbols and spaces
+    let cleanStr = commissionValue.replace(/[€\s]/g, '');
+    
+    // Check if using comma as decimal separator (European format)
+    const hasComma = cleanStr.includes(',');
+    const hasDot = cleanStr.includes('.');
+    
+    if (hasComma && hasDot) {
+      // Format: 1.234,56 (European with thousand separator)
+      cleanStr = cleanStr.replace(/\./g, '').replace(',', '.');
+    } else if (hasComma) {
+      // Format: 1234,56 (European decimal)
+      cleanStr = cleanStr.replace(',', '.');
+    }
+    // else: Format is already correct (1234.56)
     
     const parsed = parseFloat(cleanStr);
     return isNaN(parsed) ? 0 : parsed;
