@@ -140,8 +140,22 @@ const ComplexDetails = () => {
   };
 
   const getPropertyCommission = (property: Property): number => {
-    const commission = (property as any).Comision || (property as any).comision || '';
+    // Use the same getValue logic as PropertyTable to ensure consistency
+    const getValue = (prop: Property, columnName: string): any => {
+      const map: Record<string, string[]> = {
+        'Comision': ['Comision', 'comision'],
+      };
+      const synonyms = map[columnName] || [columnName];
+      for (const key of synonyms) {
+        const v = (prop as any)[key];
+        if (v !== undefined && v !== null && String(v) !== '') return v;
+      }
+      return '';
+    };
+    
+    const commission = getValue(property, 'Comision');
     if (!commission) return 0;
+    
     // Extract numeric value from commission string (e.g., "1.234,56 €" -> 1234.56)
     const cleanStr = String(commission).replace(/[€\s]/g, '').replace(/\./g, '').replace(/,/g, '.');
     return parseFloat(cleanStr) || 0;
