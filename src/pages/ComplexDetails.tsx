@@ -370,7 +370,6 @@ const ComplexDetails = () => {
                   properties={filteredProperties.filter(p => p.corp === "CORP 1")}
                   columns={columns}
                   onEdit={openEditDialog}
-                  onDelete={handleDeleteProperty}
                   onStatusChange={handleStatusChange}
                   onClientChange={handleClientChange}
                   clients={clients}
@@ -381,7 +380,6 @@ const ComplexDetails = () => {
                   properties={filteredProperties.filter(p => p.corp === "CORP 2")}
                   columns={columns}
                   onEdit={openEditDialog}
-                  onDelete={handleDeleteProperty}
                   onStatusChange={handleStatusChange}
                   onClientChange={handleClientChange}
                   clients={clients}
@@ -393,7 +391,6 @@ const ComplexDetails = () => {
                 properties={filteredProperties}
                 columns={columns}
                 onEdit={openEditDialog}
-                onDelete={handleDeleteProperty}
                 onStatusChange={handleStatusChange}
                 onClientChange={handleClientChange}
                 clients={clients}

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,7 +24,6 @@ interface PropertyTableProps {
   properties: Property[];
   columns: string[];
   onEdit: (property: Property) => void;
-  onDelete: (id: string) => void;
   onStatusChange?: (id: string, status: string) => void;
   onClientChange?: (id: string, clientId: string | null) => void;
   clients?: Client[];
@@ -34,7 +33,6 @@ export const PropertyTable = ({
   properties,
   columns,
   onEdit,
-  onDelete,
   onStatusChange,
   onClientChange,
   clients = [],
@@ -130,7 +128,7 @@ export const PropertyTable = ({
             className="h-7 w-7 p-0 hover:bg-destructive hover:text-destructive-foreground"
             title="Șterge comision"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <X className="h-3.5 w-3.5" />
           </Button>
         </div>
       );
@@ -193,24 +191,14 @@ export const PropertyTable = ({
                   <CardTitle className="text-lg">
                     Ap. {getValue(property, 'Nr. ap.')}
                   </CardTitle>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(property)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onDelete(property.id)}
-                      className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEdit(property)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -366,24 +354,14 @@ export const PropertyTable = ({
                   </TableCell>
                 ))}
                 <TableCell className="text-right">
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(property)}
-                      className="hover:bg-primary hover:text-primary-foreground transition-all"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onDelete(property.id)}
-                      className="hover:bg-destructive hover:text-destructive-foreground transition-all"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEdit(property)}
+                    className="hover:bg-primary hover:text-primary-foreground transition-all"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
