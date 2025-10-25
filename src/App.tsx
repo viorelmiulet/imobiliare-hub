@@ -12,6 +12,9 @@ import ImportComplex1Data from "./pages/ImportComplex1Data";
 import ImportViilor33Data from "./pages/ImportViilor33Data";
 import ClientsOverview from "./pages/ClientsOverview";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { initializeDatabase } from "./utils/initializeDatabase";
 
 const queryClient = new QueryClient();
@@ -30,12 +33,14 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/complex/:complexId" element={<ComplexDetails />} />
-              <Route path="/clients" element={<ClientsOverview />} />
-              <Route path="/import-eurocasa" element={<ImportEurocasaData />} />
-              <Route path="/import-complex1" element={<ImportComplex1Data />} />
-              <Route path="/import-viilor33" element={<ImportViilor33Data />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/complex/:complexId" element={<ProtectedRoute><ComplexDetails /></ProtectedRoute>} />
+              <Route path="/clients" element={<ProtectedRoute><ClientsOverview /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="/import-eurocasa" element={<ProtectedRoute><ImportEurocasaData /></ProtectedRoute>} />
+              <Route path="/import-complex1" element={<ProtectedRoute><ImportComplex1Data /></ProtectedRoute>} />
+              <Route path="/import-viilor33" element={<ProtectedRoute><ImportViilor33Data /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

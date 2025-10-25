@@ -1,21 +1,48 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, Home, ArrowRight, Users } from "lucide-react";
+import { Building2, Home, ArrowRight, Users, LogOut, Shield } from "lucide-react";
 import { useComplexes } from "@/hooks/useComplexes";
+import { useAuth } from "@/hooks/useAuth";
 import { ClientDialog } from "@/components/ClientDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const navigate = useNavigate();
   const { complexes } = useComplexes();
+  const { profile, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-3 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex justify-end pt-2 px-4">
-          <ThemeToggle />
+        <div className="flex justify-between items-center pt-2 px-4">
+          <div className="text-sm text-muted-foreground">
+            {profile?.full_name || profile?.email}
+          </div>
+          <div className="flex items-center gap-2">
+            {profile?.role === 'admin' && (
+              <Button
+                variant="outline"
+                onClick={() => navigate('/admin')}
+                className="gap-2"
+                size="sm"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Button>
+            )}
+            <ThemeToggle />
+            <Button
+              variant="outline"
+              onClick={signOut}
+              className="gap-2"
+              size="sm"
+            >
+              <LogOut className="h-4 w-4" />
+              Deconectare
+            </Button>
+          </div>
         </div>
         <div className="text-center space-y-4 pb-4">
           <div className="flex justify-center">
