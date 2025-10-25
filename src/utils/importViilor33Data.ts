@@ -23,6 +23,16 @@ const parseArea = (value: string | number | undefined): number => {
   return isNaN(num) ? 0 : num;
 };
 
+const normalizeFloor = (floor: string): string => {
+  const upperFloor = floor.toUpperCase().trim();
+  if (upperFloor === 'D') return 'DEMISOL';
+  if (upperFloor === 'P') return 'PARTER';
+  if (upperFloor === 'E1') return 'ETAJ 1';
+  if (upperFloor === 'E2') return 'ETAJ 2';
+  if (upperFloor === 'E3') return 'ETAJ 3';
+  return upperFloor;
+};
+
 const determineStatus = (row: RawProperty): string => {
   const client = String(row.Client || '').trim().toLowerCase();
   const agent = String(row.Agent || '').trim().toLowerCase();
@@ -63,7 +73,7 @@ export const importViilor33Data = async () => {
         
         // Check if this is a floor marker
         if (nrAp && ['D', 'P', 'E1', 'E2', 'E3'].includes(nrAp.toUpperCase())) {
-          currentFloor = nrAp.toUpperCase();
+          currentFloor = normalizeFloor(nrAp);
           console.log(`Floor marker found: ${currentFloor}`);
           return;
         }
