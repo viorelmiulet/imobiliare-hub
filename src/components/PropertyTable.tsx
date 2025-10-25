@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, X } from "lucide-react";
+import { Pencil, X, MessageSquare } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Property } from "@/types/property";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Client } from "@/hooks/useClients";
@@ -255,13 +261,36 @@ export const PropertyTable = ({
                         </Select>
                        ) : column.toLowerCase().includes('comision') ? (
                         renderCommissionCell(property, column)
-                      ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
-                        <Input
-                          value={getValue(property, column) || ''}
-                          onChange={(e) => onObservatiiChange(property.id, e.target.value)}
-                          placeholder="Adaugă observații..."
-                          className="h-8 text-xs"
-                        />
+                       ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 gap-2 text-xs max-w-[150px]"
+                            >
+                              <MessageSquare className="h-3.5 w-3.5" />
+                              <span className="truncate">
+                                {getValue(property, column) ? 
+                                  (getValue(property, column).length > 15 
+                                    ? getValue(property, column).substring(0, 15) + '...' 
+                                    : getValue(property, column))
+                                  : 'Adaugă'}
+                              </span>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-sm">Observații</h4>
+                              <Textarea
+                                value={getValue(property, column) || ''}
+                                onChange={(e) => onObservatiiChange(property.id, e.target.value)}
+                                placeholder="Adaugă observații..."
+                                className="min-h-[120px] text-sm"
+                              />
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       ) : (
                         formatValue(getValue(property, column), column)
                       )}
@@ -362,12 +391,35 @@ export const PropertyTable = ({
                     ) : column.toLowerCase().includes('comision') ? (
                       renderCommissionCell(property, column)
                     ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
-                      <Input
-                        value={getValue(property, column) || ''}
-                        onChange={(e) => onObservatiiChange(property.id, e.target.value)}
-                        placeholder="Adaugă observații..."
-                        className="h-7 text-xs"
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 gap-1.5 text-xs max-w-[140px]"
+                          >
+                            <MessageSquare className="h-3 w-3" />
+                            <span className="truncate">
+                              {getValue(property, column) ? 
+                                (getValue(property, column).length > 12 
+                                  ? getValue(property, column).substring(0, 12) + '...' 
+                                  : getValue(property, column))
+                                : 'Adaugă'}
+                            </span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm">Observații</h4>
+                            <Textarea
+                              value={getValue(property, column) || ''}
+                              onChange={(e) => onObservatiiChange(property.id, e.target.value)}
+                              placeholder="Adaugă observații..."
+                              className="min-h-[120px] text-sm"
+                            />
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     ) : (
                       <span className="whitespace-nowrap">{formatValue(getValue(property, column), column)}</span>
                     )}
