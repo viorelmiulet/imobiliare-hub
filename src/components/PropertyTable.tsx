@@ -186,7 +186,7 @@ export const PropertyTable = ({
         ) : (
           properties.map((property) => {
             const status = getValue(property, 'Status')?.toLowerCase();
-            const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-warning' : '';
+            const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-info' : '';
             
             return (
               <Card key={property.id} className={`overflow-hidden ${statusColorClass}`}>
@@ -300,7 +300,7 @@ export const PropertyTable = ({
           ) : (
             properties.map((property) => {
               const status = getValue(property, 'Status')?.toLowerCase();
-              const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-warning' : '';
+              const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-info' : '';
               
               return (
                 <TableRow
