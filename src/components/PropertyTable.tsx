@@ -137,14 +137,23 @@ export const PropertyTable = ({
     // If commission is empty, show calculator
     return (
       <Select
+        value={currentCommission || undefined}
         onValueChange={(value) => {
-          const commission = calculateCommission(property, value as 'credit' | 'cash');
-          // Update property with calculated commission
-          if (onEdit) {
-            onEdit({
-              ...property,
-              [columnName]: commission
-            });
+          if (value === 'remove') {
+            if (onEdit) {
+              onEdit({
+                ...property,
+                [columnName]: ''
+              });
+            }
+          } else {
+            const commission = calculateCommission(property, value as 'credit' | 'cash');
+            if (onEdit) {
+              onEdit({
+                ...property,
+                [columnName]: commission
+              });
+            }
           }
         }}
       >
@@ -168,6 +177,14 @@ export const PropertyTable = ({
               </span>
             </div>
           </SelectItem>
+          {currentCommission && (
+            <SelectItem value="remove">
+              <div className="flex items-center gap-2 text-destructive">
+                <X className="h-3 w-3" />
+                <span className="font-medium text-xs">Șterge comision</span>
+              </div>
+            </SelectItem>
+          )}
         </SelectContent>
       </Select>
     );
