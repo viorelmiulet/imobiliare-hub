@@ -24,7 +24,7 @@ const ComplexDetails = () => {
   const [currentComplex, setCurrentComplex] = useState<Complex | undefined>();
   const [columns, setColumns] = useState<string[]>([
     'Etaj', 'Nr. ap.', 'Tip Apartament', 'Suprafata', 'Pret Credit', 
-    'Pret Cash', 'Client', 'Agent', 'Comision', 'Observatii'
+    'Pret Cash', 'Status', 'Client', 'Agent', 'Comision', 'Observatii'
   ]);
 
   useEffect(() => {
@@ -91,9 +91,22 @@ const ComplexDetails = () => {
     return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
   });
 
-  const availableCount = properties.filter((p) => p.status === "disponibil").length;
-  const reservedCount = properties.filter((p) => p.status === "rezervat").length;
-  const soldCount = properties.filter((p) => p.status === "vandut").length;
+  const getPropertyStatus = (property: Property): string => {
+    return (property as any).status || (property as any).Status || (property as any).STATUS || 'disponibil';
+  };
+
+  const availableCount = properties.filter((p) => {
+    const status = getPropertyStatus(p);
+    return status.toLowerCase() === "disponibil";
+  }).length;
+  const reservedCount = properties.filter((p) => {
+    const status = getPropertyStatus(p);
+    return status.toLowerCase() === "rezervat";
+  }).length;
+  const soldCount = properties.filter((p) => {
+    const status = getPropertyStatus(p);
+    return status.toLowerCase() === "vandut";
+  }).length;
 
   const handleAddProperty = async (property: Omit<Property, "id">) => {
     const newProperty = {
@@ -117,10 +130,14 @@ const ComplexDetails = () => {
   const handleStatusChange = async (id: string, status: string) => {
     const property = properties.find(p => p.id === id);
     if (property) {
-      await updateProperty({
+      const updatedProperty = {
         ...property,
         status: status as "disponibil" | "rezervat" | "vandut"
-      });
+      };
+      // Update all possible status field variations
+      (updatedProperty as any)['Status'] = status;
+      (updatedProperty as any)['STATUS'] = status;
+      await updateProperty(updatedProperty);
     }
   };
 
