@@ -49,7 +49,7 @@ const ImportViilor33Data = () => {
                 <ul className="text-sm list-disc list-inside space-y-1 text-muted-foreground">
                   <li>Șterge proprietățile existente pentru Viilor 33</li>
                   <li>Încarcă aproximativ 50 de proprietăți noi</li>
-                  <li>Distribuie proprietățile pe 2 corpuri (Corp 1 și Corp 2)</li>
+                  <li>Distribuie proprietățile pe 2 blocuri (Bloc 8 și Bloc 9)</li>
                   <li>Organizează pe etajele: DEMISOL, PARTER, ETAJ 1, ETAJ 2, ETAJ 3</li>
                   <li>Actualizeze statisticile complexului</li>
                 </ul>

@@ -60,13 +60,13 @@ export const importViilor33Data = async () => {
     let currentFloor = '';
     let corp = 1;
     
-    // Process each sheet (Corp 1 and Corp 2)
+    // Process each sheet (Bloc 8 and Bloc 9)
     workbook.SheetNames.forEach((sheetName, sheetIndex) => {
-      corp = sheetIndex + 1;
+      corp = sheetIndex + 8; // Bloc 8 and Bloc 9
       const sheet = workbook.Sheets[sheetName];
       const jsonData: RawProperty[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
       
-      console.log(`Processing Corp ${corp} with ${jsonData.length} rows`);
+      console.log(`Processing Bloc ${corp} with ${jsonData.length} rows`);
       
       jsonData.forEach((row) => {
         const nrAp = String(row['Nr. ap.'] || '').trim();
@@ -88,7 +88,7 @@ export const importViilor33Data = async () => {
         if (suprafata === 0 && pret === 0) return;
         
         const property = {
-          corp: `CORP ${corp}`,
+          corp: `BLOC ${corp}`,
           etaj: currentFloor,
           nrAp: nrAp,
           suprafata: suprafata,
