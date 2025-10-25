@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Plus, Search, Filter, ArrowLeft, Settings } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropertyTable } from "@/components/PropertyTable";
 import { PropertyDialog } from "@/components/PropertyDialog";
 import { PropertyFilters } from "@/components/PropertyFilters";
@@ -245,42 +246,42 @@ const ComplexDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Properties Tables - Separated by Corp */}
-        <div className="space-y-6">
-          {/* Corp 1 Table */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Corp 1 ({filteredProperties.filter(p => p.corp === "CORP 1").length} proprietăți)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PropertyTable
-                properties={filteredProperties.filter(p => p.corp === "CORP 1")}
-                onEdit={openEditDialog}
-                onDelete={handleDeleteProperty}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Corp 2 Table */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Corp 2 ({filteredProperties.filter(p => p.corp === "CORP 2").length} proprietăți)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PropertyTable
-                properties={filteredProperties.filter(p => p.corp === "CORP 2")}
-                onEdit={openEditDialog}
-                onDelete={handleDeleteProperty}
-              />
-            </CardContent>
-          </Card>
-        </div>
+        {/* Properties Table with Corp Tabs */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle>
+              Proprietăți
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="corp1" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="corp1" className="gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Corp 1 ({filteredProperties.filter(p => p.corp === "CORP 1").length})
+                </TabsTrigger>
+                <TabsTrigger value="corp2" className="gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Corp 2 ({filteredProperties.filter(p => p.corp === "CORP 2").length})
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="corp1">
+                <PropertyTable
+                  properties={filteredProperties.filter(p => p.corp === "CORP 1")}
+                  onEdit={openEditDialog}
+                  onDelete={handleDeleteProperty}
+                />
+              </TabsContent>
+              <TabsContent value="corp2">
+                <PropertyTable
+                  properties={filteredProperties.filter(p => p.corp === "CORP 2")}
+                  onEdit={openEditDialog}
+                  onDelete={handleDeleteProperty}
+                />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
         {/* Add/Edit Property Dialog */}
         <PropertyDialog
