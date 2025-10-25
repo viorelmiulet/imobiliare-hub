@@ -15,6 +15,7 @@ import { Complex } from "@/types/complex";
 import { useProperties } from "@/hooks/useProperties";
 import { useComplexes } from "@/hooks/useComplexes";
 import { useClients } from "@/hooks/useClients";
+import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { importComplex1Data } from "@/utils/importComplex1Data";
@@ -27,6 +28,7 @@ const ComplexDetails = () => {
   const { complexes, updateComplex } = useComplexes();
   const { properties, addProperty, updateProperty, deleteProperty } = useProperties(complexId || "");
   const { clients } = useClients();
+  const { profile } = useAuth();
   const isMobile = useIsMobile();
   
   const [currentComplex, setCurrentComplex] = useState<Complex | undefined>();
@@ -536,6 +538,7 @@ const ComplexDetails = () => {
                           onCommissionChange={handleCommissionChange}
                           onObservatiiChange={handleObservatiiChange}
                           clients={clients}
+                          userRole={profile?.role}
                         />
                       </TabsContent>
                     ))}
@@ -552,6 +555,7 @@ const ComplexDetails = () => {
                 onCommissionChange={handleCommissionChange}
                 onObservatiiChange={handleObservatiiChange}
                 clients={clients}
+                userRole={profile?.role}
               />
             )}
           </CardContent>
@@ -570,6 +574,7 @@ const ComplexDetails = () => {
               : (handleAddProperty as any)
           }
           property={editingProperty}
+          userRole={profile?.role}
         />
 
         {/* Edit Complex Dialog */}

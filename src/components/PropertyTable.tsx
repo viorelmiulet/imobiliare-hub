@@ -36,6 +36,7 @@ interface PropertyTableProps {
   onCommissionChange?: (id: string, commission: string) => void;
   onObservatiiChange?: (id: string, observatii: string) => void;
   clients?: Client[];
+  userRole?: string;
 }
 
 export const PropertyTable = ({
@@ -47,8 +48,10 @@ export const PropertyTable = ({
   onCommissionChange,
   onObservatiiChange,
   clients = [],
+  userRole,
 }: PropertyTableProps) => {
   const isMobile = useIsMobile();
+  const isUserRole = userRole === 'user';
 
   // Resolve values for both old (label-based) and new (key-based) datasets
   const getValue = (property: Property, columnName: string): any => {
@@ -136,6 +139,7 @@ export const PropertyTable = ({
             }
           }
         }}
+        disabled={isUserRole}
       >
         <SelectTrigger className="w-[130px] h-7 text-xs">
           <SelectValue placeholder="Calc...">
@@ -217,6 +221,7 @@ export const PropertyTable = ({
                         <Select
                           value={getValue(property, column) || 'disponibil'}
                           onValueChange={(value) => onStatusChange(property.id, value)}
+                          disabled={isUserRole}
                         >
                           <SelectTrigger className="w-[130px] h-8">
                             <SelectValue />
@@ -246,6 +251,7 @@ export const PropertyTable = ({
                         <Select
                           value={property.client_id || 'none'}
                           onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
+                          disabled={isUserRole}
                         >
                           <SelectTrigger className="w-[150px] h-8">
                             <SelectValue placeholder="Selectează client" />
@@ -346,6 +352,7 @@ export const PropertyTable = ({
                       <Select
                         value={getValue(property, column) || 'disponibil'}
                         onValueChange={(value) => onStatusChange(property.id, value)}
+                        disabled={isUserRole}
                       >
                         <SelectTrigger className="w-[110px] h-7 text-xs">
                           <SelectValue />
@@ -375,6 +382,7 @@ export const PropertyTable = ({
                       <Select
                         value={property.client_id || 'none'}
                         onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
+                        disabled={isUserRole}
                       >
                         <SelectTrigger className="w-[120px] h-7 text-xs">
                           <SelectValue placeholder="Select" />

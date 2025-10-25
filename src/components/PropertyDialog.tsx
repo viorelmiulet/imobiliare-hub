@@ -24,6 +24,7 @@ interface PropertyDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (property: Property | Omit<Property, "id">) => void;
   property?: Property | null;
+  userRole?: string;
 }
 
 export const PropertyDialog = ({
@@ -31,8 +32,10 @@ export const PropertyDialog = ({
   onOpenChange,
   onSubmit,
   property,
+  userRole,
 }: PropertyDialogProps) => {
   const { clients } = useClients();
+  const isUserRole = userRole === 'user';
   const [formData, setFormData] = useState<{
     etaj: string;
     nrAp: string;
@@ -252,6 +255,7 @@ export const PropertyDialog = ({
                 onValueChange={(value: any) =>
                   setFormData({ ...formData, status: value })
                 }
+                disabled={isUserRole}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selectează statusul" />
@@ -271,6 +275,7 @@ export const PropertyDialog = ({
                 onValueChange={(value) =>
                   setFormData({ ...formData, client_id: value === "none" ? undefined : value })
                 }
+                disabled={isUserRole}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selectează clientul" />
