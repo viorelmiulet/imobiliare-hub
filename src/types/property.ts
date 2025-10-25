@@ -4,7 +4,6 @@ export interface Property {
   nrAp: string;
   tipCom: string;
   mpUtili: number;
-  pretFaraTva: number;
   pretCuTva: number;
   avans50: number;
   avans80: number;

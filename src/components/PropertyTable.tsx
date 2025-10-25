@@ -64,10 +64,13 @@ export const PropertyTable = ({
             <TableHead className="font-semibold">Tip</TableHead>
             <TableHead className="font-semibold text-right">MP</TableHead>
             <TableHead className="font-semibold text-right">
-              Preț fără TVA
+              Preț cu TVA 21%
             </TableHead>
             <TableHead className="font-semibold text-right">
-              Preț cu TVA
+              Avans 50%
+            </TableHead>
+            <TableHead className="font-semibold text-right">
+              Avans 80%
             </TableHead>
             <TableHead className="font-semibold">Status</TableHead>
             <TableHead className="font-semibold">Cumpărător</TableHead>
@@ -79,7 +82,7 @@ export const PropertyTable = ({
           {properties.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={10}
+                colSpan={11}
                 className="text-center text-muted-foreground py-8"
               >
                 Nu există proprietăți de afișat
@@ -98,10 +101,13 @@ export const PropertyTable = ({
                   {property.mpUtili.toFixed(2)}
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  {formatPrice(property.pretFaraTva)}
+                  {formatPrice(property.pretCuTva)}
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  {formatPrice(property.pretCuTva)}
+                  {formatPrice(property.avans50)}
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {formatPrice(property.avans80)}
                 </TableCell>
                 <TableCell>{getStatusBadge(property.status)}</TableCell>
                 <TableCell>

@@ -36,7 +36,6 @@ export const PropertyDialog = ({
     nrAp: string;
     tipCom: string;
     mpUtili: number;
-    pretFaraTva: number;
     pretCuTva: number;
     avans50: number;
     avans80: number;
@@ -51,7 +50,6 @@ export const PropertyDialog = ({
     nrAp: "",
     tipCom: "",
     mpUtili: 0,
-    pretFaraTva: 0,
     pretCuTva: 0,
     avans50: 0,
     avans80: 0,
@@ -70,7 +68,6 @@ export const PropertyDialog = ({
         nrAp: property.nrAp,
         tipCom: property.tipCom,
         mpUtili: property.mpUtili,
-        pretFaraTva: property.pretFaraTva,
         pretCuTva: property.pretCuTva,
         avans50: property.avans50,
         avans80: property.avans80,
@@ -87,7 +84,6 @@ export const PropertyDialog = ({
         nrAp: "",
         tipCom: "",
         mpUtili: 0,
-        pretFaraTva: 0,
         pretCuTva: 0,
         avans50: 0,
         avans80: 0,
@@ -196,23 +192,7 @@ export const PropertyDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pretFaraTva">Preț fără TVA (EUR)</Label>
-              <Input
-                id="pretFaraTva"
-                type="number"
-                value={formData.pretFaraTva || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    pretFaraTva: parseFloat(e.target.value) || 0,
-                  })
-                }
-                placeholder="40500"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="pretCuTva">Preț cu TVA (EUR)</Label>
+              <Label htmlFor="pretCuTva">Preț cu TVA 21% (EUR)</Label>
               <Input
                 id="pretCuTva"
                 type="number"
