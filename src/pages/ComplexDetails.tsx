@@ -14,6 +14,7 @@ import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
 import { initialProperties } from "@/data/initialProperties";
 import { eurocasa65gProperties } from "@/data/eurocasa65g-properties";
+import { renewChiajnaProperties } from "@/data/renew-chiajna-properties";
 import { complexes } from "@/data/complexes";
 
 const ComplexDetails = () => {
@@ -23,8 +24,8 @@ const ComplexDetails = () => {
     complexes.find((c) => c.id === complexId)
   );
   const [columns, setColumns] = useState<string[]>([
-    'ETAJ', 'NR AP', 'TIP COM', 'MP UTILI', 'PRET CU TVA 21%', 
-    'AVANS 50%', 'AVANS 80%', 'NUME', 'CONTACT', 'AGENT', 'OBSERVATII'
+    'Etaj', 'Nr. ap.', 'Tip Apartament', 'Suprafata', 'Pret Credit', 
+    'Pret Cash', 'Pret FF', 'Client', 'Agent', 'Comision', 'Observatii'
   ]);
 
   // Load properties based on complex ID
@@ -34,6 +35,8 @@ const ComplexDetails = () => {
         return initialProperties;
       case "complex-2":
         return eurocasa65gProperties;
+      case "complex-3":
+        return renewChiajnaProperties;
       default:
         return [];
     }

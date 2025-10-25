@@ -19,10 +19,10 @@ export const complexes: Complex[] = [
   },
   {
     id: "complex-3",
-    name: "Complex Rezidențial Vest",
-    location: "Sector 6, București",
-    description: "Proiect în dezvoltare cu locuințe de calitate superioară",
-    totalProperties: 0,
-    availableProperties: 0,
+    name: "Renew Chiajna",
+    location: "Chiajna, Ilfov",
+    description: "Complex rezidențial cu 48 apartamente: garsoniere, studio-uri și apartamente decomand ate. TVA 21% inclus în prețuri.",
+    totalProperties: 48,
+    availableProperties: 35,
   },
 ];
