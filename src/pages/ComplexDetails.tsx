@@ -196,6 +196,18 @@ const ComplexDetails = () => {
     }
   };
 
+  const handleCommissionChange = async (id: string, commission: string) => {
+    const property = properties.find(p => p.id === id);
+    if (property) {
+      const updatedProperty = {
+        ...property,
+        Comision: commission,
+        comision: commission
+      };
+      await updateProperty(updatedProperty);
+    }
+  };
+
   const openEditDialog = (property: Property) => {
     setEditingProperty(property);
     setIsDialogOpen(true);
@@ -374,6 +386,7 @@ const ComplexDetails = () => {
                   onEdit={openEditDialog}
                   onStatusChange={handleStatusChange}
                   onClientChange={handleClientChange}
+                  onCommissionChange={handleCommissionChange}
                   clients={clients}
                 />
               </TabsContent>
@@ -384,6 +397,7 @@ const ComplexDetails = () => {
                   onEdit={openEditDialog}
                   onStatusChange={handleStatusChange}
                   onClientChange={handleClientChange}
+                  onCommissionChange={handleCommissionChange}
                   clients={clients}
                 />
               </TabsContent>
@@ -395,6 +409,7 @@ const ComplexDetails = () => {
                 onEdit={openEditDialog}
                 onStatusChange={handleStatusChange}
                 onClientChange={handleClientChange}
+                onCommissionChange={handleCommissionChange}
                 clients={clients}
               />
             )}

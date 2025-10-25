@@ -26,6 +26,7 @@ interface PropertyTableProps {
   onEdit: (property: Property) => void;
   onStatusChange?: (id: string, status: string) => void;
   onClientChange?: (id: string, clientId: string | null) => void;
+  onCommissionChange?: (id: string, commission: string) => void;
   clients?: Client[];
 }
 
@@ -35,6 +36,7 @@ export const PropertyTable = ({
   onEdit,
   onStatusChange,
   onClientChange,
+  onCommissionChange,
   clients = [],
 }: PropertyTableProps) => {
   const isMobile = useIsMobile();
@@ -115,19 +117,13 @@ export const PropertyTable = ({
         value={hasCommission ? 'current' : ''}
         onValueChange={(value) => {
           if (value === 'remove') {
-            if (onEdit) {
-              onEdit({
-                ...property,
-                [columnName]: ''
-              });
+            if (onCommissionChange) {
+              onCommissionChange(property.id, '');
             }
           } else if (value === 'credit' || value === 'cash') {
             const commission = calculateCommission(property, value as 'credit' | 'cash');
-            if (onEdit) {
-              onEdit({
-                ...property,
-                [columnName]: commission
-              });
+            if (onCommissionChange) {
+              onCommissionChange(property.id, commission);
             }
           }
         }}
