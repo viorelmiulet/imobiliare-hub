@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Shield, Users, Plus, Edit, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
-
+import { z } from 'zod';
 interface UserWithRole {
   id: string;
   email: string;
@@ -43,6 +43,13 @@ const Admin = () => {
   const [newUserFullName, setNewUserFullName] = useState('');
   const [newUserRole, setNewUserRole] = useState<string>('user');
   const [creating, setCreating] = useState(false);
+
+  const newUserSchema = z.object({
+    email: z.string().trim().email({ message: 'Email invalid' }).max(255),
+    password: z.string().min(6, { message: 'Parola trebuie să aibă minim 6 caractere' }).max(128),
+    fullName: z.string().trim().max(120).optional(),
+    role: z.enum(['user', 'manager', 'admin'])
+  });
 
   useEffect(() => {
     if (!authLoading && profile?.role !== 'admin') {
@@ -191,26 +198,19 @@ const Admin = () => {
 
     setCreating(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({
-          email: newUserEmail,
-          password: newUserPassword,
-          fullName: newUserFullName,
-          role: newUserRole,
-        }),
+      const payload = newUserSchema.parse({
+        email: newUserEmail,
+        password: newUserPassword,
+        fullName: newUserFullName || undefined,
+        role: newUserRole as 'user' | 'manager' | 'admin',
       });
 
-      const result = await response.json();
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: payload,
+      });
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Eroare la crearea utilizatorului');
+      if (error) {
+        throw new Error((error as any).message || 'Eroare la crearea utilizatorului');
       }
 
       toast.success('Utilizator creat cu succes');
