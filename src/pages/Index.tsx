@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Building2, MapPin, Home, ArrowRight } from "lucide-react";
 import { useComplexes } from "@/hooks/useComplexes";
+import { ClientDialog } from "@/components/ClientDialog";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ const Index = () => {
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Selectează un complex pentru a gestiona proprietățile și vânzările
           </p>
+          <div className="flex justify-center pt-2">
+            <ClientDialog />
+          </div>
         </div>
 
         {/* Stats Overview */}
