@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Building2, MapPin, Home, ArrowRight } from "lucide-react";
 import { useComplexes } from "@/hooks/useComplexes";
 import { ClientDialog } from "@/components/ClientDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -13,7 +14,10 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-3 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4 py-4 sm:py-8">
+        <div className="flex justify-end pt-2 px-4">
+          <ThemeToggle />
+        </div>
+        <div className="text-center space-y-4 pb-4">
           <div className="flex justify-center">
             <div className="p-3 sm:p-4 bg-gradient-to-br from-primary to-info rounded-2xl shadow-xl">
               <Building2 className="h-10 w-10 sm:h-12 sm:w-12 text-primary-foreground" />

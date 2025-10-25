@@ -16,6 +16,7 @@ import { useProperties } from "@/hooks/useProperties";
 import { useComplexes } from "@/hooks/useComplexes";
 import { useClients } from "@/hooks/useClients";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
@@ -231,7 +232,8 @@ const ComplexDetails = () => {
               <p className="text-sm text-muted-foreground truncate">{currentComplex.location}</p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch sm:items-center">
+            <ThemeToggle />
             <Button
               variant="outline"
               onClick={() => setIsComplexEditOpen(true)}
