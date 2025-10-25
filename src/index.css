@@ -47,6 +47,13 @@ All colors MUST be HSL.
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
     
+    --complex-1: 217 91% 60%;
+    --complex-2: 280 87% 65%;
+    --complex-3: 142 76% 45%;
+    --complex-4: 24 95% 53%;
+    --complex-5: 238 84% 62%;
+    --complex-6: 45 93% 58%;
+    
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(199 89% 58%));
     --gradient-subtle: linear-gradient(180deg, hsl(210 30% 98%), hsl(214 20% 96%));
     
@@ -111,6 +118,13 @@ All colors MUST be HSL.
     
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
+    
+    --complex-1: 217 91% 60%;
+    --complex-2: 280 87% 65%;
+    --complex-3: 142 76% 45%;
+    --complex-4: 24 95% 53%;
+    --complex-5: 238 84% 62%;
+    --complex-6: 45 93% 58%;
     
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(199 89% 58%));
     --gradient-subtle: linear-gradient(180deg, hsl(215 28% 12%), hsl(215 25% 16%));

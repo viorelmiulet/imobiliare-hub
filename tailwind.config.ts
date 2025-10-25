@@ -59,6 +59,14 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        complex: {
+          1: "hsl(var(--complex-1))",
+          2: "hsl(var(--complex-2))",
+          3: "hsl(var(--complex-3))",
+          4: "hsl(var(--complex-4))",
+          5: "hsl(var(--complex-5))",
+          6: "hsl(var(--complex-6))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
