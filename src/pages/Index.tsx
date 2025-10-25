@@ -10,6 +10,15 @@ const Index = () => {
   const navigate = useNavigate();
   const { complexes } = useComplexes();
 
+  const complexColors = [
+    { from: "from-blue-500", to: "to-cyan-500", iconBg: "from-blue-500 to-cyan-500", border: "border-blue-500" },
+    { from: "from-purple-500", to: "to-pink-500", iconBg: "from-purple-500 to-pink-500", border: "border-purple-500" },
+    { from: "from-green-500", to: "to-emerald-500", iconBg: "from-green-500 to-emerald-500", border: "border-green-500" },
+    { from: "from-orange-500", to: "to-red-500", iconBg: "from-orange-500 to-red-500", border: "border-orange-500" },
+    { from: "from-indigo-500", to: "to-blue-500", iconBg: "from-indigo-500 to-blue-500", border: "border-indigo-500" },
+    { from: "from-yellow-500", to: "to-orange-500", iconBg: "from-yellow-500 to-orange-500", border: "border-yellow-500" },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-3 sm:p-6 space-y-6 sm:space-y-8">
@@ -79,17 +88,19 @@ const Index = () => {
 
         {/* Complexes Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-          {complexes.map((complex) => (
-            <Card
-              key={complex.id}
-              className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary"
-              onClick={() => navigate(`/complex/${complex.id}`)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="p-3 bg-gradient-to-br from-primary/10 to-info/10 rounded-lg group-hover:from-primary group-hover:to-info transition-all">
-                    <Building2 className="h-6 w-6 text-primary group-hover:text-primary-foreground transition-all" />
-                  </div>
+          {complexes.map((complex, index) => {
+            const color = complexColors[index % complexColors.length];
+            return (
+              <Card
+                key={complex.id}
+                className={`group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:${color.border}`}
+                onClick={() => navigate(`/complex/${complex.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className={`p-3 bg-gradient-to-br ${color.from}/10 ${color.to}/10 rounded-lg group-hover:${color.iconBg} transition-all`}>
+                      <Building2 className="h-6 w-6 group-hover:text-white transition-all" style={{ color: `hsl(var(--${color.from.split('-')[1]}-500))` }} />
+                    </div>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -128,7 +139,8 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
