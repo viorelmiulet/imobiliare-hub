@@ -4,10 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 interface RawProperty {
   'Nr. ap.'?: string | number;
   'Suprafata Utila'?: string | number;
+  'Suprafață Utilă'?: string | number;
   'Pret'?: string | number;
+  'Preț'?: string | number;
+  'PRET'?: string | number;
   'Client'?: string;
   'Agent'?: string;
   'Observatii'?: string;
+  'Observații'?: string;
+  [key: string]: any;
 }
 
 const parsePrice = (value: string | number | undefined): number => {
@@ -81,11 +86,16 @@ export const importViilor33Data = async () => {
         // Skip rows without apartment number
         if (!nrAp || nrAp === '') return;
         
-        const suprafata = parseArea(row['Suprafata Utila']);
-        const pret = parsePrice(row['Pret']);
+        // Try multiple column name variations for area
+        const suprafata = parseArea(row['Suprafata Utila'] || row['Suprafață Utilă']);
         
-        // Skip if no valid data
-        if (suprafata === 0 && pret === 0) return;
+        // Try multiple column name variations for price
+        const pret = parsePrice(row['Pret'] || row['Preț'] || row['PRET']);
+        
+        console.log(`Processing AP ${nrAp}: suprafata=${suprafata}, pret=${pret}`);
+        
+        // Skip if no valid data (must have at least area)
+        if (suprafata === 0) return;
         
         const property = {
           corp: `BLOC ${corp}`,
@@ -95,7 +105,7 @@ export const importViilor33Data = async () => {
           pret: pret,
           client: String(row.Client || '').trim(),
           agent: String(row.Agent || '').trim(),
-          observatii: String(row.Observatii || '').trim(),
+          observatii: String(row.Observatii || row['Observații'] || '').trim(),
           status: determineStatus(row)
         };
         
