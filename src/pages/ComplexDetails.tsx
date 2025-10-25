@@ -140,25 +140,31 @@ const ComplexDetails = () => {
   };
 
   const getPropertyCommission = (property: Property): number => {
-    // Use the same getValue logic as PropertyTable to ensure consistency
-    const getValue = (prop: Property, columnName: string): any => {
-      const map: Record<string, string[]> = {
-        'Comision': ['Comision', 'comision'],
-      };
-      const synonyms = map[columnName] || [columnName];
-      for (const key of synonyms) {
-        const v = (prop as any)[key];
-        if (v !== undefined && v !== null && String(v) !== '') return v;
-      }
-      return '';
+    // Use the same getValue logic as PropertyTable
+    const map: Record<string, string[]> = {
+      'Comision': ['Comision', 'comision'],
     };
+    const synonyms = map['Comision'] || ['Comision'];
     
-    const commission = getValue(property, 'Comision');
+    let commission = '';
+    for (const key of synonyms) {
+      const v = (property as any)[key];
+      if (v !== undefined && v !== null && String(v).trim() !== '') {
+        commission = String(v);
+        break;
+      }
+    }
+    
     if (!commission) return 0;
     
-    // Extract numeric value from commission string (e.g., "1.234,56 €" -> 1234.56)
-    const cleanStr = String(commission).replace(/[€\s]/g, '').replace(/\./g, '').replace(/,/g, '.');
-    return parseFloat(cleanStr) || 0;
+    // Parse commission value - handle formats like "1.234,56 €" or "1234.56" or "1234,56"
+    const cleanStr = commission
+      .replace(/[€\s]/g, '') // Remove currency symbol and spaces
+      .replace(/\./g, '')    // Remove thousand separators (dots)
+      .replace(/,/g, '.');   // Replace decimal comma with dot
+    
+    const parsed = parseFloat(cleanStr);
+    return isNaN(parsed) ? 0 : parsed;
   };
 
   const availableCount = properties.filter((p) => {
