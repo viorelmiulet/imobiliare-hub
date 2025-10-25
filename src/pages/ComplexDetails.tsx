@@ -139,6 +139,14 @@ const ComplexDetails = () => {
     return (property as any).status || (property as any).Status || (property as any).STATUS || 'disponibil';
   };
 
+  const getPropertyCommission = (property: Property): number => {
+    const commission = (property as any).Comision || (property as any).comision || '';
+    if (!commission) return 0;
+    // Extract numeric value from commission string (e.g., "1.234,56 €" -> 1234.56)
+    const cleanStr = String(commission).replace(/[€\s]/g, '').replace(/\./g, '').replace(/,/g, '.');
+    return parseFloat(cleanStr) || 0;
+  };
+
   const availableCount = properties.filter((p) => {
     const status = getPropertyStatus(p);
     return status.toLowerCase() === "disponibil";
@@ -151,6 +159,7 @@ const ComplexDetails = () => {
     const status = getPropertyStatus(p);
     return status.toLowerCase() === "vandut";
   }).length;
+  const totalCommissions = properties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
 
   const handleAddProperty = async (property: Omit<Property, "id">) => {
     const newProperty = {
@@ -290,7 +299,7 @@ const ComplexDetails = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <Card className="border-l-4 border-l-primary shadow-md hover:shadow-lg transition-all">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -336,6 +345,23 @@ const ComplexDetails = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl sm:text-3xl font-bold text-info">{soldCount}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-accent shadow-md hover:shadow-lg transition-all">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Comisioane
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl sm:text-2xl font-bold text-accent">
+                {new Intl.NumberFormat('ro-RO', {
+                  style: 'currency',
+                  currency: 'EUR',
+                  minimumFractionDigits: 2,
+                }).format(totalCommissions)}
+              </div>
             </CardContent>
           </Card>
         </div>
