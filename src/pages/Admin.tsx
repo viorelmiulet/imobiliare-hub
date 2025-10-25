@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Shield, Users } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Plus, Edit, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -233,80 +233,150 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="hover:bg-primary/10">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-2">
-              <Shield className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold">Administrare Utilizatori</h1>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-primary to-info rounded-lg">
+                <Shield className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Panou Administrare</h1>
+                <p className="text-sm text-muted-foreground">Gestionează utilizatori și permisiuni</p>
+              </div>
             </div>
           </div>
           <ThemeToggle />
         </div>
 
-        <Card>
-          <CardHeader>
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border-l-4 border-l-primary">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Total Utilizatori
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{users.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-success">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Administratori
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-success">
+                {users.filter(u => u.role === 'admin').length}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-info">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Complexe
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-info">{complexes.length}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Users Table */}
+        <Card className="shadow-lg">
+          <CardHeader className="bg-muted/50">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Users className="h-5 w-5 text-primary" />
                   Utilizatori
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="mt-1">
                   Gestionează rolurile și accesul utilizatorilor la complexe
                 </CardDescription>
               </div>
-              <Button onClick={() => setCreateDialogOpen(true)}>
-                Creează utilizator
+              <Button 
+                onClick={() => setCreateDialogOpen(true)}
+                className="gap-2 shadow-md hover:shadow-lg transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                Utilizator Nou
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nume</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead>Acțiuni</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.full_name || 'N/A'}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {getRoleLabel(user.role)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(user)}
-                      >
-                        Editează
-                      </Button>
-                    </TableCell>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="font-semibold">Nume</TableHead>
+                    <TableHead className="font-semibold">Email</TableHead>
+                    <TableHead className="font-semibold">Rol</TableHead>
+                    <TableHead className="font-semibold text-right">Acțiuni</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {users.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                        Niciun utilizator găsit
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    users.map((user) => (
+                      <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
+                        <TableCell className="font-medium">
+                          {user.full_name || <span className="text-muted-foreground italic">Fără nume</span>}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={getRoleBadgeVariant(user.role)} className="font-medium">
+                            {getRoleLabel(user.role)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditDialog(user)}
+                            className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                          >
+                            <Edit className="h-3 w-3" />
+                            Editează
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Create User Dialog */}
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Creează utilizator nou</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5 text-primary" />
+                Creează utilizator nou
+              </DialogTitle>
               <DialogDescription>
-                Adaugă un utilizator nou în sistem
+                Adaugă un utilizator nou în sistem cu credențiale și rol
               </DialogDescription>
             </DialogHeader>
 
@@ -360,75 +430,140 @@ const Admin = () => {
               </div>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
                 Anulează
               </Button>
-              <Button onClick={handleCreateUser} disabled={creating}>
-                {creating ? 'Se creează...' : 'Creează'}
+              <Button onClick={handleCreateUser} disabled={creating} className="gap-2">
+                {creating ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Se creează...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    Creează Utilizator
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
+        {/* Edit User Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Editează utilizator</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Edit className="h-5 w-5 text-primary" />
+                Editează utilizator
+              </DialogTitle>
               <DialogDescription>
-                Modifică rolul și accesul la complexe pentru {selectedUser?.email}
+                Modifică rolul și accesul la complexe pentru{' '}
+                <span className="font-medium text-foreground">{selectedUser?.email}</span>
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Rol</Label>
+            <div className="space-y-6 py-4">
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">Rol utilizator</Label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="user">User (vizualizare)</SelectItem>
-                    <SelectItem value="manager">Manager (editare)</SelectItem>
-                    <SelectItem value="admin">Admin (acces complet)</SelectItem>
+                    <SelectItem value="user">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium">User</div>
+                          <div className="text-xs text-muted-foreground">Doar vizualizare</div>
+                        </div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="manager">
+                      <div className="flex items-center gap-2">
+                        <Edit className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium">Manager</div>
+                          <div className="text-xs text-muted-foreground">Vizualizare și editare</div>
+                        </div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="admin">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium">Admin</div>
+                          <div className="text-xs text-muted-foreground">Acces complet</div>
+                        </div>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {selectedRole !== 'admin' && (
-                <div className="space-y-2">
-                  <Label>Acces la complexe</Label>
-                  <div className="border rounded-lg p-4 space-y-2 max-h-60 overflow-y-auto">
-                    {complexes.map((complex) => (
-                      <div key={complex.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={complex.id}
-                          checked={selectedComplexes.includes(complex.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedComplexes([...selectedComplexes, complex.id]);
-                            } else {
-                              setSelectedComplexes(
-                                selectedComplexes.filter((id) => id !== complex.id)
-                              );
-                            }
-                          }}
-                        />
-                        <Label htmlFor={complex.id} className="cursor-pointer">
-                          {complex.name}
-                        </Label>
-                      </div>
-                    ))}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-semibold">Acces la complexe</Label>
+                    <Badge variant="outline" className="text-xs">
+                      {selectedComplexes.length} / {complexes.length}
+                    </Badge>
                   </div>
+                  <div className="border rounded-lg p-4 space-y-3 max-h-60 overflow-y-auto bg-muted/30">
+                    {complexes.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        Niciun complex disponibil
+                      </p>
+                    ) : (
+                      complexes.map((complex) => (
+                        <div key={complex.id} className="flex items-center space-x-3 p-2 rounded hover:bg-background transition-colors">
+                          <Checkbox
+                            id={complex.id}
+                            checked={selectedComplexes.includes(complex.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedComplexes([...selectedComplexes, complex.id]);
+                              } else {
+                                setSelectedComplexes(
+                                  selectedComplexes.filter((id) => id !== complex.id)
+                                );
+                              }
+                            }}
+                          />
+                          <Label htmlFor={complex.id} className="cursor-pointer flex-1 font-medium">
+                            <div className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4 text-muted-foreground" />
+                              {complex.name}
+                            </div>
+                          </Label>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {selectedRole === 'admin' && (
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    Administratorii au acces complet la toate complexele
+                  </p>
                 </div>
               )}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Anulează
               </Button>
-              <Button onClick={handleSaveUser}>Salvează</Button>
+              <Button onClick={handleSaveUser} className="gap-2">
+                <Shield className="h-4 w-4" />
+                Salvează Modificările
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
