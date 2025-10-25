@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,39 +12,35 @@ import { ComplexEditDialog } from "@/components/ComplexEditDialog";
 import { ExcelImportDialog } from "@/components/ExcelImportDialog";
 import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
-import { initialProperties } from "@/data/initialProperties";
-import { eurocasa65gProperties } from "@/data/eurocasa65g-properties";
-import { renewChiajnaProperties } from "@/data/renew-chiajna-properties";
-import { complexes } from "@/data/complexes";
+import { useProperties } from "@/hooks/useProperties";
+import { useComplexes } from "@/hooks/useComplexes";
 
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
   const navigate = useNavigate();
-  const [currentComplex, setCurrentComplex] = useState<Complex | undefined>(
-    complexes.find((c) => c.id === complexId)
-  );
+  const { complexes } = useComplexes();
+  const { properties, addProperty, updateProperty, deleteProperty } = useProperties(complexId || "");
+  
+  const [currentComplex, setCurrentComplex] = useState<Complex | undefined>();
   const [columns, setColumns] = useState<string[]>([
     'Etaj', 'Nr. ap.', 'Tip Apartament', 'Suprafata', 'Pret Credit', 
     'Pret Cash', 'Client', 'Agent', 'Comision', 'Observatii'
   ]);
 
-  // Load properties based on complex ID
-  const getPropertiesForComplex = (id: string): Property[] => {
-    switch (id) {
-      case "complex-1":
-        return initialProperties;
-      case "complex-2":
-        return eurocasa65gProperties;
-      case "complex-3":
-        return renewChiajnaProperties;
-      default:
-        return [];
+  useEffect(() => {
+    const complex = complexes.find((c) => c.id === complexId);
+    if (complex) {
+      setCurrentComplex({
+        id: complex.id,
+        name: complex.name,
+        location: complex.location,
+        description: complex.description,
+        totalProperties: complex.total_properties,
+        availableProperties: complex.available_properties,
+        image: complex.image
+      });
     }
-  };
-
-  const [properties, setProperties] = useState<Property[]>(
-    getPropertiesForComplex(complexId || "")
-  );
+  }, [complexes, complexId]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFloor, setSelectedFloor] = useState<string>("toate");
   const [selectedType, setSelectedType] = useState<string>("toate");
@@ -70,9 +66,9 @@ const ComplexDetails = () => {
     );
   }
 
-  const handleComplexUpdate = (updatedComplex: Complex) => {
+  const handleComplexUpdate = async (updatedComplex: Complex) => {
     setCurrentComplex(updatedComplex);
-    // In a real app, this would update the complex in a database or global state
+    // Update in database will be handled by useComplexes hook
   };
 
   const filteredProperties = properties.filter((property) => {
@@ -99,35 +95,33 @@ const ComplexDetails = () => {
   const reservedCount = properties.filter((p) => p.status === "rezervat").length;
   const soldCount = properties.filter((p) => p.status === "vandut").length;
 
-  const handleAddProperty = (property: Omit<Property, "id">) => {
+  const handleAddProperty = async (property: Omit<Property, "id">) => {
     const newProperty = {
       ...property,
       id: Date.now().toString(),
     };
-    setProperties([...properties, newProperty]);
+    await addProperty(newProperty);
     setIsDialogOpen(false);
   };
 
-  const handleEditProperty = (property: Property) => {
-    setProperties(
-      properties.map((p) => (p.id === property.id ? property : p))
-    );
+  const handleEditProperty = async (property: Property) => {
+    await updateProperty(property);
     setEditingProperty(null);
     setIsDialogOpen(false);
   };
 
-  const handleDeleteProperty = (id: string) => {
-    setProperties(properties.filter((p) => p.id !== id));
+  const handleDeleteProperty = async (id: string) => {
+    await deleteProperty(id);
   };
 
-  const handleStatusChange = (id: string, status: string) => {
-    setProperties(
-      properties.map((p) => 
-        p.id === id 
-          ? { ...p, status: status as "disponibil" | "rezervat" | "vandut" } 
-          : p
-      )
-    );
+  const handleStatusChange = async (id: string, status: string) => {
+    const property = properties.find(p => p.id === id);
+    if (property) {
+      await updateProperty({
+        ...property,
+        status: status as "disponibil" | "rezervat" | "vandut"
+      });
+    }
   };
 
   const openEditDialog = (property: Property) => {
@@ -135,8 +129,10 @@ const ComplexDetails = () => {
     setIsDialogOpen(true);
   };
 
-  const handleExcelImport = (importedProperties: Property[], importedColumns: string[]) => {
-    setProperties([...properties, ...importedProperties]);
+  const handleExcelImport = async (importedProperties: Property[], importedColumns: string[]) => {
+    for (const property of importedProperties) {
+      await addProperty(property);
+    }
     setColumns(importedColumns);
   };
 

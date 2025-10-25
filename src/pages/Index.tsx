@@ -2,10 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, MapPin, Home, ArrowRight } from "lucide-react";
-import { complexes } from "@/data/complexes";
+import { useComplexes } from "@/hooks/useComplexes";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { complexes } = useComplexes();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
@@ -48,7 +49,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-success">
-                {complexes.reduce((acc, c) => acc + c.totalProperties, 0)}
+                {complexes.reduce((acc, c) => acc + c.total_properties, 0)}
               </div>
             </CardContent>
           </Card>
@@ -62,7 +63,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-warning">
-                {complexes.reduce((acc, c) => acc + c.availableProperties, 0)}
+                {complexes.reduce((acc, c) => acc + c.available_properties, 0)}
               </div>
             </CardContent>
           </Card>
@@ -102,18 +103,18 @@ const Index = () => {
                 <div className="flex justify-between items-center pt-4 border-t">
                   <div>
                     <p className="text-xs text-muted-foreground">Total</p>
-                    <p className="text-lg font-bold">{complex.totalProperties}</p>
+                    <p className="text-lg font-bold">{complex.total_properties}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Disponibile</p>
                     <p className="text-lg font-bold text-success">
-                      {complex.availableProperties}
+                      {complex.available_properties}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Vândute</p>
                     <p className="text-lg font-bold text-info">
-                      {complex.totalProperties - complex.availableProperties}
+                      {complex.total_properties - complex.available_properties}
                     </p>
                   </div>
                 </div>
