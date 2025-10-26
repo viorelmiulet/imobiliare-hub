@@ -61,7 +61,7 @@ const Index = () => {
           </div>
           <div className="space-y-3">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-info bg-clip-text text-transparent px-4 animate-fade-in [animation-delay:0.2s]">
-              Dashboard Complexe
+              Administrare vanzari
             </h1>
             <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4 animate-fade-in [animation-delay:0.3s]">
               Selectează un complex pentru a gestiona proprietățile și vânzările
