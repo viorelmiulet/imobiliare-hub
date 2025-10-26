@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Shield, Users, Plus, Edit, Building2 } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Plus, Edit, Building2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { z } from 'zod';
@@ -43,6 +43,9 @@ const Admin = () => {
   const [newUserFullName, setNewUserFullName] = useState('');
   const [newUserRole, setNewUserRole] = useState<string>('user');
   const [creating, setCreating] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserWithRole | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const newUserSchema = z.object({
     email: z.string().trim().email({ message: 'Email invalid' }).max(255),
@@ -228,6 +231,36 @@ const Admin = () => {
     }
   };
 
+  const openDeleteDialog = (user: UserWithRole) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: { userId: userToDelete.id },
+      });
+
+      if (error) {
+        throw new Error((error as any).message || 'Eroare la ștergerea utilizatorului');
+      }
+
+      toast.success('Utilizator șters cu succes');
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error(error instanceof Error ? error.message : 'Eroare la ștergerea utilizatorului');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (authLoading || loading) {
     return <div>Se încarcă...</div>;
   }
@@ -348,15 +381,27 @@ const Admin = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditDialog(user)}
-                            className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
-                          >
-                            <Edit className="h-3 w-3" />
-                            Editează
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openEditDialog(user)}
+                              className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                            >
+                              <Edit className="h-3 w-3" />
+                              Editează
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openDeleteDialog(user)}
+                              className="gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                              disabled={user.id === profile?.id}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Șterge
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -444,6 +489,51 @@ const Admin = () => {
                   <>
                     <Plus className="h-4 w-4" />
                     Creează Utilizator
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive">
+                <Trash2 className="h-5 w-5" />
+                Șterge utilizator
+              </DialogTitle>
+              <DialogDescription>
+                Ești sigur că vrei să ștergi utilizatorul{' '}
+                <span className="font-medium text-foreground">{userToDelete?.email}</span>?
+                Această acțiune este permanentă și nu poate fi anulată.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button 
+                variant="outline" 
+                onClick={() => setDeleteDialogOpen(false)}
+                disabled={deleting}
+              >
+                Anulează
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteUser}
+                disabled={deleting}
+                className="gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Se șterge...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Șterge utilizator
                   </>
                 )}
               </Button>
