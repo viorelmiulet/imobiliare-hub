@@ -560,6 +560,8 @@ const ComplexDetails = () => {
                 onObservatiiChange={handleObservatiiChange}
                 clients={clients}
                 userRole={profile?.role}
+                commissionType={currentComplex?.commission_type}
+                commissionValue={currentComplex?.commission_value}
               />
             )}
           </CardContent>

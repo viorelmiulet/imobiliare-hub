@@ -37,6 +37,8 @@ interface PropertyTableProps {
   onObservatiiChange?: (id: string, observatii: string) => void;
   clients?: Client[];
   userRole?: string;
+  commissionType?: 'fixed' | 'percentage';
+  commissionValue?: number;
 }
 
 export const PropertyTable = ({
@@ -49,6 +51,8 @@ export const PropertyTable = ({
   onObservatiiChange,
   clients = [],
   userRole,
+  commissionType = 'percentage',
+  commissionValue = 2,
 }: PropertyTableProps) => {
   const isMobile = useIsMobile();
   const isUserRole = userRole === 'user';
@@ -108,11 +112,21 @@ export const PropertyTable = ({
   };
 
   const calculateCommission = (property: Property, priceType: 'credit' | 'cash'): string => {
+    // If commission type is fixed, return the fixed amount regardless of price
+    if (commissionType === 'fixed') {
+      return new Intl.NumberFormat('ro-RO', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+      }).format(commissionValue);
+    }
+    
+    // For percentage commission, calculate based on price
     const priceValue = priceType === 'credit'
       ? getValue(property, 'Pret Credit')
       : getValue(property, 'Pret Cash');
     const price = parsePrice(priceValue);
-    const commission = price * 0.02;
+    const commission = price * (commissionValue / 100);
     return new Intl.NumberFormat('ro-RO', {
       style: 'currency',
       currency: 'EUR',
@@ -124,6 +138,57 @@ export const PropertyTable = ({
     const currentCommission = getValue(property, columnName);
     const hasCommission = currentCommission && String(currentCommission).trim() !== '';
     
+    // For fixed commission, only show one option
+    if (commissionType === 'fixed') {
+      return (
+        <Select
+          value={hasCommission ? 'current' : ''}
+          onValueChange={(value) => {
+            if (value === 'remove') {
+              if (onCommissionChange) {
+                onCommissionChange(property.id, '');
+              }
+            } else if (value === 'fixed') {
+              const commission = calculateCommission(property, 'credit'); // Price type doesn't matter for fixed
+              if (onCommissionChange) {
+                onCommissionChange(property.id, commission);
+              }
+            }
+          }}
+          disabled={isUserRole}
+        >
+          <SelectTrigger className="w-[130px] h-7 text-xs">
+            <SelectValue placeholder="Calc...">
+              {hasCommission ? (
+                <span className="font-medium text-success">{currentCommission}</span>
+              ) : (
+                "Calc..."
+              )}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="fixed">
+              <div className="flex flex-col">
+                <span className="font-medium text-xs">Sumă fixă</span>
+                <span className="text-xs text-muted-foreground">
+                  {calculateCommission(property, 'credit')}
+                </span>
+              </div>
+            </SelectItem>
+            {hasCommission && (
+              <SelectItem value="remove">
+                <div className="flex items-center gap-2 text-destructive">
+                  <X className="h-3 w-3" />
+                  <span className="font-medium text-xs">Șterge comision</span>
+                </div>
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
+      );
+    }
+    
+    // For percentage commission, show credit and cash options
     return (
       <Select
         value={hasCommission ? 'current' : ''}
@@ -155,7 +220,7 @@ export const PropertyTable = ({
             <div className="flex flex-col">
               <span className="font-medium text-xs">Din Credit</span>
               <span className="text-xs text-muted-foreground">
-                2% = {calculateCommission(property, 'credit')}
+                {commissionValue}% = {calculateCommission(property, 'credit')}
               </span>
             </div>
           </SelectItem>
@@ -163,7 +228,7 @@ export const PropertyTable = ({
             <div className="flex flex-col">
               <span className="font-medium text-xs">Din Cash</span>
               <span className="text-xs text-muted-foreground">
-                2% = {calculateCommission(property, 'cash')}
+                {commissionValue}% = {calculateCommission(property, 'cash')}
               </span>
             </div>
           </SelectItem>
