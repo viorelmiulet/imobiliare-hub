@@ -25,8 +25,8 @@ import { toast } from "sonner";
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
   const navigate = useNavigate();
-  const { complexes, updateComplex } = useComplexes();
-  const { properties, addProperty, updateProperty, deleteProperty } = useProperties(complexId || "");
+  const { complexes, updateComplex, loading: complexesLoading } = useComplexes();
+  const { properties, addProperty, updateProperty, deleteProperty, loading: propertiesLoading } = useProperties(complexId || "");
   const { clients } = useClients();
   const { profile } = useAuth();
   const isMobile = useIsMobile();
@@ -99,6 +99,21 @@ const ComplexDetails = () => {
       setIsImporting(false);
     }
   };
+
+  if (complexesLoading || propertiesLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="text-center text-muted-foreground">Se încarcă...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!currentComplex) {
     return (
