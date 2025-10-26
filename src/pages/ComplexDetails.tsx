@@ -100,7 +100,10 @@ const ComplexDetails = () => {
     }
   };
 
-  if (complexesLoading || propertiesLoading) {
+  // Show loading if hooks are loading OR if we're waiting for currentComplex to be set
+  const isStillLoading = complexesLoading || propertiesLoading || (!currentComplex && complexes.length > 0);
+  
+  if (isStillLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
         <Card>
