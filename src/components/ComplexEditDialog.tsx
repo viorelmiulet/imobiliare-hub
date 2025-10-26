@@ -4,14 +4,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Complex } from "@/types/complex";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { Percent, Euro } from "lucide-react";
 
 const complexSchema = z.object({
   name: z
@@ -19,6 +22,8 @@ const complexSchema = z.object({
     .trim()
     .min(1, { message: "Numele complexului este obligatoriu" })
     .max(100, { message: "Numele trebuie să aibă maxim 100 caractere" }),
+  commission_type: z.enum(['fixed', 'percentage']),
+  commission_value: z.number().min(0, { message: "Valoarea trebuie să fie pozitivă" }),
 });
 
 interface ComplexEditDialogProps {
@@ -37,14 +42,19 @@ export const ComplexEditDialog = ({
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: complex.name,
+    commission_type: complex.commission_type || 'percentage' as 'fixed' | 'percentage',
+    commission_value: complex.commission_value || 0,
   });
   const [errors, setErrors] = useState<{
     name?: string;
+    commission_value?: string;
   }>({});
 
   useEffect(() => {
     setFormData({
       name: complex.name,
+      commission_type: complex.commission_type || 'percentage',
+      commission_value: complex.commission_value || 0,
     });
     setErrors({});
   }, [complex, open]);
@@ -60,6 +70,8 @@ export const ComplexEditDialog = ({
       onSubmit({
         ...complex,
         name: validatedData.name,
+        commission_type: validatedData.commission_type,
+        commission_value: validatedData.commission_value,
       });
 
       toast({
@@ -72,6 +84,7 @@ export const ComplexEditDialog = ({
       if (error instanceof z.ZodError) {
         const fieldErrors: {
           name?: string;
+          commission_value?: string;
         } = {};
         error.issues.forEach((err) => {
           if (err.path[0]) {
@@ -94,6 +107,9 @@ export const ComplexEditDialog = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Editează Complex</DialogTitle>
+          <DialogDescription>
+            Modifică detaliile complexului și setările de comision
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
@@ -113,6 +129,82 @@ export const ComplexEditDialog = ({
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name}</p>
             )}
+          </div>
+
+          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+            <div>
+              <Label className="text-base font-semibold">Tip Comision</Label>
+              <p className="text-sm text-muted-foreground mb-3">
+                Selectează modul de calcul al comisionului
+              </p>
+            </div>
+
+            <RadioGroup
+              value={formData.commission_type}
+              onValueChange={(value: 'fixed' | 'percentage') =>
+                setFormData({ ...formData, commission_type: value })
+              }
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-background transition-colors">
+                <RadioGroupItem value="percentage" id="percentage" />
+                <Label
+                  htmlFor="percentage"
+                  className="flex-1 cursor-pointer flex items-center gap-2"
+                >
+                  <Percent className="h-4 w-4 text-primary" />
+                  <div>
+                    <div className="font-medium">Procent</div>
+                    <div className="text-xs text-muted-foreground">
+                      Comision calculat ca procent din preț
+                    </div>
+                  </div>
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-background transition-colors">
+                <RadioGroupItem value="fixed" id="fixed" />
+                <Label
+                  htmlFor="fixed"
+                  className="flex-1 cursor-pointer flex items-center gap-2"
+                >
+                  <Euro className="h-4 w-4 text-success" />
+                  <div>
+                    <div className="font-medium">Sumă fixă</div>
+                    <div className="text-xs text-muted-foreground">
+                      Comision fix în EUR pentru fiecare vânzare
+                    </div>
+                  </div>
+                </Label>
+              </div>
+            </RadioGroup>
+
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="commission_value">
+                {formData.commission_type === 'percentage' ? 'Procent Comision (%)' : 'Sumă Comision (EUR)'}
+                <span className="text-destructive"> *</span>
+              </Label>
+              <Input
+                id="commission_value"
+                type="number"
+                step={formData.commission_type === 'percentage' ? '0.01' : '1'}
+                min="0"
+                value={formData.commission_value}
+                onChange={(e) =>
+                  setFormData({ ...formData, commission_value: parseFloat(e.target.value) || 0 })
+                }
+                placeholder={formData.commission_type === 'percentage' ? 'ex: 5' : 'ex: 1000'}
+                className={errors.commission_value ? "border-destructive" : ""}
+              />
+              {errors.commission_value && (
+                <p className="text-sm text-destructive">{errors.commission_value}</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {formData.commission_type === 'percentage'
+                  ? 'Introdu procentul (ex: 5 pentru 5%)'
+                  : 'Introdu suma în EUR (ex: 1000)'}
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-3 justify-end">

@@ -10,6 +10,8 @@ export interface Complex {
   total_properties: number;
   available_properties: number;
   image?: string;
+  commission_type?: 'fixed' | 'percentage';
+  commission_value?: number;
 }
 
 export const useComplexes = () => {

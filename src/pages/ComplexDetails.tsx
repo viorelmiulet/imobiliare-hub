@@ -118,6 +118,8 @@ const ComplexDetails = () => {
       name: updatedComplex.name,
       location: updatedComplex.location,
       description: updatedComplex.description,
+      commission_type: updatedComplex.commission_type,
+      commission_value: updatedComplex.commission_value,
     });
     setCurrentComplex(updatedComplex);
   };

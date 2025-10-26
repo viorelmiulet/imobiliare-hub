@@ -7,4 +7,6 @@ export interface Complex {
   availableProperties: number;
   image?: string;
   columns?: string[];
+  commission_type?: 'fixed' | 'percentage';
+  commission_value?: number;
 }

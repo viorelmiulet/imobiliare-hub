@@ -44,6 +44,8 @@ export type Database = {
       complexes: {
         Row: {
           available_properties: number | null
+          commission_type: Database["public"]["Enums"]["commission_type"] | null
+          commission_value: number | null
           created_at: string | null
           description: string | null
           id: string
@@ -55,6 +57,10 @@ export type Database = {
         }
         Insert: {
           available_properties?: number | null
+          commission_type?:
+            | Database["public"]["Enums"]["commission_type"]
+            | null
+          commission_value?: number | null
           created_at?: string | null
           description?: string | null
           id: string
@@ -66,6 +72,10 @@ export type Database = {
         }
         Update: {
           available_properties?: number | null
+          commission_type?:
+            | Database["public"]["Enums"]["commission_type"]
+            | null
+          commission_value?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -220,6 +230,7 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "manager" | "admin"
+      commission_type: "fixed" | "percentage"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -348,6 +359,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "manager", "admin"],
+      commission_type: ["fixed", "percentage"],
     },
   },
 } as const
