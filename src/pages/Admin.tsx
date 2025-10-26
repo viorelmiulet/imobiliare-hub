@@ -46,6 +46,9 @@ const Admin = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserWithRole | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [updating, setUpdating] = useState(false);
 
   const newUserSchema = z.object({
     email: z.string().trim().email({ message: 'Email invalid' }).max(255),
@@ -112,6 +115,8 @@ const Admin = () => {
   const openEditDialog = async (user: UserWithRole) => {
     setSelectedUser(user);
     setSelectedRole(user.role);
+    setEditEmail(user.email);
+    setEditPassword('');
 
     try {
       const { data, error } = await supabase
@@ -131,7 +136,35 @@ const Admin = () => {
   const handleSaveUser = async () => {
     if (!selectedUser) return;
 
+    setUpdating(true);
     try {
+      // Update email and/or password if changed
+      if (editEmail !== selectedUser.email || editPassword) {
+        const updateData: { email?: string; password?: string } = {};
+        if (editEmail !== selectedUser.email) {
+          updateData.email = editEmail;
+        }
+        if (editPassword) {
+          if (editPassword.length < 6) {
+            toast.error('Parola trebuie să aibă minim 6 caractere');
+            setUpdating(false);
+            return;
+          }
+          updateData.password = editPassword;
+        }
+
+        const { error: authError } = await supabase.functions.invoke('update-user', {
+          body: { 
+            userId: selectedUser.id,
+            ...updateData
+          },
+        });
+
+        if (authError) {
+          throw new Error((authError as any).message || 'Eroare la actualizarea credențialelor');
+        }
+      }
+
       // Update role
       const { error: roleError } = await supabase
         .from('user_roles')
@@ -167,7 +200,9 @@ const Admin = () => {
       fetchUsers();
     } catch (error) {
       console.error('Error updating user:', error);
-      toast.error('Eroare la actualizarea utilizatorului');
+      toast.error(error instanceof Error ? error.message : 'Eroare la actualizarea utilizatorului');
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -557,6 +592,34 @@ const Admin = () => {
 
             <div className="space-y-6 py-4">
               <div className="space-y-3">
+                <Label htmlFor="edit-email" className="text-base font-semibold">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  placeholder="email@exemplu.ro"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="edit-password" className="text-base font-semibold">
+                  Parolă nouă (opțional)
+                </Label>
+                <Input
+                  id="edit-password"
+                  type="password"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  placeholder="Lasă gol pentru a păstra parola actuală"
+                  minLength={6}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Minimum 6 caractere. Lasă câmpul gol dacă nu vrei să schimbi parola.
+                </p>
+              </div>
+
+              <div className="space-y-3">
                 <Label className="text-base font-semibold">Rol utilizator</Label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
                   <SelectTrigger className="w-full">
@@ -647,12 +710,21 @@ const Admin = () => {
             </div>
 
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={updating}>
                 Anulează
               </Button>
-              <Button onClick={handleSaveUser} className="gap-2">
-                <Shield className="h-4 w-4" />
-                Salvează Modificările
+              <Button onClick={handleSaveUser} disabled={updating} className="gap-2">
+                {updating ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Se actualizează...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="h-4 w-4" />
+                    Salvează Modificările
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
