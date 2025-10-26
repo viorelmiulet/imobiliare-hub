@@ -244,6 +244,22 @@ const ComplexDetails = () => {
     return status.toLowerCase() === "vandut";
   }).length;
   const totalCommissions = properties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
+  
+  // Calculate commissions per corp
+  const corpNames = Array.from(
+    new Set(
+      properties
+        .map(p => (p as any).corp || (p as any).CORP)
+        .filter(Boolean)
+    )
+  ) as string[];
+  
+  const commissionsPerCorp = corpNames.reduce((acc, corp) => {
+    const corpProperties = properties.filter(p => ((p as any).corp || (p as any).CORP) === corp);
+    const corpTotal = corpProperties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
+    acc[corp] = corpTotal;
+    return acc;
+  }, {} as Record<string, number>);
 
   const handleAddProperty = async (property: Omit<Property, "id">) => {
     const newProperty = {
@@ -461,13 +477,38 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-accent">
-                {new Intl.NumberFormat('ro-RO', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(totalCommissions)}
-                {` EUR`}
-              </div>
+              {corpNames.length > 1 ? (
+                <div className="space-y-2">
+                  {corpNames.map(corp => (
+                    <div key={corp} className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-muted-foreground">{corp}:</span>
+                      <span className="text-lg font-bold text-accent">
+                        {new Intl.NumberFormat('ro-RO', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(commissionsPerCorp[corp])} EUR
+                      </span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between items-center pt-2 border-t border-border">
+                    <span className="text-sm font-semibold">Total:</span>
+                    <span className="text-xl font-bold text-accent">
+                      {new Intl.NumberFormat('ro-RO', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(totalCommissions)} EUR
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xl sm:text-2xl font-bold text-accent">
+                  {new Intl.NumberFormat('ro-RO', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(totalCommissions)}
+                  {` EUR`}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
