@@ -100,39 +100,7 @@ const ComplexDetails = () => {
     }
   };
 
-  // Show loading if hooks are loading OR if we're waiting for currentComplex to be set
-  const isStillLoading = complexesLoading || propertiesLoading || (!currentComplex && complexes.length > 0);
-  
-  if (isStillLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-center text-muted-foreground">Se încarcă...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!currentComplex) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Complex negăsit</p>
-            <Button onClick={() => navigate("/")} className="mt-4 w-full">
-              Înapoi la Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
+  // ALL HOOKS MUST BE BEFORE ANY CONDITIONAL RETURNS
   const handleComplexUpdate = useCallback(async (updatedComplex: Complex) => {
     await updateComplex(updatedComplex.id, {
       name: updatedComplex.name,
@@ -377,6 +345,39 @@ const ComplexDetails = () => {
     }
     setColumns(importedColumns);
   }, [addProperty]);
+
+  // Show loading if hooks are loading OR if we're waiting for currentComplex to be set
+  const isStillLoading = complexesLoading || propertiesLoading || (!currentComplex && complexes.length > 0);
+  
+  if (isStillLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="text-center text-muted-foreground">Se încarcă...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!currentComplex) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">Complex negăsit</p>
+            <Button onClick={() => navigate("/")} className="mt-4 w-full">
+              Înapoi la Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
