@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -18,7 +18,7 @@ export const useComplexes = () => {
   const [complexes, setComplexes] = useState<Complex[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchComplexes = async () => {
+  const fetchComplexes = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('complexes')
@@ -33,9 +33,9 @@ export const useComplexes = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateComplex = async (id: string, updates: Partial<Complex>) => {
+  const updateComplex = useCallback(async (id: string, updates: Partial<Complex>) => {
     try {
       const { error } = await supabase
         .from('complexes')
@@ -50,7 +50,7 @@ export const useComplexes = () => {
       console.error('Error updating complex:', error);
       toast.error('Eroare la actualizarea complexului');
     }
-  };
+  }, [fetchComplexes]);
 
   useEffect(() => {
     fetchComplexes();

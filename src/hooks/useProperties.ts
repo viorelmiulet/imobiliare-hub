@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Property } from '@/types/property';
@@ -7,7 +7,12 @@ export const useProperties = (complexId: string) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
+    if (!complexId) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('properties')
@@ -36,73 +41,11 @@ export const useProperties = (complexId: string) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [complexId]);
 
-  const addProperty = async (property: Property) => {
-    try {
-      const { id, client_id, clientName, ...data } = property;
-      
-      const { error } = await supabase
-        .from('properties')
-        .insert({
-          complex_id: complexId,
-          client_id: client_id || null,
-          data: data
-        });
-
-      if (error) throw error;
-      
-      await fetchProperties();
-      await updateComplexStats();
-      toast.success('Proprietate adăugată cu succes');
-    } catch (error) {
-      console.error('Error adding property:', error);
-      toast.error('Eroare la adăugarea proprietății');
-    }
-  };
-
-  const updateProperty = async (property: Property) => {
-    try {
-      const { id, client_id, clientName, ...data } = property;
-      
-      const { error } = await supabase
-        .from('properties')
-        .update({ 
-          data,
-          client_id: client_id || null
-        })
-        .eq('id', id);
-
-      if (error) throw error;
-      
-      await fetchProperties();
-      await updateComplexStats();
-      toast.success('Proprietate actualizată cu succes');
-    } catch (error) {
-      console.error('Error updating property:', error);
-      toast.error('Eroare la actualizarea proprietății');
-    }
-  };
-
-  const deleteProperty = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      
-      await fetchProperties();
-      await updateComplexStats();
-      toast.success('Proprietate ștearsă cu succes');
-    } catch (error) {
-      console.error('Error deleting property:', error);
-      toast.error('Eroare la ștergerea proprietății');
-    }
-  };
-
-  const updateComplexStats = async () => {
+  const updateComplexStats = useCallback(async () => {
+    if (!complexId) return;
+    
     try {
       // Fetch all properties to calculate stats
       const { data, error } = await supabase
@@ -129,7 +72,71 @@ export const useProperties = (complexId: string) => {
     } catch (error) {
       console.error('Error updating complex stats:', error);
     }
-  };
+  }, [complexId]);
+
+  const addProperty = useCallback(async (property: Property) => {
+    try {
+      const { id, client_id, clientName, ...data } = property;
+      
+      const { error } = await supabase
+        .from('properties')
+        .insert({
+          complex_id: complexId,
+          client_id: client_id || null,
+          data: data
+        });
+
+      if (error) throw error;
+      
+      await fetchProperties();
+      await updateComplexStats();
+      toast.success('Proprietate adăugată cu succes');
+    } catch (error) {
+      console.error('Error adding property:', error);
+      toast.error('Eroare la adăugarea proprietății');
+    }
+  }, [complexId, fetchProperties, updateComplexStats]);
+
+  const updateProperty = useCallback(async (property: Property) => {
+    try {
+      const { id, client_id, clientName, ...data } = property;
+      
+      const { error } = await supabase
+        .from('properties')
+        .update({ 
+          data,
+          client_id: client_id || null
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      await fetchProperties();
+      await updateComplexStats();
+      toast.success('Proprietate actualizată cu succes');
+    } catch (error) {
+      console.error('Error updating property:', error);
+      toast.error('Eroare la actualizarea proprietății');
+    }
+  }, [fetchProperties, updateComplexStats]);
+
+  const deleteProperty = useCallback(async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      await fetchProperties();
+      await updateComplexStats();
+      toast.success('Proprietate ștearsă cu succes');
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast.error('Eroare la ștergerea proprietății');
+    }
+  }, [fetchProperties, updateComplexStats]);
 
   useEffect(() => {
     fetchProperties();

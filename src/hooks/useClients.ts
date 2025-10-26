@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -16,7 +16,7 @@ export const useClients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('clients')
@@ -31,9 +31,9 @@ export const useClients = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const addClient = async (client: Omit<Client, 'id' | 'created_at' | 'updated_at'>) => {
+  const addClient = useCallback(async (client: Omit<Client, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { error } = await supabase
         .from('clients')
@@ -48,9 +48,9 @@ export const useClients = () => {
       toast.error('Eroare la adăugarea clientului');
       throw error;
     }
-  };
+  }, [fetchClients]);
 
-  const updateClient = async (id: string, client: Partial<Client>) => {
+  const updateClient = useCallback(async (id: string, client: Partial<Client>) => {
     try {
       const { error } = await supabase
         .from('clients')
@@ -66,9 +66,9 @@ export const useClients = () => {
       toast.error('Eroare la actualizarea clientului');
       throw error;
     }
-  };
+  }, [fetchClients]);
 
-  const deleteClient = async (id: string) => {
+  const deleteClient = useCallback(async (id: string) => {
     try {
       const { error } = await supabase
         .from('clients')
@@ -84,7 +84,7 @@ export const useClients = () => {
       toast.error('Eroare la ștergerea clientului');
       throw error;
     }
-  };
+  }, [fetchClients]);
 
   useEffect(() => {
     fetchClients();

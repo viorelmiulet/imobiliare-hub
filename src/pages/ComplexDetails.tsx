@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,7 +133,7 @@ const ComplexDetails = () => {
     );
   }
 
-  const handleComplexUpdate = async (updatedComplex: Complex) => {
+  const handleComplexUpdate = useCallback(async (updatedComplex: Complex) => {
     await updateComplex(updatedComplex.id, {
       name: updatedComplex.name,
       location: updatedComplex.location,
@@ -142,72 +142,14 @@ const ComplexDetails = () => {
       commission_value: updatedComplex.commission_value,
     });
     setCurrentComplex(updatedComplex);
-  };
+  }, [updateComplex]);
 
-  const filteredProperties = properties
-    .filter((property) => {
-      const matchesSearch = searchTerm === "" || Object.values(property).some(value => 
-        value && String(value).toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      const matchesFloor =
-        selectedFloor === "toate" || property.etaj === selectedFloor || property.ETAJ === selectedFloor;
-
-      const matchesType =
-        selectedType === "toate" || property.tipCom === selectedType || property['TIP COM'] === selectedType;
-
-      const matchesStatus =
-        selectedStatus === "toate" || property.status === selectedStatus || property.STATUS === selectedStatus;
-
-      const matchesCorp =
-        selectedCorp === "toate" || property.corp === selectedCorp || property.CORP === selectedCorp;
-
-      return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
-    })
-    .sort((a, b) => {
-      // Sort by floor order
-      const floorOrder: Record<string, number> = {
-        'DEMISOL': 0,
-        'PARTER': 1,
-        'P': 1,
-        'ETAJ 1': 2,
-        'E1': 2,
-        'ETAJ 2': 3,
-        'E2': 3,
-        'ETAJ 3': 4,
-        'E3': 4,
-        'ETAJ 4': 5,
-        'E4': 5,
-        'ETAJ 5': 6,
-        'E5': 6,
-        'ETAJ 6': 7,
-        'E6': 7,
-      };
-
-      const etajA = (a.etaj || a.ETAJ || a.Etaj || '').toUpperCase();
-      const etajB = (b.etaj || b.ETAJ || b.Etaj || '').toUpperCase();
-      const floorA = floorOrder[etajA] ?? 999;
-      const floorB = floorOrder[etajB] ?? 999;
-
-      if (floorA !== floorB) {
-        return floorA - floorB;
-      }
-
-      // Then sort by apartment number
-      const getApNumber = (prop: Property): number => {
-        const nrAp = prop.nrAp || prop['Nr. ap.'] || prop['nr_ap'] || '';
-        const match = String(nrAp).match(/\d+/);
-        return match ? parseInt(match[0]) : 0;
-      };
-
-      return getApNumber(a) - getApNumber(b);
-    });
-
-  const getPropertyStatus = (property: Property): string => {
+  // Memoized helper functions
+  const getPropertyStatus = useCallback((property: Property): string => {
     return (property as any).status || (property as any).Status || (property as any).STATUS || 'disponibil';
-  };
+  }, []);
 
-  const getPropertyCommission = (property: Property): number => {
+  const getPropertyCommission = useCallback((property: Property): number => {
     // Extract commission from various possible keys and parse robustly
     const synonyms = ['Comision', 'comision'];
     let commissionValue = '';
@@ -247,58 +189,135 @@ const ComplexDetails = () => {
 
     const parsed = parseFloat(cleanStr);
     return isNaN(parsed) ? 0 : parsed;
-  };
+  }, []);
 
-  const availableCount = properties.filter((p) => {
-    const status = getPropertyStatus(p);
-    return status.toLowerCase() === "disponibil";
-  }).length;
-  const reservedCount = properties.filter((p) => {
-    const status = getPropertyStatus(p);
-    return status.toLowerCase() === "rezervat";
-  }).length;
-  const soldCount = properties.filter((p) => {
-    const status = getPropertyStatus(p);
-    return status.toLowerCase() === "vandut";
-  }).length;
-  const totalCommissions = properties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
-  
-  // Calculate commissions per corp
-  const corpNames = Array.from(
-    new Set(
-      properties
-        .map(p => (p as any).corp || (p as any).CORP)
-        .filter(Boolean)
-    )
-  ) as string[];
-  
-  const commissionsPerCorp = corpNames.reduce((acc, corp) => {
-    const corpProperties = properties.filter(p => ((p as any).corp || (p as any).CORP) === corp);
-    const corpTotal = corpProperties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
-    acc[corp] = corpTotal;
-    return acc;
-  }, {} as Record<string, number>);
+  // Memoized filtered and sorted properties
+  const filteredProperties = useMemo(() => {
+    return properties
+      .filter((property) => {
+        const matchesSearch = searchTerm === "" || Object.values(property).some(value => 
+          value && String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
-  const handleAddProperty = async (property: Omit<Property, "id">) => {
+        const matchesFloor =
+          selectedFloor === "toate" || property.etaj === selectedFloor || property.ETAJ === selectedFloor;
+
+        const matchesType =
+          selectedType === "toate" || property.tipCom === selectedType || property['TIP COM'] === selectedType;
+
+        const matchesStatus =
+          selectedStatus === "toate" || property.status === selectedStatus || property.STATUS === selectedStatus;
+
+        const matchesCorp =
+          selectedCorp === "toate" || property.corp === selectedCorp || property.CORP === selectedCorp;
+
+        return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
+      })
+      .sort((a, b) => {
+        // Sort by floor order
+        const floorOrder: Record<string, number> = {
+          'DEMISOL': 0,
+          'PARTER': 1,
+          'P': 1,
+          'ETAJ 1': 2,
+          'E1': 2,
+          'ETAJ 2': 3,
+          'E2': 3,
+          'ETAJ 3': 4,
+          'E3': 4,
+          'ETAJ 4': 5,
+          'E4': 5,
+          'ETAJ 5': 6,
+          'E5': 6,
+          'ETAJ 6': 7,
+          'E6': 7,
+        };
+
+        const etajA = (a.etaj || a.ETAJ || a.Etaj || '').toUpperCase();
+        const etajB = (b.etaj || b.ETAJ || b.Etaj || '').toUpperCase();
+        const floorA = floorOrder[etajA] ?? 999;
+        const floorB = floorOrder[etajB] ?? 999;
+
+        if (floorA !== floorB) {
+          return floorA - floorB;
+        }
+
+        // Then sort by apartment number
+        const getApNumber = (prop: Property): number => {
+          const nrAp = prop.nrAp || prop['Nr. ap.'] || prop['nr_ap'] || '';
+          const match = String(nrAp).match(/\d+/);
+          return match ? parseInt(match[0]) : 0;
+        };
+
+        return getApNumber(a) - getApNumber(b);
+      });
+  }, [properties, searchTerm, selectedFloor, selectedType, selectedStatus, selectedCorp]);
+
+  // Memoized statistics
+  const statistics = useMemo(() => {
+    const availableCount = properties.filter((p) => {
+      const status = getPropertyStatus(p);
+      return status.toLowerCase() === "disponibil";
+    }).length;
+    
+    const reservedCount = properties.filter((p) => {
+      const status = getPropertyStatus(p);
+      return status.toLowerCase() === "rezervat";
+    }).length;
+    
+    const soldCount = properties.filter((p) => {
+      const status = getPropertyStatus(p);
+      return status.toLowerCase() === "vandut";
+    }).length;
+    
+    const totalCommissions = properties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
+    
+    // Calculate commissions per corp
+    const corpNames = Array.from(
+      new Set(
+        properties
+          .map(p => (p as any).corp || (p as any).CORP)
+          .filter(Boolean)
+      )
+    ) as string[];
+    
+    const commissionsPerCorp = corpNames.reduce((acc, corp) => {
+      const corpProperties = properties.filter(p => ((p as any).corp || (p as any).CORP) === corp);
+      const corpTotal = corpProperties.reduce((sum, p) => sum + getPropertyCommission(p), 0);
+      acc[corp] = corpTotal;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      availableCount,
+      reservedCount,
+      soldCount,
+      totalCommissions,
+      corpNames,
+      commissionsPerCorp
+    };
+  }, [properties, getPropertyStatus, getPropertyCommission]);
+
+  const handleAddProperty = useCallback(async (property: Omit<Property, "id">) => {
     const newProperty = {
       ...property,
       id: Date.now().toString(),
     };
     await addProperty(newProperty);
     setIsDialogOpen(false);
-  };
+  }, [addProperty]);
 
-  const handleEditProperty = async (property: Property) => {
+  const handleEditProperty = useCallback(async (property: Property) => {
     await updateProperty(property);
     setEditingProperty(null);
     setIsDialogOpen(false);
-  };
+  }, [updateProperty]);
 
-  const handleDeleteProperty = async (id: string) => {
+  const handleDeleteProperty = useCallback(async (id: string) => {
     await deleteProperty(id);
-  };
+  }, [deleteProperty]);
 
-  const handleStatusChange = async (id: string, status: string) => {
+  const handleStatusChange = useCallback(async (id: string, status: string) => {
     const property = properties.find(p => p.id === id);
     if (property) {
       const updatedProperty = {
@@ -310,9 +329,9 @@ const ComplexDetails = () => {
       (updatedProperty as any)['STATUS'] = status;
       await updateProperty(updatedProperty);
     }
-  };
+  }, [properties, updateProperty]);
 
-  const handleClientChange = async (id: string, clientId: string | null) => {
+  const handleClientChange = useCallback(async (id: string, clientId: string | null) => {
     const property = properties.find(p => p.id === id);
     if (property) {
       const updatedProperty = {
@@ -321,9 +340,9 @@ const ComplexDetails = () => {
       };
       await updateProperty(updatedProperty);
     }
-  };
+  }, [properties, updateProperty]);
 
-  const handleCommissionChange = async (id: string, commission: string) => {
+  const handleCommissionChange = useCallback(async (id: string, commission: string) => {
     const property = properties.find(p => p.id === id);
     if (property) {
       const updatedProperty = {
@@ -333,9 +352,9 @@ const ComplexDetails = () => {
       };
       await updateProperty(updatedProperty);
     }
-  };
+  }, [properties, updateProperty]);
 
-  const handleObservatiiChange = async (id: string, observatii: string) => {
+  const handleObservatiiChange = useCallback(async (id: string, observatii: string) => {
     const property = properties.find(p => p.id === id);
     if (property) {
       const updatedProperty = {
@@ -345,19 +364,19 @@ const ComplexDetails = () => {
       };
       await updateProperty(updatedProperty);
     }
-  };
+  }, [properties, updateProperty]);
 
-  const openEditDialog = (property: Property) => {
+  const openEditDialog = useCallback((property: Property) => {
     setEditingProperty(property);
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const handleExcelImport = async (importedProperties: Property[], importedColumns: string[]) => {
+  const handleExcelImport = useCallback(async (importedProperties: Property[], importedColumns: string[]) => {
     for (const property of importedProperties) {
       await addProperty(property);
     }
     setColumns(importedColumns);
-  };
+  }, [addProperty]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
@@ -459,7 +478,7 @@ const ComplexDetails = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl sm:text-3xl font-bold text-success">
-                {availableCount}
+                {statistics.availableCount}
               </div>
             </CardContent>
           </Card>
@@ -472,7 +491,7 @@ const ComplexDetails = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl sm:text-3xl font-bold text-warning">
-                {reservedCount}
+                {statistics.reservedCount}
               </div>
             </CardContent>
           </Card>
@@ -484,7 +503,7 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-info">{soldCount}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-info">{statistics.soldCount}</div>
             </CardContent>
           </Card>
 
@@ -495,16 +514,16 @@ const ComplexDetails = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {corpNames.length > 1 ? (
+              {statistics.corpNames.length > 1 ? (
                 <div className="space-y-2">
-                  {corpNames.map(corp => (
+                  {statistics.corpNames.map(corp => (
                     <div key={corp} className="flex justify-between items-center">
                       <span className="text-sm font-medium text-muted-foreground">{corp}:</span>
                       <span className="text-lg font-bold text-accent">
                         {new Intl.NumberFormat('ro-RO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }).format(commissionsPerCorp[corp])} EUR
+                        }).format(statistics.commissionsPerCorp[corp])} EUR
                       </span>
                     </div>
                   ))}
@@ -514,7 +533,7 @@ const ComplexDetails = () => {
                       {new Intl.NumberFormat('ro-RO', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      }).format(totalCommissions)} EUR
+                      }).format(statistics.totalCommissions)} EUR
                     </span>
                   </div>
                 </div>
@@ -523,7 +542,7 @@ const ComplexDetails = () => {
                   {new Intl.NumberFormat('ro-RO', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(totalCommissions)}
+                  }).format(statistics.totalCommissions)}
                   {` EUR`}
                 </div>
               )}
