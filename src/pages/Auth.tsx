@@ -28,21 +28,40 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/30" />
+      
+      {/* Decorative elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
+      
+      {/* Main card */}
+      <Card className="w-full max-w-md relative backdrop-blur-sm border-border/50 shadow-xl animate-fade-in">
+        <CardHeader className="text-center space-y-6 pb-8">
           <div className="flex justify-center">
-            <Building2 className="h-12 w-12 text-primary" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative bg-gradient-to-br from-primary to-accent p-4 rounded-2xl shadow-lg">
+                <Building2 className="h-10 w-10 text-primary-foreground" />
+              </div>
+            </div>
           </div>
-          <CardTitle className="text-2xl">Bine ai venit!</CardTitle>
-          <CardDescription>
-            Autentifică-te pentru a accesa platforma
-          </CardDescription>
+          <div className="space-y-2">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+              Bine ai venit!
+            </CardTitle>
+            <CardDescription className="text-base">
+              Autentifică-te pentru a accesa platforma
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+        <CardContent className="pb-8">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="login-email">Email</Label>
+              <Label htmlFor="login-email" className="text-sm font-medium">
+                Email
+              </Label>
               <Input
                 id="login-email"
                 type="email"
@@ -50,19 +69,27 @@ const Auth = () => {
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 required
+                className="h-11 transition-all focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="login-password">Parolă</Label>
+              <Label htmlFor="login-password" className="text-sm font-medium">
+                Parolă
+              </Label>
               <Input
                 id="login-password"
                 type="password"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 required
+                className="h-11 transition-all focus:ring-2 focus:ring-primary/20"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button 
+              type="submit" 
+              className="w-full h-11 text-base font-medium shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]" 
+              disabled={loading}
+            >
               {loading ? 'Se autentifică...' : 'Autentificare'}
             </Button>
           </form>
