@@ -47,7 +47,9 @@ const ComplexDetails = () => {
         description: complex.description,
         totalProperties: complex.total_properties,
         availableProperties: complex.available_properties,
-        image: complex.image
+        image: complex.image,
+        commission_type: complex.commission_type,
+        commission_value: complex.commission_value,
       });
     }
   }, [complexes, complexId]);
