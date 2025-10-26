@@ -580,12 +580,14 @@ const ComplexDetails = () => {
         />
 
         {/* Edit Complex Dialog */}
-        <ComplexEditDialog
-          open={isComplexEditOpen}
-          onOpenChange={setIsComplexEditOpen}
-          onSubmit={handleComplexUpdate}
-          complex={currentComplex}
-        />
+        {currentComplex && (
+          <ComplexEditDialog
+            open={isComplexEditOpen}
+            onOpenChange={setIsComplexEditOpen}
+            onSubmit={handleComplexUpdate}
+            complex={currentComplex}
+          />
+        )}
 
         {/* Excel Import Dialog */}
         <ExcelImportDialog
