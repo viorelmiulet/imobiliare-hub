@@ -11,6 +11,7 @@ import ImportEurocasaData from "./pages/ImportEurocasaData";
 import ImportComplex1Data from "./pages/ImportComplex1Data";
 import ImportViilor33Data from "./pages/ImportViilor33Data";
 import ClientsOverview from "./pages/ClientsOverview";
+import ImportContacts from "./pages/ImportContacts";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
@@ -41,6 +42,7 @@ const App = () => {
               <Route path="/import-eurocasa" element={<ProtectedRoute><ImportEurocasaData /></ProtectedRoute>} />
               <Route path="/import-complex1" element={<ProtectedRoute><ImportComplex1Data /></ProtectedRoute>} />
               <Route path="/import-viilor33" element={<ProtectedRoute><ImportViilor33Data /></ProtectedRoute>} />
+              <Route path="/import-contacts" element={<ProtectedRoute><ImportContacts /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

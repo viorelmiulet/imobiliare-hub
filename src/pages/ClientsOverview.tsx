@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, User, Building2, Phone, Mail } from "lucide-react";
+import { ArrowLeft, Search, User, Building2, Phone, Mail, Upload } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { useComplexes } from "@/hooks/useComplexes";
 import { supabase } from "@/integrations/supabase/client";
@@ -99,7 +99,16 @@ export default function ClientsOverview() {
               <p className="text-sm text-muted-foreground">Vizualizare completă clienți</p>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => navigate("/import-contacts")}
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Import VCF
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Stats */}
