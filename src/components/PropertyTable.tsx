@@ -39,6 +39,7 @@ interface PropertyTableProps {
   userRole?: string;
   commissionType?: 'fixed' | 'percentage';
   commissionValue?: number;
+  isAuthenticated?: boolean;
 }
 
 export const PropertyTable = ({
@@ -53,9 +54,16 @@ export const PropertyTable = ({
   userRole,
   commissionType = 'percentage',
   commissionValue = 2,
+  isAuthenticated = true,
 }: PropertyTableProps) => {
   const isMobile = useIsMobile();
   const isUserRole = userRole === 'user';
+
+  // Filter columns to hide sensitive data for unauthenticated users
+  const sensitiveColumns = ['Client', 'Agent', 'Comision', 'Observatii'];
+  const visibleColumns = isAuthenticated 
+    ? columns 
+    : columns.filter(col => !sensitiveColumns.includes(col));
 
   // Resolve values for both old (label-based) and new (key-based) datasets
   const getValue = (property: Property, columnName: string): any => {
@@ -267,18 +275,20 @@ export const PropertyTable = ({
                     <CardTitle className="text-lg">
                       Ap. {getValue(property, 'Nr. ap.')}
                     </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(property)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {columns.filter(col => col !== 'id' && col !== 'Nr. ap.').map((column) => (
+                    {isAuthenticated && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(property)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {visibleColumns.filter(col => col !== 'id' && col !== 'Nr. ap.').map((column) => (
                   <div key={`${property.id}-${column}`} className="flex justify-between items-center py-1 border-b last:border-0">
                     <span className="text-sm text-muted-foreground font-medium">{column}:</span>
                     <span className="text-sm font-semibold">
@@ -286,7 +296,7 @@ export const PropertyTable = ({
                         <Select
                           value={getValue(property, column) || 'disponibil'}
                           onValueChange={(value) => onStatusChange(property.id, value)}
-                          disabled={isUserRole}
+                          disabled={isUserRole || !isAuthenticated}
                         >
                           <SelectTrigger className="w-[130px] h-8">
                             <SelectValue />
@@ -316,7 +326,7 @@ export const PropertyTable = ({
                         <Select
                           value={property.client_id || 'none'}
                           onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
-                          disabled={isUserRole}
+                          disabled={isUserRole || !isAuthenticated}
                         >
                           <SelectTrigger className="w-[150px] h-8">
                             <SelectValue placeholder="Selectează client" />
@@ -383,19 +393,21 @@ export const PropertyTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            {columns.filter(col => col !== 'id').map((column) => (
+            {visibleColumns.filter(col => col !== 'id').map((column) => (
               <TableHead key={column} className="font-semibold text-xs px-2 py-2 whitespace-nowrap">
                 {column}
               </TableHead>
             ))}
-            <TableHead className="font-semibold text-xs text-right px-2 py-2">Acțiuni</TableHead>
+            {isAuthenticated && (
+              <TableHead className="font-semibold text-xs text-right px-2 py-2">Acțiuni</TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
           {properties.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={columns.length + 1}
+                colSpan={visibleColumns.length + (isAuthenticated ? 1 : 0)}
                 className="text-center text-muted-foreground py-8"
               >
                 Nu există proprietăți de afișat
@@ -411,13 +423,13 @@ export const PropertyTable = ({
                   key={property.id}
                   className={`hover:bg-muted/30 transition-colors ${statusColorClass}`}
                 >
-                {columns.filter(col => col !== 'id').map((column) => (
+                {visibleColumns.filter(col => col !== 'id').map((column) => (
                   <TableCell key={`${property.id}-${column}`} className="px-2 py-2 text-xs">
                     {column.toLowerCase().includes('status') && onStatusChange ? (
                       <Select
                         value={getValue(property, column) || 'disponibil'}
                         onValueChange={(value) => onStatusChange(property.id, value)}
-                        disabled={isUserRole}
+                        disabled={isUserRole || !isAuthenticated}
                       >
                         <SelectTrigger className="w-[110px] h-7 text-xs">
                           <SelectValue />
@@ -447,7 +459,7 @@ export const PropertyTable = ({
                       <Select
                         value={property.client_id || 'none'}
                         onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
-                        disabled={isUserRole}
+                        disabled={isUserRole || !isAuthenticated}
                       >
                         <SelectTrigger className="w-[120px] h-7 text-xs">
                           <SelectValue placeholder="Select" />
@@ -498,16 +510,18 @@ export const PropertyTable = ({
                     )}
                   </TableCell>
                 ))}
-                <TableCell className="text-right px-2 py-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(property)}
-                    className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                </TableCell>
+                {isAuthenticated && (
+                  <TableCell className="text-right px-2 py-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(property)}
+                      className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
               );
             })

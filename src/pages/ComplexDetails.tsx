@@ -28,7 +28,7 @@ const ComplexDetails = () => {
   const { complexes, updateComplex, loading: complexesLoading } = useComplexes();
   const { properties, addProperty, updateProperty, deleteProperty, loading: propertiesLoading } = useProperties(complexId || "");
   const { clients } = useClients();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const isMobile = useIsMobile();
   
   const [currentComplex, setCurrentComplex] = useState<Complex | undefined>();
@@ -405,56 +405,69 @@ const ComplexDetails = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch sm:items-center">
             <ThemeToggle />
-            {complexId === "complex-1" && (
+            {!user && (
               <Button
                 variant="outline"
-                onClick={handleImportComplex1Data}
-                disabled={isImporting}
+                onClick={() => navigate('/auth')}
                 className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
               >
-                <FileUp className="h-4 w-4" />
-                {isImporting ? "Se importă..." : "Import complet"}
+                Autentificare
               </Button>
             )}
-            {complexId === "complex-viilor33" && (
-              <Button
-                variant="outline"
-                onClick={handleImportViilor33Data}
-                disabled={isImporting}
-                className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
-              >
-                <FileUp className="h-4 w-4" />
-                {isImporting ? "Se importă..." : "Import date"}
-              </Button>
+            {user && (
+              <>
+                {complexId === "complex-1" && (
+                  <Button
+                    variant="outline"
+                    onClick={handleImportComplex1Data}
+                    disabled={isImporting}
+                    className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                  >
+                    <FileUp className="h-4 w-4" />
+                    {isImporting ? "Se importă..." : "Import complet"}
+                  </Button>
+                )}
+                {complexId === "complex-viilor33" && (
+                  <Button
+                    variant="outline"
+                    onClick={handleImportViilor33Data}
+                    disabled={isImporting}
+                    className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                  >
+                    <FileUp className="h-4 w-4" />
+                    {isImporting ? "Se importă..." : "Import date"}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => setIsComplexEditOpen(true)}
+                  className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">Editează Complex</span>
+                  <span className="sm:hidden">Complex</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsImportDialogOpen(true)}
+                  className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                >
+                  <FileUp className="h-4 w-4" />
+                  <span className="hidden sm:inline">Importă Excel</span>
+                  <span className="sm:hidden">Import</span>
+                </Button>
+                <Button
+                  onClick={() => {
+                    setEditingProperty(null);
+                    setIsDialogOpen(true);
+                  }}
+                  className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                >
+                  <Plus className="h-4 w-4" />
+                  Adaugă
+                </Button>
+              </>
             )}
-            <Button
-              variant="outline"
-              onClick={() => setIsComplexEditOpen(true)}
-              className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
-            >
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Editează Complex</span>
-              <span className="sm:hidden">Complex</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsImportDialogOpen(true)}
-              className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
-            >
-              <FileUp className="h-4 w-4" />
-              <span className="hidden sm:inline">Importă Excel</span>
-              <span className="sm:hidden">Import</span>
-            </Button>
-            <Button
-              onClick={() => {
-                setEditingProperty(null);
-                setIsDialogOpen(true);
-              }}
-              className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
-            >
-              <Plus className="h-4 w-4" />
-              Adaugă
-            </Button>
           </div>
         </div>
 
@@ -624,6 +637,7 @@ const ComplexDetails = () => {
                           userRole={profile?.role}
                           commissionType={currentComplex?.commission_type}
                           commissionValue={currentComplex?.commission_value}
+                          isAuthenticated={!!user}
                         />
                       </TabsContent>
                     ))}
@@ -643,6 +657,7 @@ const ComplexDetails = () => {
                 userRole={profile?.role}
                 commissionType={currentComplex?.commission_type}
                 commissionValue={currentComplex?.commission_value}
+                isAuthenticated={!!user}
               />
             )}
           </CardContent>

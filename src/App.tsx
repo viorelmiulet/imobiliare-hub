@@ -35,8 +35,8 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/complex/:complexId" element={<ProtectedRoute><ComplexDetails /></ProtectedRoute>} />
+              <Route path="/" element={<Index />} />
+              <Route path="/complex/:complexId" element={<ComplexDetails />} />
               <Route path="/clients" element={<ProtectedRoute><ClientsOverview /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="/import-eurocasa" element={<ProtectedRoute><ImportEurocasaData /></ProtectedRoute>} />

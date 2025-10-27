@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const Index = () => {
   const navigate = useNavigate();
   const { complexes } = useComplexes();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/5 relative overflow-hidden">
@@ -22,31 +22,53 @@ const Index = () => {
         {/* Header */}
         <div className="flex justify-between items-center pt-2 px-4 glass-card rounded-2xl p-4 animate-fade-in">
           <div className="text-sm font-medium">
-            <span className="text-muted-foreground">Bine ai venit, </span>
-            <span className="text-foreground">{profile?.full_name || profile?.email}</span>
+            {user ? (
+              <>
+                <span className="text-muted-foreground">Bine ai venit, </span>
+                <span className="text-foreground">{profile?.full_name || profile?.email}</span>
+              </>
+            ) : (
+              <span className="text-muted-foreground">Bine ai venit!</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            {profile?.role === 'admin' && (
-              <Button
-                variant="outline"
-                onClick={() => navigate('/admin')}
-                className="gap-2 glass-hover"
-                size="sm"
-              >
-                <Shield className="h-4 w-4" />
-                Admin
-              </Button>
+            {user ? (
+              <>
+                {profile?.role === 'admin' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/admin')}
+                    className="gap-2 glass-hover"
+                    size="sm"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Button>
+                )}
+                <ThemeToggle />
+                <Button
+                  variant="outline"
+                  onClick={signOut}
+                  className="gap-2 glass-hover hover:border-destructive/50 hover:text-destructive"
+                  size="sm"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Deconectare
+                </Button>
+              </>
+            ) : (
+              <>
+                <ThemeToggle />
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/auth')}
+                  className="gap-2 glass-hover"
+                  size="sm"
+                >
+                  Autentificare
+                </Button>
+              </>
             )}
-            <ThemeToggle />
-            <Button
-              variant="outline"
-              onClick={signOut}
-              className="gap-2 glass-hover hover:border-destructive/50 hover:text-destructive"
-              size="sm"
-            >
-              <LogOut className="h-4 w-4" />
-              Deconectare
-            </Button>
           </div>
         </div>
         
@@ -67,17 +89,19 @@ const Index = () => {
               Selectează un complex pentru a gestiona proprietățile și vânzările
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2 animate-fade-in [animation-delay:0.4s]">
-            <ClientDialog />
-            <Button
-              onClick={() => navigate("/clients")}
-              variant="outline"
-              className="gap-2 glass-hover shadow-lg hover:shadow-xl transition-all hover:scale-105"
-            >
-              <Users className="h-4 w-4" />
-              Vizualizare Clienți
-            </Button>
-          </div>
+          {user && (
+            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2 animate-fade-in [animation-delay:0.4s]">
+              <ClientDialog />
+              <Button
+                onClick={() => navigate("/clients")}
+                variant="outline"
+                className="gap-2 glass-hover shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <Users className="h-4 w-4" />
+                Vizualizare Clienți
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Stats Overview */}

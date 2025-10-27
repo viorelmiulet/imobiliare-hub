@@ -14,23 +14,35 @@ export const useProperties = (complexId: string) => {
     }
     
     try {
-      const { data, error } = await supabase
-        .from('properties')
-        .select(`
-          *,
-          clients (
-            name
-          )
-        `)
-        .eq('complex_id', complexId);
+      // Check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      const isAuthenticated = !!session;
+
+      // Only include client data if user is authenticated
+      const query = isAuthenticated
+        ? supabase
+            .from('properties')
+            .select(`
+              *,
+              clients (
+                name
+              )
+            `)
+            .eq('complex_id', complexId)
+        : supabase
+            .from('properties')
+            .select('*')
+            .eq('complex_id', complexId);
+
+      const { data, error } = await query;
 
       if (error) throw error;
       
       // Transform from database format to Property format
       const transformedData = (data || []).map(row => ({
         id: row.id,
-        client_id: row.client_id,
-        clientName: row.clients?.name,
+        client_id: isAuthenticated ? row.client_id : undefined,
+        clientName: isAuthenticated ? (row as any).clients?.name : undefined,
         ...(row.data as Record<string, any>)
       }));
       
