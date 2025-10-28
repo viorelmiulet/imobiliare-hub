@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useComplexes } from '@/hooks/useComplexes';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Shield, Users, Plus, Edit, Building2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -22,7 +24,7 @@ interface UserWithRole {
   role: string;
 }
 
-interface Complex {
+interface ComplexInfo {
   id: string;
   name: string;
 }
@@ -30,8 +32,9 @@ interface Complex {
 const Admin = () => {
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
+  const { complexes: complexesList, addComplex, deleteComplex } = useComplexes();
   const [users, setUsers] = useState<UserWithRole[]>([]);
-  const [complexes, setComplexes] = useState<Complex[]>([]);
+  const [complexes, setComplexes] = useState<ComplexInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('');
@@ -49,6 +52,17 @@ const Admin = () => {
   const [editEmail, setEditEmail] = useState('');
   const [editPassword, setEditPassword] = useState('');
   const [updating, setUpdating] = useState(false);
+  
+  // Complex creation states
+  const [createComplexDialogOpen, setCreateComplexDialogOpen] = useState(false);
+  const [newComplexId, setNewComplexId] = useState('');
+  const [newComplexName, setNewComplexName] = useState('');
+  const [newComplexLocation, setNewComplexLocation] = useState('');
+  const [newComplexDescription, setNewComplexDescription] = useState('');
+  const [newComplexImage, setNewComplexImage] = useState('');
+  const [newComplexCommissionType, setNewComplexCommissionType] = useState<'fixed' | 'percentage'>('percentage');
+  const [newComplexCommissionValue, setNewComplexCommissionValue] = useState('0');
+  const [creatingComplex, setCreatingComplex] = useState(false);
 
   const newUserSchema = z.object({
     email: z.string().trim().email({ message: 'Email invalid' }).max(255),
@@ -293,6 +307,54 @@ const Admin = () => {
       toast.error(error instanceof Error ? error.message : 'Eroare la ștergerea utilizatorului');
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleCreateComplex = async () => {
+    if (!newComplexId || !newComplexName || !newComplexLocation) {
+      toast.error('ID, nume și locație sunt obligatorii');
+      return;
+    }
+
+    setCreatingComplex(true);
+    try {
+      await addComplex({
+        id: newComplexId,
+        name: newComplexName,
+        location: newComplexLocation,
+        description: newComplexDescription,
+        image: newComplexImage,
+        commission_type: newComplexCommissionType,
+        commission_value: parseFloat(newComplexCommissionValue) || 0,
+      });
+
+      toast.success('Complex creat cu succes');
+      setCreateComplexDialogOpen(false);
+      setNewComplexId('');
+      setNewComplexName('');
+      setNewComplexLocation('');
+      setNewComplexDescription('');
+      setNewComplexImage('');
+      setNewComplexCommissionType('percentage');
+      setNewComplexCommissionValue('0');
+      fetchComplexes();
+    } catch (error) {
+      console.error('Error creating complex:', error);
+    } finally {
+      setCreatingComplex(false);
+    }
+  };
+
+  const handleDeleteComplex = async (complexId: string) => {
+    if (!confirm('Sigur doriți să ștergeți acest complex? Această acțiune nu poate fi anulată.')) {
+      return;
+    }
+
+    try {
+      await deleteComplex(complexId);
+      fetchComplexes();
+    } catch (error) {
+      console.error('Error deleting complex:', error);
     }
   };
 
@@ -723,6 +785,184 @@ const Admin = () => {
                   <>
                     <Shield className="h-4 w-4" />
                     Salvează Modificările
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Complexes Table */}
+        <Card className="shadow-lg">
+          <CardHeader className="bg-muted/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Building2 className="h-5 w-5 text-primary" />
+                  Complexe
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Gestionează complexurile rezidențiale
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={() => setCreateComplexDialogOpen(true)}
+                className="gap-2 shadow-md hover:shadow-lg transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                Complex Nou
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="font-semibold">ID</TableHead>
+                    <TableHead className="font-semibold">Nume</TableHead>
+                    <TableHead className="font-semibold">Locație</TableHead>
+                    <TableHead className="font-semibold text-right">Acțiuni</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {complexesList.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                        Niciun complex găsit
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    complexesList.map((complex) => (
+                      <TableRow key={complex.id} className="hover:bg-muted/50 transition-colors">
+                        <TableCell className="font-mono text-sm text-muted-foreground">{complex.id}</TableCell>
+                        <TableCell className="font-medium">{complex.name}</TableCell>
+                        <TableCell className="text-muted-foreground">{complex.location}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteComplex(complex.id)}
+                            className="gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            Șterge
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Create Complex Dialog */}
+        <Dialog open={createComplexDialogOpen} onOpenChange={setCreateComplexDialogOpen}>
+          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-primary" />
+                Creează complex nou
+              </DialogTitle>
+              <DialogDescription>
+                Adaugă un complex rezidențial nou în sistem
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="complex-id">ID Complex *</Label>
+                <Input
+                  id="complex-id"
+                  value={newComplexId}
+                  onChange={(e) => setNewComplexId(e.target.value)}
+                  placeholder="complex-1"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="complex-name">Nume *</Label>
+                <Input
+                  id="complex-name"
+                  value={newComplexName}
+                  onChange={(e) => setNewComplexName(e.target.value)}
+                  placeholder="Numele complexului"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="complex-location">Locație *</Label>
+                <Input
+                  id="complex-location"
+                  value={newComplexLocation}
+                  onChange={(e) => setNewComplexLocation(e.target.value)}
+                  placeholder="București, România"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="complex-description">Descriere</Label>
+                <Textarea
+                  id="complex-description"
+                  value={newComplexDescription}
+                  onChange={(e) => setNewComplexDescription(e.target.value)}
+                  placeholder="Descrierea complexului..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="complex-image">URL Imagine</Label>
+                <Input
+                  id="complex-image"
+                  value={newComplexImage}
+                  onChange={(e) => setNewComplexImage(e.target.value)}
+                  placeholder="https://exemplu.com/imagine.jpg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="commission-type">Tip Comision</Label>
+                <Select value={newComplexCommissionType} onValueChange={(value: 'fixed' | 'percentage') => setNewComplexCommissionType(value)}>
+                  <SelectTrigger id="commission-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="percentage">Procent (%)</SelectItem>
+                    <SelectItem value="fixed">Fix (EUR)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="commission-value">Valoare Comision</Label>
+                <Input
+                  id="commission-value"
+                  type="number"
+                  step="0.01"
+                  value={newComplexCommissionValue}
+                  onChange={(e) => setNewComplexCommissionValue(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setCreateComplexDialogOpen(false)} disabled={creatingComplex}>
+                Anulează
+              </Button>
+              <Button onClick={handleCreateComplex} disabled={creatingComplex} className="gap-2">
+                {creatingComplex ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Se creează...
+                  </>
+                ) : (
+                  <>
+                    <Building2 className="h-4 w-4" />
+                    Creează Complex
                   </>
                 )}
               </Button>

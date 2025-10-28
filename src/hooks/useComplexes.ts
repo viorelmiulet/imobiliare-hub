@@ -35,6 +35,33 @@ export const useComplexes = () => {
     }
   }, []);
 
+  const addComplex = useCallback(async (complex: Omit<Complex, 'total_properties' | 'available_properties'>) => {
+    try {
+      const { error } = await supabase
+        .from('complexes')
+        .insert({
+          id: complex.id,
+          name: complex.name,
+          location: complex.location,
+          description: complex.description,
+          image: complex.image,
+          commission_type: complex.commission_type || 'percentage',
+          commission_value: complex.commission_value || 0,
+          total_properties: 0,
+          available_properties: 0,
+        });
+
+      if (error) throw error;
+      
+      await fetchComplexes();
+      toast.success('Complex creat cu succes');
+    } catch (error) {
+      console.error('Error adding complex:', error);
+      toast.error('Eroare la crearea complexului');
+      throw error;
+    }
+  }, [fetchComplexes]);
+
   const updateComplex = useCallback(async (id: string, updates: Partial<Complex>) => {
     try {
       const { error } = await supabase
@@ -52,6 +79,24 @@ export const useComplexes = () => {
     }
   }, [fetchComplexes]);
 
+  const deleteComplex = useCallback(async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('complexes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      await fetchComplexes();
+      toast.success('Complex șters cu succes');
+    } catch (error) {
+      console.error('Error deleting complex:', error);
+      toast.error('Eroare la ștergerea complexului');
+      throw error;
+    }
+  }, [fetchComplexes]);
+
   useEffect(() => {
     fetchComplexes();
   }, []);
@@ -59,7 +104,9 @@ export const useComplexes = () => {
   return {
     complexes,
     loading,
+    addComplex,
     updateComplex,
+    deleteComplex,
     refetch: fetchComplexes,
   };
 };
