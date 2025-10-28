@@ -28,7 +28,7 @@ const ComplexDetails = () => {
   const { complexes, updateComplex, loading: complexesLoading } = useComplexes();
   const { properties, addProperty, updateProperty, deleteProperty, loading: propertiesLoading } = useProperties(complexId || "");
   const { clients } = useClients();
-  const { profile, user } = useAuth();
+  const { profile, user, isAdmin, isManager } = useAuth();
   const isMobile = useIsMobile();
   
   const [currentComplex, setCurrentComplex] = useState<Complex | undefined>();
@@ -521,47 +521,50 @@ const ComplexDetails = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-accent shadow-md hover:shadow-lg transition-all">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Comisioane
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {statistics.corpNames.length > 1 ? (
-                <div className="space-y-2">
-                  {statistics.corpNames.map(corp => (
-                    <div key={corp} className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-muted-foreground">{corp}:</span>
-                      <span className="text-lg font-bold text-accent">
+
+          {(isAdmin || isManager) && (
+            <Card className="border-l-4 border-l-accent shadow-md hover:shadow-lg transition-all">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total Comisioane
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {statistics.corpNames.length > 1 ? (
+                  <div className="space-y-2">
+                    {statistics.corpNames.map(corp => (
+                      <div key={corp} className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-muted-foreground">{corp}:</span>
+                        <span className="text-lg font-bold text-accent">
+                          {new Intl.NumberFormat('ro-RO', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(statistics.commissionsPerCorp[corp])} EUR
+                        </span>
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-center pt-2 border-t border-border">
+                      <span className="text-sm font-semibold">Total:</span>
+                      <span className="text-xl font-bold text-accent">
                         {new Intl.NumberFormat('ro-RO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }).format(statistics.commissionsPerCorp[corp])} EUR
+                        }).format(statistics.totalCommissions)} EUR
                       </span>
                     </div>
-                  ))}
-                  <div className="flex justify-between items-center pt-2 border-t border-border">
-                    <span className="text-sm font-semibold">Total:</span>
-                    <span className="text-xl font-bold text-accent">
-                      {new Intl.NumberFormat('ro-RO', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(statistics.totalCommissions)} EUR
-                    </span>
                   </div>
-                </div>
-              ) : (
-                <div className="text-xl sm:text-2xl font-bold text-accent">
-                  {new Intl.NumberFormat('ro-RO', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(statistics.totalCommissions)}
-                  {` EUR`}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <div className="text-xl sm:text-2xl font-bold text-accent">
+                    {new Intl.NumberFormat('ro-RO', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(statistics.totalCommissions)}
+                    {` EUR`}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Filters and Search */}
