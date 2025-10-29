@@ -351,8 +351,8 @@ const ComplexDetails = () => {
   
   if (isStillLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
-        <Card>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
+        <Card className="glass-card">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center gap-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -366,11 +366,11 @@ const ComplexDetails = () => {
 
   if (!currentComplex) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center">
-        <Card>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
+        <Card className="glass-card">
           <CardContent className="pt-6">
             <p className="text-center text-muted-foreground">Complex negăsit</p>
-            <Button onClick={() => navigate("/")} className="mt-4 w-full">
+            <Button onClick={() => navigate("/")} className="mt-4 w-full shadow-md hover:shadow-lg">
               Înapoi la Dashboard
             </Button>
           </CardContent>
@@ -380,24 +380,24 @@ const ComplexDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 animate-fade-in">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header with Back Button */}
-        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between animate-slide-in">
           <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="icon"
               onClick={() => navigate("/")}
-              className="hover:bg-primary hover:text-primary-foreground transition-all shrink-0 h-9 w-9 sm:h-10 sm:w-10"
+              className="hover:bg-primary hover:text-primary-foreground transition-all duration-300 shrink-0 h-9 w-9 sm:h-10 sm:w-10 active:scale-95"
             >
               <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <div className="p-2 sm:p-3 bg-gradient-to-br from-primary to-info rounded-lg sm:rounded-xl shadow-lg shrink-0">
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-primary via-accent to-info rounded-xl shadow-xl shrink-0 hover:scale-110 transition-all duration-300">
               <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent truncate">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-info bg-clip-text text-transparent truncate">
                 {currentComplex.name}
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground truncate">{currentComplex.location}</p>
@@ -479,58 +479,58 @@ const ComplexDetails = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <Card className="border-l-4 border-l-primary shadow-md hover:shadow-lg transition-all">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 animate-fade-in">
+          <Card className="glass-card border-l-4 border-l-primary shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Proprietăți
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold">{properties.length}</div>
+              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{properties.length}</div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-success shadow-md hover:shadow-lg transition-all">
+          <Card className="glass-card border-l-4 border-l-success shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Disponibile
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-success">
+              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
                 {statistics.availableCount}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-warning shadow-md hover:shadow-lg transition-all">
+          <Card className="glass-card border-l-4 border-l-warning shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Rezervate
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-warning">
+              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-warning to-warning/70 bg-clip-text text-transparent">
                 {statistics.reservedCount}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-info shadow-md hover:shadow-lg transition-all">
+          <Card className="glass-card border-l-4 border-l-info shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Vândute
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-info">{statistics.soldCount}</div>
+              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-info to-info/70 bg-clip-text text-transparent">{statistics.soldCount}</div>
             </CardContent>
           </Card>
 
 
           {(isAdmin || isManager) && (
-            <Card className="border-l-4 border-l-accent shadow-md hover:shadow-lg transition-all">
+            <Card className="glass-card border-l-4 border-l-accent shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Total Comisioane
@@ -575,9 +575,10 @@ const ComplexDetails = () => {
         </div>
 
         {/* Filters and Search */}
-        <Card className="shadow-md">
+        <Card className="glass-card shadow-lg hover:shadow-xl transition-all duration-300 gradient-border">
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5 text-primary" />
               Filtre și Căutare
             </CardTitle>
           </CardHeader>
@@ -606,9 +607,10 @@ const ComplexDetails = () => {
         </Card>
 
         {/* Properties Table with Corps Tabs (conditional) */}
-        <Card className="shadow-md">
+        <Card className="glass-card shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-primary" />
               Proprietăți
             </CardTitle>
           </CardHeader>
