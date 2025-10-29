@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { ArrowLeft, Search, User, Building2, Phone, Mail, Upload } from "lucide-
 import { useClients } from "@/hooks/useClients";
 import { useComplexes } from "@/hooks/useComplexes";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface PropertyWithComplex {
@@ -26,28 +25,42 @@ export default function ClientsOverview() {
 
   useEffect(() => {
     const fetchClientProperties = async () => {
-      const propertiesMap: Record<string, PropertyWithComplex[]> = {};
+      // Fetch all properties with client_id in one query instead of multiple queries
+      const clientIds = clients.map(c => c.id);
       
-      for (const client of clients) {
-        const { data, error } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('client_id', client.id);
-        
-        if (!error && data) {
-          propertiesMap[client.id] = data.map(prop => {
-            const complex = complexes.find(c => c.id === prop.complex_id);
-            return {
-              id: prop.id,
-              complex_id: prop.complex_id,
-              complex_name: complex?.name || 'Unknown',
-              data: prop.data
-            };
-          });
-        }
+      if (clientIds.length === 0) {
+        setClientProperties({});
+        return;
       }
+
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .in('client_id', clientIds);
       
-      setClientProperties(propertiesMap);
+      if (!error && data) {
+        // Group properties by client_id
+        const propertiesMap: Record<string, PropertyWithComplex[]> = {};
+        
+        data.forEach(prop => {
+          if (!prop.client_id) return;
+          
+          const complex = complexes.find(c => c.id === prop.complex_id);
+          const propertyWithComplex = {
+            id: prop.id,
+            complex_id: prop.complex_id,
+            complex_name: complex?.name || 'Unknown',
+            data: prop.data
+          };
+          
+          if (!propertiesMap[prop.client_id]) {
+            propertiesMap[prop.client_id] = [];
+          }
+          propertiesMap[prop.client_id].push(propertyWithComplex);
+        });
+        
+        setClientProperties(propertiesMap);
+      }
     };
 
     if (clients.length > 0 && complexes.length > 0) {
@@ -55,10 +68,22 @@ export default function ClientsOverview() {
     }
   }, [clients, complexes]);
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredClients = useMemo(() => 
+    clients.filter(client =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    ), [clients, searchTerm]
+  );
+
+  const clientsWithProperties = useMemo(() => 
+    Object.keys(clientProperties).filter(id => clientProperties[id].length > 0).length,
+    [clientProperties]
+  );
+
+  const totalProperties = useMemo(() => 
+    Object.values(clientProperties).reduce((sum, props) => sum + props.length, 0),
+    [clientProperties]
   );
 
   const getPropertyLabel = (property: PropertyWithComplex) => {
@@ -132,7 +157,7 @@ export default function ClientsOverview() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-success">
-                {Object.keys(clientProperties).filter(id => clientProperties[id].length > 0).length}
+                {clientsWithProperties}
               </div>
             </CardContent>
           </Card>
@@ -145,7 +170,7 @@ export default function ClientsOverview() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-info">
-                {Object.values(clientProperties).reduce((sum, props) => sum + props.length, 0)}
+                {totalProperties}
               </div>
             </CardContent>
           </Card>
