@@ -351,247 +351,229 @@ const ComplexDetails = () => {
   
   if (isStillLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-center text-muted-foreground">Se încarcă...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="p-8 rounded-2xl border bg-card">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
+            <p className="text-sm text-muted-foreground">Se încarcă...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!currentComplex) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Complex negăsit</p>
-            <Button onClick={() => navigate("/")} className="mt-4 w-full shadow-md hover:shadow-lg">
-              Înapoi la Dashboard
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="p-8 rounded-2xl border bg-card space-y-4 text-center">
+          <p className="text-sm text-muted-foreground">Complex negăsit</p>
+          <Button onClick={() => navigate("/")} size="sm">
+            Înapoi la Dashboard
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 animate-fade-in">
-      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
-        {/* Header with Back Button */}
-        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between animate-slide-in">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate("/")}
-              className="hover:bg-primary hover:text-primary-foreground transition-all duration-300 shrink-0 h-9 w-9 sm:h-10 sm:w-10 active:scale-95"
-            >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            <div className="p-2 sm:p-3 bg-gradient-to-br from-primary via-accent to-info rounded-xl shadow-xl shrink-0 hover:scale-110 transition-all duration-300">
-              <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary-foreground" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-info bg-clip-text text-transparent truncate">
-                {currentComplex.name}
-              </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground truncate">{currentComplex.location}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2 w-full md:w-auto items-stretch">
-            <ThemeToggle />
-            {!user && (
+    <div className="min-h-screen bg-background">
+      {/* Fixed Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left side - Back button and complex info */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <Button
-                variant="outline"
-                onClick={() => navigate('/auth')}
-                className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 min-w-0"
-                size="sm"
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+                className="shrink-0 h-9 w-9"
               >
-                Autentificare
+                <ArrowLeft className="h-4 w-4" />
               </Button>
-            )}
-            {user && (
-              <>
-                {complexId === "complex-1" && (
+              
+              <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                <Building2 className="h-4 w-4 text-primary-foreground" />
+              </div>
+              
+              <div className="min-w-0">
+                <h1 className="text-sm font-bold tracking-tight truncate">
+                  {currentComplex.name}
+                </h1>
+                <p className="text-xs text-muted-foreground truncate">
+                  {currentComplex.location}
+                </p>
+              </div>
+            </div>
+
+            {/* Right side - Action buttons */}
+            <div className="flex items-center gap-2 shrink-0">
+              <ThemeToggle />
+              
+              {!user && (
+                <Button variant="default" size="sm" onClick={() => navigate('/auth')}>
+                  Login
+                </Button>
+              )}
+              
+              {user && (
+                <>
+                  {complexId === "complex-1" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleImportComplex1Data}
+                      disabled={isImporting}
+                    >
+                      <FileUp className="h-4 w-4" />
+                      <span className="hidden md:inline ml-2">
+                        {isImporting ? "Import..." : "Import"}
+                      </span>
+                    </Button>
+                  )}
+                  
+                  {complexId === "complex-viilor33" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleImportViilor33Data}
+                      disabled={isImporting}
+                    >
+                      <FileUp className="h-4 w-4" />
+                      <span className="hidden md:inline ml-2">
+                        {isImporting ? "Import..." : "Date"}
+                      </span>
+                    </Button>
+                  )}
+                  
                   <Button
-                    variant="outline"
-                    onClick={handleImportComplex1Data}
-                    disabled={isImporting}
-                    className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
+                    variant="ghost"
                     size="sm"
+                    onClick={() => setIsComplexEditOpen(true)}
                   >
-                    <FileUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">{isImporting ? "Se importă..." : "Import complet"}</span>
-                    <span className="sm:hidden">{isImporting ? "Import..." : "Import"}</span>
+                    <Settings className="h-4 w-4" />
                   </Button>
-                )}
-                {complexId === "complex-viilor33" && (
+                  
                   <Button
-                    variant="outline"
-                    onClick={handleImportViilor33Data}
-                    disabled={isImporting}
-                    className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
+                    variant="ghost"
                     size="sm"
+                    onClick={() => setIsImportDialogOpen(true)}
                   >
-                    <FileUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">{isImporting ? "Se importă..." : "Import date"}</span>
-                    <span className="sm:hidden">{isImporting ? "Import..." : "Date"}</span>
+                    <FileUp className="h-4 w-4" />
                   </Button>
-                )}
-                <Button
-                  variant="outline"
-                  onClick={() => setIsComplexEditOpen(true)}
-                  className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
-                  size="sm"
-                >
-                  <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Editează Complex</span>
-                  <span className="sm:hidden">Complex</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsImportDialogOpen(true)}
-                  className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
-                  size="sm"
-                >
-                  <FileUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Importă Excel</span>
-                  <span className="sm:hidden">Excel</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setEditingProperty(null);
-                    setIsDialogOpen(true);
-                  }}
-                  className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
-                >
-                  <Plus className="h-4 w-4" />
-                  Adaugă
-                </Button>
-              </>
-            )}
+                  
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setEditingProperty(null);
+                      setIsDialogOpen(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden md:inline ml-2">Adaugă</span>
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 animate-fade-in">
-          <Card className="glass-card border-l-4 border-l-primary shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Proprietăți
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{properties.length}</div>
-            </CardContent>
-          </Card>
+      <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Stats Cards - Minimalist Bento Style */}
+        <section className="grid gap-3 grid-cols-2 md:grid-cols-5">
+          <div className="p-4 rounded-2xl border bg-card">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Total</p>
+              <p className="text-3xl font-bold tracking-tighter">{properties.length}</p>
+            </div>
+          </div>
 
-          <Card className="glass-card border-l-4 border-l-success shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Disponibile
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
+          <div className="p-4 rounded-2xl border bg-card">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Disponibile</p>
+              <p className="text-3xl font-bold tracking-tighter text-success">
                 {statistics.availableCount}
-              </div>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+          </div>
 
-          <Card className="glass-card border-l-4 border-l-warning shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Rezervate
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-warning to-warning/70 bg-clip-text text-transparent">
+          <div className="p-4 rounded-2xl border bg-card">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Rezervate</p>
+              <p className="text-3xl font-bold tracking-tighter text-warning">
                 {statistics.reservedCount}
-              </div>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+          </div>
 
-          <Card className="glass-card border-l-4 border-l-info shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Vândute
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-info to-info/70 bg-clip-text text-transparent">{statistics.soldCount}</div>
-            </CardContent>
-          </Card>
-
+          <div className="p-4 rounded-2xl border bg-card">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Vândute</p>
+              <p className="text-3xl font-bold tracking-tighter text-info">{statistics.soldCount}</p>
+            </div>
+          </div>
 
           {(isAdmin || isManager) && (
-            <Card className="glass-card border-l-4 border-l-accent shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Comisioane
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="p-4 rounded-2xl border bg-card col-span-2 md:col-span-1">
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Comisioane</p>
                 {statistics.corpNames.length > 1 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {statistics.corpNames.map(corp => (
-                      <div key={corp} className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-muted-foreground">{corp}:</span>
-                        <span className="text-lg font-bold text-accent">
+                      <div key={corp} className="flex justify-between items-center text-xs">
+                        <span className="text-muted-foreground">{corp}:</span>
+                        <span className="font-semibold text-accent">
                           {new Intl.NumberFormat('ro-RO', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
-                          }).format(statistics.commissionsPerCorp[corp])} EUR
+                          }).format(statistics.commissionsPerCorp[corp])} €
                         </span>
                       </div>
                     ))}
-                    <div className="flex justify-between items-center pt-2 border-t border-border">
-                      <span className="text-sm font-semibold">Total:</span>
-                      <span className="text-xl font-bold text-accent">
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="text-xs font-medium">Total:</span>
+                      <span className="text-lg font-bold tracking-tighter text-accent">
                         {new Intl.NumberFormat('ro-RO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }).format(statistics.totalCommissions)} EUR
+                        }).format(statistics.totalCommissions)} €
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-xl sm:text-2xl font-bold text-accent">
+                  <p className="text-2xl font-bold tracking-tighter text-accent">
                     {new Intl.NumberFormat('ro-RO', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }).format(statistics.totalCommissions)}
-                    {` EUR`}
-                  </div>
+                    }).format(statistics.totalCommissions)} €
+                  </p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
-        </div>
+        </section>
 
-        {/* Filters and Search */}
-        <Card className="glass-card shadow-lg hover:shadow-xl transition-all duration-300 gradient-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5 text-primary" />
-              Filtre și Căutare
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* Search and Filters - Inline */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold tracking-tight">Proprietăți</h2>
+            <p className="text-sm text-muted-foreground">
+              {filteredProperties.length} din {properties.length}
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Caută după număr apartament, nume, agent..."
+                placeholder="Caută apartament, client, agent..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
+            
             <PropertyFilters
               selectedFloor={selectedFloor}
               selectedType={selectedType}
@@ -603,18 +585,11 @@ const ComplexDetails = () => {
               onCorpChange={setSelectedCorp}
               properties={properties}
             />
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
         {/* Properties Table with Corps Tabs (conditional) */}
-        <Card className="glass-card shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
-              Proprietăți
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <section className="rounded-2xl border bg-card p-6">
             {properties.some(p => (p as any).corp || (p as any).CORP) ? (
               (() => {
                 const corpNames = Array.from(
@@ -671,9 +646,8 @@ const ComplexDetails = () => {
                 commissionValue={currentComplex?.commission_value}
                 isAuthenticated={!!user}
               />
-            )}
-          </CardContent>
-        </Card>
+          )}
+        </section>
 
         {/* Add/Edit Property Dialog */}
         <PropertyDialog
@@ -708,7 +682,7 @@ const ComplexDetails = () => {
           complexId={complexId || ""}
           onImport={handleExcelImport}
         />
-      </div>
+      </main>
     </div>
   );
 };
