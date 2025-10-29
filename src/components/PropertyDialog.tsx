@@ -227,7 +227,6 @@ export const PropertyDialog = ({
                   setFormData({ ...formData, nrAp: e.target.value })
                 }
                 placeholder="ex: AP 1"
-                required
               />
             </div>
 
@@ -267,7 +266,6 @@ export const PropertyDialog = ({
                   })
                 }
                 placeholder="33.52"
-                required
               />
             </div>
 
