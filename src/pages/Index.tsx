@@ -13,232 +13,185 @@ const Index = () => {
   const { profile, signOut, user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/5 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse [animation-delay:2s]" />
-      
-      <div className="container mx-auto p-3 sm:p-6 space-y-6 sm:space-y-8 relative z-10">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 px-3 sm:px-4 glass-card rounded-2xl p-3 sm:p-4 animate-fade-in">
-          <div className="text-xs sm:text-sm font-medium">
-            {user ? (
-              <>
-                <span className="text-muted-foreground">Bine ai venit, </span>
-                <span className="text-foreground">{profile?.full_name || profile?.email}</span>
-              </>
-            ) : (
-              <span className="text-muted-foreground">Bine ai venit!</span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {user ? (
-              <>
-                {profile?.role === 'admin' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate('/admin')}
-                    className="gap-2 glass-hover flex-1 sm:flex-initial"
-                    size="sm"
-                  >
-                    <Shield className="h-4 w-4" />
-                    <span className="hidden sm:inline">Admin</span>
-                  </Button>
+    <div className="min-h-screen bg-background">
+      {/* Fixed Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold tracking-tight">Administrare vanzari</h1>
+                {user && (
+                  <p className="text-xs text-muted-foreground">
+                    {profile?.full_name || profile?.email}
+                  </p>
                 )}
-                <ThemeToggle />
-                <Button
-                  variant="outline"
-                  onClick={signOut}
-                  className="gap-2 glass-hover hover:border-destructive/50 hover:text-destructive flex-1 sm:flex-initial"
-                  size="sm"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Deconectare</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                <ThemeToggle />
-                <Button
-                  variant="outline"
-                  onClick={() => navigate('/auth')}
-                  className="gap-2 glass-hover flex-1 sm:flex-initial"
-                  size="sm"
-                >
-                  Autentificare
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-        
-        <div className="text-center space-y-4 sm:space-y-6 pb-4 animate-fade-in [animation-delay:0.1s]">
-          <div className="flex justify-center">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-info rounded-2xl sm:rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative p-3 sm:p-5 bg-gradient-to-br from-primary via-accent to-info rounded-2xl sm:rounded-3xl shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105">
-                <Building2 className="h-10 w-10 sm:h-14 sm:w-14 text-primary-foreground" />
               </div>
             </div>
+            
+            <div className="flex items-center gap-2">
+              {user ? (
+                <>
+                  {profile?.role === 'admin' && (
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/admin')}>
+                      <Shield className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <ThemeToggle />
+                  <Button variant="ghost" size="sm" onClick={signOut}>
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <ThemeToggle />
+                  <Button variant="default" size="sm" onClick={() => navigate('/auth')}>
+                    Autentificare
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-          <div className="space-y-2 sm:space-y-3">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-info bg-clip-text text-transparent px-3 sm:px-4 animate-fade-in [animation-delay:0.2s]">
-              Administrare vanzari
-            </h1>
-            <p className="text-sm sm:text-xl text-muted-foreground max-w-2xl mx-auto px-3 sm:px-4 animate-fade-in [animation-delay:0.3s]">
-              Selectează un complex pentru a gestiona proprietățile și vânzările
-            </p>
-          </div>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8 space-y-8">
+        {/* Hero Section */}
+        <section className="py-12 text-center space-y-4">
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter">
+            Selectează un complex
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Gestionează proprietățile și vânzările din fiecare complex imobiliar
+          </p>
+          
           {user && (
-            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-2 px-3 sm:px-0 animate-fade-in [animation-delay:0.4s]">
+            <div className="flex gap-3 justify-center pt-4">
               <ClientDialog />
-              <Button
-                onClick={() => navigate("/clients")}
-                variant="outline"
-                className="gap-2 glass-hover shadow-lg hover:shadow-xl transition-all hover:scale-105 w-full sm:w-auto"
-              >
-                <Users className="h-4 w-4" />
-                Vizualizare Clienți
+              <Button variant="outline" onClick={() => navigate("/clients")}>
+                <Users className="h-4 w-4 mr-2" />
+                Clienți
               </Button>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Stats Overview */}
-        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto px-3 sm:px-0 animate-fade-in [animation-delay:0.5s]">
-          <Card className="glass-card border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all hover:scale-105 gradient-border">
-            <CardHeader className="pb-2 p-4 sm:p-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
-                Total Complexe
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 pt-0">
-              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                {complexes.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-l-4 border-l-success shadow-lg hover:shadow-2xl transition-all hover:scale-105 gradient-border">
-            <CardHeader className="pb-2 p-4 sm:p-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success" />
-                Total Proprietăți
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 pt-0">
-              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
+        {/* Stats Cards - Bento Style */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <div className="col-span-1 p-6 rounded-2xl border bg-card">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Complexe</p>
+              <p className="text-4xl font-bold tracking-tighter">{complexes.length}</p>
+            </div>
+          </div>
+          
+          <div className="col-span-1 p-6 rounded-2xl border bg-card">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Proprietăți</p>
+              <p className="text-4xl font-bold tracking-tighter text-primary">
                 {complexes.reduce((acc, c) => acc + c.total_properties, 0)}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-l-4 border-l-warning shadow-lg hover:shadow-2xl transition-all hover:scale-105 gradient-border">
-            <CardHeader className="pb-2 p-4 sm:p-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-warning" />
-                Disponibile
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 pt-0">
-              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-warning to-warning/70 bg-clip-text text-transparent">
+              </p>
+            </div>
+          </div>
+          
+          <div className="col-span-1 p-6 rounded-2xl border bg-card">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Disponibile</p>
+              <p className="text-4xl font-bold tracking-tighter text-success">
                 {complexes.reduce((acc, c) => acc + c.available_properties, 0)}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </p>
+            </div>
+          </div>
+          
+          <div className="col-span-1 p-6 rounded-2xl border bg-card">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Vândute</p>
+              <p className="text-4xl font-bold tracking-tighter text-info">
+                {complexes.reduce((acc, c) => acc + (c.total_properties - c.available_properties), 0)}
+              </p>
+            </div>
+          </div>
+        </section>
 
-        {/* Complexes Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto animate-fade-in [animation-delay:0.6s]">
-          {complexes.map((complex, index) => {
-            const colorIndex = (index % 6) + 1;
-            return (
-              <Card
-                key={complex.id}
-                className="group glass-card hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 hover:scale-105 gradient-border overflow-hidden relative"
-                style={{
-                  borderColor: 'hsl(var(--border))',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = `hsl(var(--complex-${colorIndex}))`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'hsl(var(--border))';
-                }}
-                onClick={() => navigate(`/complex/${complex.id}`)}
-              >
-                {/* Decorative gradient overlay */}
-                <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
-                  style={{
-                    background: `linear-gradient(135deg, hsl(var(--complex-${colorIndex})), transparent)`,
-                  }}
-                />
-                <CardHeader className="relative z-10">
-                  <div className="flex items-start justify-between">
-                    <div 
-                      className="p-4 rounded-xl transition-all duration-300 shadow-lg group-hover:shadow-xl relative"
-                      style={{
-                        backgroundColor: `hsl(var(--complex-${colorIndex}) / 0.15)`,
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = `hsl(var(--complex-${colorIndex}))`;
-                        e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
-                        const icon = e.currentTarget.querySelector('svg');
-                        if (icon) (icon as SVGSVGElement).style.color = 'white';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = `hsl(var(--complex-${colorIndex}) / 0.15)`;
-                        e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
-                        const icon = e.currentTarget.querySelector('svg');
-                        if (icon) (icon as SVGSVGElement).style.color = `hsl(var(--complex-${colorIndex}))`;
-                      }}
-                    >
-                      <Building2 
-                        className="h-7 w-7 transition-all duration-300" 
-                        style={{ color: `hsl(var(--complex-${colorIndex}))` }}
-                      />
+        {/* Complexes - Modern Minimalist Grid */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-bold tracking-tight">Complexe</h3>
+            <p className="text-sm text-muted-foreground">{complexes.length} complexe active</p>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {complexes.map((complex, index) => {
+              const colorIndex = (index % 6) + 1;
+              const soldCount = complex.total_properties - complex.available_properties;
+              const soldPercentage = Math.round((soldCount / complex.total_properties) * 100);
+              
+              return (
+                <button
+                  key={complex.id}
+                  onClick={() => navigate(`/complex/${complex.id}`)}
+                  className="group text-left p-6 rounded-2xl border bg-card hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/50"
+                >
+                  <div className="space-y-4">
+                    {/* Header */}
+                    <div className="flex items-start justify-between">
+                      <div 
+                        className="h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                        style={{ backgroundColor: `hsl(var(--complex-${colorIndex}) / 0.1)` }}
+                      >
+                        <Building2 
+                          className="h-6 w-6"
+                          style={{ color: `hsl(var(--complex-${colorIndex}))` }}
+                        />
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    </div>
+                    
+                    {/* Title */}
+                    <div>
+                      <h4 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
+                        {complex.name}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {complex.total_properties} proprietăți
+                      </p>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Vândute</span>
+                        <span className="font-medium">{soldPercentage}%</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary transition-all duration-500"
+                          style={{ width: `${soldPercentage}%` }}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Stats */}
+                    <div className="flex gap-4 pt-2">
+                      <div className="flex-1 space-y-1">
+                        <p className="text-xs text-muted-foreground">Disponibile</p>
+                        <p className="text-lg font-semibold text-success">{complex.available_properties}</p>
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <p className="text-xs text-muted-foreground">Vândute</p>
+                        <p className="text-lg font-semibold text-info">{soldCount}</p>
+                      </div>
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1"
-                  >
-                    <ArrowRight className="h-5 w-5" style={{ color: `hsl(var(--complex-${colorIndex}))` }} />
-                  </Button>
-                </div>
-                <CardTitle className="text-xl mt-4 group-hover:text-primary transition-colors">
-                  {complex.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 relative z-10">
-                <div className="flex justify-between items-center pt-4 border-t border-border/50">
-                  <div className="text-center">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Total</p>
-                    <p className="text-xl font-bold bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
-                      {complex.total_properties}
-                    </p>
-                  </div>
-                  <div className="text-center px-4 py-2 rounded-lg bg-success/10 group-hover:bg-success/20 transition-colors">
-                    <p className="text-xs font-medium text-success mb-1">Disponibile</p>
-                    <p className="text-xl font-bold text-success">
-                      {complex.available_properties}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Vândute</p>
-                    <p className="text-xl font-bold bg-gradient-to-b from-info to-info/70 bg-clip-text text-transparent">
-                      {complex.total_properties - complex.available_properties}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            );
-          })}
-        </div>
-      </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      </main>
     </div>
   );
 };
