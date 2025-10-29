@@ -21,6 +21,11 @@ const complexSchema = z.object({
     .trim()
     .min(1, { message: "Numele complexului este obligatoriu" })
     .max(100, { message: "Numele trebuie să aibă maxim 100 caractere" }),
+  location: z
+    .string()
+    .trim()
+    .min(1, { message: "Adresa complexului este obligatorie" })
+    .max(200, { message: "Adresa trebuie să aibă maxim 200 caractere" }),
   commission_type: z.enum(['fixed', 'percentage']),
   commission_value: z.number().min(0, { message: "Valoarea trebuie să fie pozitivă" }),
 });
@@ -41,17 +46,20 @@ export const ComplexEditDialog = ({
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: complex.name,
+    location: complex.location,
     commission_type: complex.commission_type || 'percentage' as 'fixed' | 'percentage',
     commission_value: complex.commission_value || 0,
   });
   const [errors, setErrors] = useState<{
     name?: string;
+    location?: string;
     commission_value?: string;
   }>({});
 
   useEffect(() => {
     setFormData({
       name: complex.name,
+      location: complex.location,
       commission_type: complex.commission_type || 'percentage',
       commission_value: complex.commission_value || 0,
     });
@@ -69,6 +77,7 @@ export const ComplexEditDialog = ({
       onSubmit({
         ...complex,
         name: validatedData.name,
+        location: validatedData.location,
         commission_type: validatedData.commission_type,
         commission_value: validatedData.commission_value,
       });
@@ -83,6 +92,7 @@ export const ComplexEditDialog = ({
       if (error instanceof z.ZodError) {
         const fieldErrors: {
           name?: string;
+          location?: string;
           commission_value?: string;
         } = {};
         error.issues.forEach((err) => {
@@ -127,6 +137,25 @@ export const ComplexEditDialog = ({
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">
+              Adresă <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) =>
+                setFormData({ ...formData, location: e.target.value })
+              }
+              placeholder="ex: Str. Exemplu nr. 123, București"
+              maxLength={200}
+              className={errors.location ? "border-destructive" : ""}
+            />
+            {errors.location && (
+              <p className="text-sm text-destructive">{errors.location}</p>
             )}
           </div>
 
