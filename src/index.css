@@ -55,14 +55,17 @@ All colors MUST be HSL.
     --complex-6: 45 93% 58%;
     
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(199 89% 58%));
+    --gradient-secondary: linear-gradient(135deg, hsl(280 87% 65%), hsl(238 84% 62%));
     --gradient-subtle: linear-gradient(180deg, hsl(210 30% 98%), hsl(214 20% 96%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60% / 0.1), hsl(199 89% 58% / 0.05));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(214 20% 98% / 0.8));
+    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60% / 0.15), hsl(199 89% 58% / 0.1));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.95), hsl(214 20% 99% / 0.9));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0.05));
     
-    --shadow-sm: 0 1px 2px 0 hsl(215 25% 15% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(215 25% 15% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(215 25% 15% / 0.1);
-    --shadow-xl: 0 20px 25px -5px hsl(215 25% 15% / 0.1);
+    --shadow-sm: 0 2px 4px -1px hsl(215 25% 15% / 0.06);
+    --shadow-md: 0 4px 12px -2px hsl(215 25% 15% / 0.12);
+    --shadow-lg: 0 12px 24px -4px hsl(215 25% 15% / 0.15);
+    --shadow-xl: 0 24px 48px -8px hsl(215 25% 15% / 0.18);
+    --shadow-glow: 0 0 24px hsl(217 91% 60% / 0.3);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -129,14 +132,17 @@ All colors MUST be HSL.
     --complex-6: 45 93% 58%;
     
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(199 89% 58%));
+    --gradient-secondary: linear-gradient(135deg, hsl(280 87% 65%), hsl(238 84% 62%));
     --gradient-subtle: linear-gradient(180deg, hsl(215 28% 12%), hsl(215 25% 16%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60% / 0.15), hsl(199 89% 58% / 0.08));
-    --gradient-card: linear-gradient(145deg, hsl(215 25% 18% / 0.9), hsl(215 25% 16% / 0.8));
+    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60% / 0.2), hsl(199 89% 58% / 0.12));
+    --gradient-card: linear-gradient(145deg, hsl(215 25% 18% / 0.95), hsl(215 25% 16% / 0.9));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.04));
     
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.15);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.25);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.35);
-    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.45);
+    --shadow-sm: 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 12px 24px -4px hsl(0 0% 0% / 0.4);
+    --shadow-xl: 0 24px 48px -8px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 24px hsl(217 91% 60% / 0.4);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --sidebar-background: 240 5.9% 10%;
@@ -162,11 +168,11 @@ All colors MUST be HSL.
 
 @layer utilities {
   .glass-card {
-    @apply backdrop-blur-md bg-card/80 border-border/50;
+    @apply backdrop-blur-xl bg-card/60 border-border/40 shadow-lg;
   }
   
   .glass-hover {
-    @apply hover:backdrop-blur-xl hover:bg-card/90 transition-all duration-300;
+    @apply hover:backdrop-blur-2xl hover:bg-card/80 hover:border-border/60 transition-all duration-300 hover:shadow-xl;
   }
   
   .gradient-border {
@@ -189,6 +195,34 @@ All colors MUST be HSL.
   
   .gradient-border:hover::before {
     opacity: 1;
+  }
+  
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+  
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out;
+  }
+  
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   
   /* Mobile optimizations */
