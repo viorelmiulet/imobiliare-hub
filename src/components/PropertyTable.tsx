@@ -1,14 +1,7 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, X, MessageSquare } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, MessageSquare, User as UserIcon, Building } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
@@ -24,7 +16,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Property } from "@/types/property";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Client } from "@/hooks/useClients";
 import { PropertyPlanViewer } from "./PropertyPlanViewer";
 
@@ -45,7 +36,6 @@ interface PropertyTableProps {
 
 export const PropertyTable = ({
   properties,
-  columns,
   onEdit,
   onStatusChange,
   onClientChange,
@@ -57,492 +47,288 @@ export const PropertyTable = ({
   commissionValue = 2,
   isAuthenticated = true,
 }: PropertyTableProps) => {
-  const isMobile = useIsMobile();
   const isUserRole = userRole === 'user';
 
-  // Filter columns to hide sensitive data for unauthenticated users
-  const sensitiveColumns = ['Client', 'Agent', 'Comision', 'Observatii'];
-  const visibleColumns = isAuthenticated 
-    ? columns 
-    : columns.filter(col => !sensitiveColumns.includes(col));
-
-  // Resolve values for both old (label-based) and new (key-based) datasets
-  const getValue = (property: Property, columnName: string): any => {
+  const getValue = (property: Property, key: string): any => {
     const map: Record<string, string[]> = {
-      'Etaj': ['Etaj', 'etaj', 'ETAJ'],
-      'Nr. ap.': ['Nr. ap.', 'nrAp', 'nr_ap', 'Nr Ap', 'nr ap'],
-      'Tip Apartament': ['Tip Apartament', 'tipCom', 'TIP COM', 'tip_apartament'],
-      'Suprafata': ['Suprafata', 'mpUtili', 'suprafata', 'mp'],
-      'Pret Credit': ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit'],
-      'Pret Cash': ['Pret Cash', 'pretCash', 'pret_cash', 'avans80'],
-      'Client': ['Client', 'clientName', 'nume'],
-      'Agent': ['Agent', 'agent'],
-      'Comision': ['Comision', 'comision'],
-      'Observatii': ['Observatii', 'observatii'],
-      'Status': ['Status', 'status', 'STATUS'],
-      'Corp': ['Corp', 'corp', 'CORP'],
+      floor: ['Etaj', 'etaj', 'ETAJ'],
+      apartment: ['Nr. ap.', 'nrAp', 'nr_ap', 'Nr Ap', 'nr ap'],
+      type: ['Tip Apartament', 'tipCom', 'TIP COM', 'tip_apartament'],
+      area: ['Suprafata', 'mpUtili', 'suprafata', 'mp'],
+      creditPrice: ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit'],
+      cashPrice: ['Pret Cash', 'pretCash', 'pret_cash', 'avans80'],
+      status: ['Status', 'status', 'STATUS'],
+      agent: ['Agent', 'agent'],
+      commission: ['Comision', 'comision'],
+      observations: ['Observatii', 'observatii'],
+      corp: ['Corp', 'corp', 'CORP'],
     };
-    const synonyms = map[columnName] || [columnName];
-    for (const key of synonyms) {
-      const v = (property as any)[key];
+    const synonyms = map[key] || [key];
+    for (const k of synonyms) {
+      const v = (property as any)[k];
       if (v !== undefined && v !== null && String(v) !== '') return v;
     }
     return '';
   };
 
-  const formatValue = (value: any, columnName: string): string => {
-    if (value === null || value === undefined || value === '') return '-';
-
-    if (typeof value === 'number' &&
-        (columnName.toLowerCase().includes('pret') ||
-         columnName.toLowerCase().includes('avans') ||
-         columnName.toLowerCase().includes('price'))) {
-      return new Intl.NumberFormat('ro-RO', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-      }).format(value);
-    }
-
-    if (typeof value === 'number' &&
-        (columnName.toLowerCase().includes('mp') ||
-         columnName.toLowerCase().includes('suprafata'))) {
-      return value.toFixed(2);
-    }
-
-    return String(value);
-  };
-
-  const parsePrice = (price: any): number => {
-    if (!price && price !== 0) return 0;
-    if (typeof price === 'number') return price;
-    const cleanStr = String(price).replace(/[€\s]/g, '').replace(/,/g, '');
-    return parseFloat(cleanStr) || 0;
-  };
-
-  const calculateCommission = (property: Property, priceType: 'credit' | 'cash'): string => {
-    // If commission type is fixed, return the fixed amount regardless of price
-    if (commissionType === 'fixed') {
-      return new Intl.NumberFormat('ro-RO', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 2,
-      }).format(commissionValue);
-    }
-    
-    // For percentage commission, calculate based on price
-    const priceValue = priceType === 'credit'
-      ? getValue(property, 'Pret Credit')
-      : getValue(property, 'Pret Cash');
-    const price = parsePrice(priceValue);
-    const commission = price * (commissionValue / 100);
+  const formatPrice = (value: any): string => {
+    if (!value) return '-';
+    const price = typeof value === 'number' ? value : parseFloat(String(value).replace(/[€\s]/g, '').replace(/,/g, ''));
+    if (isNaN(price)) return '-';
     return new Intl.NumberFormat('ro-RO', {
       style: 'currency',
       currency: 'EUR',
-      minimumFractionDigits: 2,
-    }).format(commission);
+      minimumFractionDigits: 0,
+    }).format(price);
   };
 
-  const renderCommissionCell = (property: Property, columnName: string) => {
-    const currentCommission = getValue(property, columnName);
-    const hasCommission = currentCommission && String(currentCommission).trim() !== '';
-    
-    // For fixed commission, only show one option
+  const formatArea = (value: any): string => {
+    if (!value) return '-';
+    const area = typeof value === 'number' ? value : parseFloat(String(value));
+    if (isNaN(area)) return '-';
+    return `${area.toFixed(2)} m²`;
+  };
+
+  const getStatusConfig = (status: string) => {
+    const s = status?.toLowerCase();
+    if (s === 'disponibil') return { label: 'Disponibil', color: 'bg-success/10 text-success border-success/20', dot: 'bg-success' };
+    if (s === 'rezervat') return { label: 'Rezervat', color: 'bg-warning/10 text-warning border-warning/20', dot: 'bg-warning' };
+    if (s === 'vandut') return { label: 'Vândut', color: 'bg-info/10 text-info border-info/20', dot: 'bg-info' };
+    return { label: 'Disponibil', color: 'bg-success/10 text-success border-success/20', dot: 'bg-success' };
+  };
+
+  const calculateCommission = (property: Property, priceType: 'credit' | 'cash'): string => {
     if (commissionType === 'fixed') {
-      return (
-        <Select
-          value={hasCommission ? 'current' : ''}
-          onValueChange={(value) => {
-            if (value === 'remove') {
-              if (onCommissionChange) {
-                onCommissionChange(property.id, '');
-              }
-            } else if (value === 'fixed') {
-              const commission = calculateCommission(property, 'credit'); // Price type doesn't matter for fixed
-              if (onCommissionChange) {
-                onCommissionChange(property.id, commission);
-              }
-            }
-          }}
-          disabled={isUserRole}
-        >
-          <SelectTrigger className="w-[130px] h-7 text-xs">
-            <SelectValue placeholder="Calc...">
-              {hasCommission ? (
-                <span className="font-medium text-success">{currentCommission}</span>
-              ) : (
-                "Calc..."
-              )}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="fixed">
-              <div className="flex flex-col">
-                <span className="font-medium text-xs">Sumă fixă</span>
-                <span className="text-xs text-muted-foreground">
-                  {calculateCommission(property, 'credit')}
-                </span>
-              </div>
-            </SelectItem>
-            {hasCommission && (
-              <SelectItem value="remove">
-                <div className="flex items-center gap-2 text-destructive">
-                  <X className="h-3 w-3" />
-                  <span className="font-medium text-xs">Șterge comision</span>
-                </div>
-              </SelectItem>
-            )}
-          </SelectContent>
-        </Select>
-      );
+      return formatPrice(commissionValue);
     }
-    
-    // For percentage commission, show credit and cash options
-    return (
-      <Select
-        value={hasCommission ? 'current' : ''}
-        onValueChange={(value) => {
-          if (value === 'remove') {
-            if (onCommissionChange) {
-              onCommissionChange(property.id, '');
-            }
-          } else if (value === 'credit' || value === 'cash') {
-            const commission = calculateCommission(property, value as 'credit' | 'cash');
-            if (onCommissionChange) {
-              onCommissionChange(property.id, commission);
-            }
-          }
-        }}
-        disabled={isUserRole}
-      >
-        <SelectTrigger className="w-[130px] h-7 text-xs">
-          <SelectValue placeholder="Calc...">
-            {hasCommission ? (
-              <span className="font-medium text-success">{currentCommission}</span>
-            ) : (
-              "Calc..."
-            )}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="credit">
-            <div className="flex flex-col">
-              <span className="font-medium text-xs">Din Credit</span>
-              <span className="text-xs text-muted-foreground">
-                {commissionValue}% = {calculateCommission(property, 'credit')}
-              </span>
-            </div>
-          </SelectItem>
-          <SelectItem value="cash">
-            <div className="flex flex-col">
-              <span className="font-medium text-xs">Din Cash</span>
-              <span className="text-xs text-muted-foreground">
-                {commissionValue}% = {calculateCommission(property, 'cash')}
-              </span>
-            </div>
-          </SelectItem>
-          {hasCommission && (
-            <SelectItem value="remove">
-              <div className="flex items-center gap-2 text-destructive">
-                <X className="h-3 w-3" />
-                <span className="font-medium text-xs">Șterge comision</span>
-              </div>
-            </SelectItem>
-          )}
-        </SelectContent>
-      </Select>
-    );
+    const price = getValue(property, priceType === 'credit' ? 'creditPrice' : 'cashPrice');
+    const priceNum = typeof price === 'number' ? price : parseFloat(String(price).replace(/[€\s]/g, '').replace(/,/g, ''));
+    if (isNaN(priceNum)) return '-';
+    return formatPrice(priceNum * (commissionValue / 100));
   };
 
-  // Mobile card view
-  if (isMobile) {
+  if (properties.length === 0) {
     return (
-      <div className="space-y-4">
-        {properties.length === 0 ? (
-          <Card>
-            <CardContent className="text-center text-muted-foreground py-8">
-              Nu există proprietăți de afișat
-            </CardContent>
-          </Card>
-        ) : (
-          properties.map((property) => {
-            const status = getValue(property, 'Status')?.toLowerCase();
-            const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-info' : '';
-            
-            return (
-              <Card key={property.id} className={`overflow-hidden ${statusColorClass}`}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg">
-                      Ap. {getValue(property, 'Nr. ap.')}
-                    </CardTitle>
-                    {isAuthenticated && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(property)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {visibleColumns.filter(col => col !== 'id' && col !== 'Nr. ap.').map((column) => (
-                  <div key={`${property.id}-${column}`} className="flex justify-between items-center py-1 border-b last:border-0">
-                    <span className="text-sm text-muted-foreground font-medium">{column}:</span>
-                    <span className="text-sm font-semibold">
-                      {column.toLowerCase().includes('status') && onStatusChange ? (
-                        <div className="flex items-center gap-2">
-                          <Select
-                            value={getValue(property, column) || 'disponibil'}
-                            onValueChange={(value) => onStatusChange(property.id, value)}
-                            disabled={isUserRole || !isAuthenticated}
-                          >
-                            <SelectTrigger className="w-[130px] h-8">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="disponibil">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-success" />
-                                  Disponibil
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="rezervat">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-warning" />
-                                  Rezervat
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="vandut">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-info" />
-                                  Vândut
-                                </div>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {!isAuthenticated && (
-                            <PropertyPlanViewer 
-                              imageUrl={property.property_plan_url} 
-                              propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
-                            />
-                          )}
-                        </div>
-                      ) : column.toLowerCase() === 'client' && onClientChange ? (
-                        <Select
-                          value={property.client_id || 'none'}
-                          onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
-                          disabled={isUserRole || !isAuthenticated}
-                        >
-                          <SelectTrigger className="w-[150px] h-8">
-                            <SelectValue placeholder="Selectează client" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Fără client</SelectItem>
-                            {clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                {client.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                       ) : column.toLowerCase().includes('comision') ? (
-                        renderCommissionCell(property, column)
-                       ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 gap-2 text-xs max-w-[150px]"
-                            >
-                              <MessageSquare className="h-3.5 w-3.5" />
-                              <span className="truncate">
-                                {getValue(property, column) ? 
-                                  (getValue(property, column).length > 15 
-                                    ? getValue(property, column).substring(0, 15) + '...' 
-                                    : getValue(property, column))
-                                  : 'Adaugă'}
-                              </span>
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-80">
-                            <div className="space-y-2">
-                              <h4 className="font-medium text-sm">Observații</h4>
-                              <Textarea
-                                value={getValue(property, column) || ''}
-                                onChange={(e) => onObservatiiChange(property.id, e.target.value)}
-                                placeholder="Adaugă observații..."
-                                className="min-h-[120px] text-sm"
-                              />
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        formatValue(getValue(property, column), column)
-                      )}
-                    </span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-            );
-          })
-        )}
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Nu există proprietăți de afișat</p>
       </div>
     );
   }
 
-  // Desktop table view
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            {visibleColumns.filter(col => col !== 'id').map((column) => (
-              <TableHead key={column} className="font-semibold text-xs px-2 py-2 whitespace-nowrap">
-                {column}
-              </TableHead>
-            ))}
-            <TableHead className="font-semibold text-xs text-right px-2 py-2">Acțiuni</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {properties.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={visibleColumns.length + 1}
-                className="text-center text-muted-foreground py-8"
-              >
-                Nu există proprietăți de afișat
-              </TableCell>
-            </TableRow>
-          ) : (
-            properties.map((property) => {
-              const status = getValue(property, 'Status')?.toLowerCase();
-              const statusColorClass = status === 'vandut' ? 'text-destructive' : status === 'rezervat' ? 'text-info' : '';
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {properties.map((property) => {
+        const status = getValue(property, 'status') || 'disponibil';
+        const statusConfig = getStatusConfig(status);
+        const client = clients.find(c => c.id === property.client_id);
+
+        return (
+          <Card
+            key={property.id}
+            className="group p-5 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] space-y-4"
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
+                    {getValue(property, 'floor')}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold">
+                  Ap. {getValue(property, 'apartment')}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {getValue(property, 'type')}
+                </p>
+              </div>
               
-              return (
-                <TableRow
-                  key={property.id}
-                  className={`hover:bg-muted/30 transition-colors ${statusColorClass}`}
+              {isAuthenticated && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onEdit(property)}
+                  className="h-8 w-8"
                 >
-                {visibleColumns.filter(col => col !== 'id').map((column) => (
-                  <TableCell key={`${property.id}-${column}`} className="px-2 py-2 text-xs">
-                    {column.toLowerCase().includes('status') && onStatusChange ? (
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Status Badge */}
+            <div>
+              {onStatusChange && isAuthenticated ? (
+                <Select
+                  value={status}
+                  onValueChange={(value) => onStatusChange(property.id, value)}
+                  disabled={isUserRole}
+                >
+                  <SelectTrigger className="w-full h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="disponibil">
                       <div className="flex items-center gap-2">
-                        <Select
-                          value={getValue(property, column) || 'disponibil'}
-                          onValueChange={(value) => onStatusChange(property.id, value)}
-                          disabled={isUserRole || !isAuthenticated}
-                        >
-                          <SelectTrigger className="w-[110px] h-7 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="disponibil">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-success" />
-                                Disponibil
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="rezervat">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-warning" />
-                                Rezervat
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="vandut">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-info" />
-                                Vândut
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {!isAuthenticated && (
-                          <PropertyPlanViewer 
-                            imageUrl={property.property_plan_url} 
-                            propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
-                          />
-                        )}
+                        <div className="w-2 h-2 rounded-full bg-success" />
+                        Disponibil
                       </div>
-                    ) : column.toLowerCase() === 'client' && onClientChange ? (
-                      <Select
-                        value={property.client_id || 'none'}
-                        onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
-                        disabled={isUserRole || !isAuthenticated}
-                      >
-                        <SelectTrigger className="w-[120px] h-7 text-xs">
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Fără client</SelectItem>
-                          {clients.map((client) => (
-                            <SelectItem key={client.id} value={client.id}>
-                              {client.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : column.toLowerCase().includes('comision') ? (
-                      renderCommissionCell(property, column)
-                    ) : column.toLowerCase().includes('observatii') && onObservatiiChange ? (
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 gap-1.5 text-xs max-w-[140px]"
-                          >
-                            <MessageSquare className="h-3 w-3" />
-                            <span className="truncate">
-                              {getValue(property, column) ? 
-                                (getValue(property, column).length > 12 
-                                  ? getValue(property, column).substring(0, 12) + '...' 
-                                  : getValue(property, column))
-                                : 'Adaugă'}
-                            </span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-sm">Observații</h4>
-                            <Textarea
-                              value={getValue(property, column) || ''}
-                              onChange={(e) => onObservatiiChange(property.id, e.target.value)}
-                              placeholder="Adaugă observații..."
-                              className="min-h-[120px] text-sm"
-                            />
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    ) : (
-                      <span className="whitespace-nowrap">{formatValue(getValue(property, column), column)}</span>
-                    )}
-                  </TableCell>
-                ))}
-                <TableCell className="text-right px-2 py-2">
-                  {isAuthenticated && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(property)}
-                      className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
+                    </SelectItem>
+                    <SelectItem value="rezervat">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-warning" />
+                        Rezervat
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="vandut">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-info" />
+                        Vândut
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge className={`${statusConfig.color} w-full justify-center border`}>
+                  <div className={`w-2 h-2 rounded-full ${statusConfig.dot} mr-2`} />
+                  {statusConfig.label}
+                </Badge>
+              )}
+            </div>
+
+            {/* Details */}
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Suprafață:</span>
+                <span className="font-medium">{formatArea(getValue(property, 'area'))}</span>
+              </div>
+              
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Preț Credit:</span>
+                <span className="font-semibold text-primary">
+                  {formatPrice(getValue(property, 'creditPrice'))}
+                </span>
+              </div>
+              
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Preț Cash:</span>
+                <span className="font-semibold">
+                  {formatPrice(getValue(property, 'cashPrice'))}
+                </span>
+              </div>
+            </div>
+
+            {/* Client & Agent */}
+            {isAuthenticated && (
+              <div className="space-y-2 pt-2 border-t">
+                {onClientChange && (
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Client:</label>
+                    <Select
+                      value={property.client_id || 'none'}
+                      onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
+                      disabled={isUserRole}
                     >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-              );
-            })
-          )}
-        </TableBody>
-      </Table>
+                      <SelectTrigger className="w-full h-9 text-sm">
+                        <SelectValue placeholder="Selectează client" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">
+                          <span className="text-muted-foreground">Fără client</span>
+                        </SelectItem>
+                        {clients.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {getValue(property, 'agent') && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <UserIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Agent:</span>
+                    <span className="font-medium">{getValue(property, 'agent')}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Commission & Observations */}
+            {isAuthenticated && (userRole === 'admin' || userRole === 'manager') && (
+              <div className="flex gap-2 pt-2 border-t">
+                {onCommissionChange && (
+                  <Select
+                    value={getValue(property, 'commission') ? 'current' : ''}
+                    onValueChange={(value) => {
+                      if (value === 'credit' || value === 'cash') {
+                        const commission = calculateCommission(property, value as 'credit' | 'cash');
+                        onCommissionChange(property.id, commission);
+                      } else if (value === 'remove') {
+                        onCommissionChange(property.id, '');
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="flex-1 h-9 text-xs">
+                      <SelectValue placeholder="Comision">
+                        {getValue(property, 'commission') ? (
+                          <span className="text-success font-medium">{getValue(property, 'commission')}</span>
+                        ) : (
+                          "Calc. comision"
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {commissionType === 'percentage' ? (
+                        <>
+                          <SelectItem value="credit">
+                            Credit: {calculateCommission(property, 'credit')}
+                          </SelectItem>
+                          <SelectItem value="cash">
+                            Cash: {calculateCommission(property, 'cash')}
+                          </SelectItem>
+                        </>
+                      ) : (
+                        <SelectItem value="credit">
+                          Fix: {calculateCommission(property, 'credit')}
+                        </SelectItem>
+                      )}
+                      {getValue(property, 'commission') && (
+                        <SelectItem value="remove" className="text-destructive">
+                          Șterge
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {onObservatiiChange && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-9">
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Observații</h4>
+                        <Textarea
+                          value={getValue(property, 'observations') || ''}
+                          onChange={(e) => onObservatiiChange(property.id, e.target.value)}
+                          placeholder="Adaugă observații..."
+                          className="min-h-[100px] text-sm"
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 };
