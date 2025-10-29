@@ -26,6 +26,7 @@ import {
 import { Property } from "@/types/property";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Client } from "@/hooks/useClients";
+import { PropertyPlanViewer } from "./PropertyPlanViewer";
 
 interface PropertyTableProps {
   properties: Property[];
@@ -271,20 +272,26 @@ export const PropertyTable = ({
             return (
               <Card key={property.id} className={`overflow-hidden ${statusColorClass}`}>
                 <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-lg">
                       Ap. {getValue(property, 'Nr. ap.')}
                     </CardTitle>
-                    {isAuthenticated && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(property)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <PropertyPlanViewer 
+                        imageUrl={property.property_plan_url} 
+                        propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
+                      />
+                      {isAuthenticated && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onEdit(property)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -398,16 +405,14 @@ export const PropertyTable = ({
                 {column}
               </TableHead>
             ))}
-            {isAuthenticated && (
-              <TableHead className="font-semibold text-xs text-right px-2 py-2">Acțiuni</TableHead>
-            )}
+            <TableHead className="font-semibold text-xs text-right px-2 py-2">Acțiuni</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {properties.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={visibleColumns.length + (isAuthenticated ? 1 : 0)}
+                colSpan={visibleColumns.length + 1}
                 className="text-center text-muted-foreground py-8"
               >
                 Nu există proprietăți de afișat
@@ -510,18 +515,24 @@ export const PropertyTable = ({
                     )}
                   </TableCell>
                 ))}
-                {isAuthenticated && (
-                  <TableCell className="text-right px-2 py-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(property)}
-                      className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                  </TableCell>
-                )}
+                <TableCell className="text-right px-2 py-2">
+                  <div className="flex items-center justify-end gap-1">
+                    <PropertyPlanViewer 
+                      imageUrl={property.property_plan_url} 
+                      propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
+                    />
+                    {isAuthenticated && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(property)}
+                        className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
               </TableRow>
               );
             })

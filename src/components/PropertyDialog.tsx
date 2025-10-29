@@ -18,6 +18,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Property } from "@/types/property";
 import { useClients } from "@/hooks/useClients";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Upload, X, Image } from "lucide-react";
 
 interface PropertyDialogProps {
   open: boolean;
@@ -36,6 +39,8 @@ export const PropertyDialog = ({
 }: PropertyDialogProps) => {
   const { clients } = useClients();
   const isUserRole = userRole === 'user';
+  const [uploading, setUploading] = useState(false);
+  const [propertyPlanUrl, setPropertyPlanUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
     etaj: string;
     nrAp: string;
@@ -51,6 +56,7 @@ export const PropertyDialog = ({
     observatii: string;
     status: "disponibil" | "rezervat" | "vandut";
     client_id?: string;
+    property_plan_url?: string;
   }>({
     etaj: "",
     nrAp: "",
@@ -66,6 +72,7 @@ export const PropertyDialog = ({
     observatii: "",
     status: "disponibil",
     client_id: undefined,
+    property_plan_url: undefined,
   });
 
   useEffect(() => {
@@ -85,7 +92,9 @@ export const PropertyDialog = ({
         observatii: property.observatii,
         status: property.status,
         client_id: property.client_id,
+        property_plan_url: property.property_plan_url,
       });
+      setPropertyPlanUrl(property.property_plan_url || null);
     } else {
       setFormData({
         etaj: "",
@@ -102,16 +111,78 @@ export const PropertyDialog = ({
         observatii: "",
         status: "disponibil",
         client_id: undefined,
+        property_plan_url: undefined,
       });
+      setPropertyPlanUrl(null);
     }
   }, [property, open]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vă rugăm să încărcați doar fișiere imagine');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Fișierul este prea mare. Dimensiunea maximă este 5MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('property-plans')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('property-plans')
+        .getPublicUrl(filePath);
+
+      setPropertyPlanUrl(publicUrl);
+      setFormData({ ...formData, property_plan_url: publicUrl });
+      toast.success('Plan încărcat cu succes');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Eroare la încărcarea fișierului');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemovePlan = async () => {
+    if (!propertyPlanUrl) return;
+
+    try {
+      const fileName = propertyPlanUrl.split('/').pop();
+      if (fileName) {
+        await supabase.storage
+          .from('property-plans')
+          .remove([fileName]);
+      }
+      setPropertyPlanUrl(null);
+      setFormData({ ...formData, property_plan_url: undefined });
+      toast.success('Plan șters cu succes');
+    } catch (error) {
+      console.error('Error removing file:', error);
+      toast.error('Eroare la ștergerea fișierului');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (property) {
-      onSubmit({ ...formData, id: property.id });
+      onSubmit({ ...formData, property_plan_url: propertyPlanUrl || undefined, id: property.id });
     } else {
-      onSubmit(formData);
+      onSubmit({ ...formData, property_plan_url: propertyPlanUrl || undefined });
     }
   };
 
@@ -351,6 +422,66 @@ export const PropertyDialog = ({
               placeholder="Notițe suplimentare..."
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="property-plan">Plan Proprietate</Label>
+            <div className="space-y-3">
+              {propertyPlanUrl ? (
+                <div className="relative border rounded-lg p-4 bg-muted/30">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1">
+                      <img 
+                        src={propertyPlanUrl} 
+                        alt="Plan proprietate" 
+                        className="w-full max-h-48 object-contain rounded-md"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleRemovePlan}
+                      className="shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                  <Input
+                    id="property-plan"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <Label
+                    htmlFor="property-plan"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    {uploading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <span className="text-sm text-muted-foreground">Se încarcă...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          Click pentru a încărca planul proprietății
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          PNG, JPG până la 5MB
+                        </span>
+                      </>
+                    )}
+                  </Label>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end gap-3">
