@@ -276,22 +276,16 @@ export const PropertyTable = ({
                     <CardTitle className="text-lg">
                       Ap. {getValue(property, 'Nr. ap.')}
                     </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <PropertyPlanViewer 
-                        imageUrl={property.property_plan_url} 
-                        propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
-                      />
-                      {isAuthenticated && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onEdit(property)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                    {isAuthenticated && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(property)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -300,35 +294,43 @@ export const PropertyTable = ({
                     <span className="text-sm text-muted-foreground font-medium">{column}:</span>
                     <span className="text-sm font-semibold">
                       {column.toLowerCase().includes('status') && onStatusChange ? (
-                        <Select
-                          value={getValue(property, column) || 'disponibil'}
-                          onValueChange={(value) => onStatusChange(property.id, value)}
-                          disabled={isUserRole || !isAuthenticated}
-                        >
-                          <SelectTrigger className="w-[130px] h-8">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="disponibil">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-success" />
-                                Disponibil
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="rezervat">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-warning" />
-                                Rezervat
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="vandut">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-info" />
-                                Vândut
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={getValue(property, column) || 'disponibil'}
+                            onValueChange={(value) => onStatusChange(property.id, value)}
+                            disabled={isUserRole || !isAuthenticated}
+                          >
+                            <SelectTrigger className="w-[130px] h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="disponibil">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-success" />
+                                  Disponibil
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="rezervat">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-warning" />
+                                  Rezervat
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="vandut">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-info" />
+                                  Vândut
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {!isAuthenticated && (
+                            <PropertyPlanViewer 
+                              imageUrl={property.property_plan_url} 
+                              propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
+                            />
+                          )}
+                        </div>
                       ) : column.toLowerCase() === 'client' && onClientChange ? (
                         <Select
                           value={property.client_id || 'none'}
@@ -431,35 +433,43 @@ export const PropertyTable = ({
                 {visibleColumns.filter(col => col !== 'id').map((column) => (
                   <TableCell key={`${property.id}-${column}`} className="px-2 py-2 text-xs">
                     {column.toLowerCase().includes('status') && onStatusChange ? (
-                      <Select
-                        value={getValue(property, column) || 'disponibil'}
-                        onValueChange={(value) => onStatusChange(property.id, value)}
-                        disabled={isUserRole || !isAuthenticated}
-                      >
-                        <SelectTrigger className="w-[110px] h-7 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="disponibil">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-success" />
-                              Disponibil
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="rezervat">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-warning" />
-                              Rezervat
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="vandut">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-info" />
-                              Vândut
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={getValue(property, column) || 'disponibil'}
+                          onValueChange={(value) => onStatusChange(property.id, value)}
+                          disabled={isUserRole || !isAuthenticated}
+                        >
+                          <SelectTrigger className="w-[110px] h-7 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="disponibil">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-success" />
+                                Disponibil
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="rezervat">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-warning" />
+                                Rezervat
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="vandut">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-info" />
+                                Vândut
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {!isAuthenticated && (
+                          <PropertyPlanViewer 
+                            imageUrl={property.property_plan_url} 
+                            propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
+                          />
+                        )}
+                      </div>
                     ) : column.toLowerCase() === 'client' && onClientChange ? (
                       <Select
                         value={property.client_id || 'none'}
@@ -516,22 +526,16 @@ export const PropertyTable = ({
                   </TableCell>
                 ))}
                 <TableCell className="text-right px-2 py-2">
-                  <div className="flex items-center justify-end gap-1">
-                    <PropertyPlanViewer 
-                      imageUrl={property.property_plan_url} 
-                      propertyName={`Ap. ${getValue(property, 'Nr. ap.')}`}
-                    />
-                    {isAuthenticated && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(property)}
-                        className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
-                  </div>
+                  {isAuthenticated && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(property)}
+                      className="hover:bg-primary hover:text-primary-foreground transition-all h-7 w-7 p-0"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
               );
