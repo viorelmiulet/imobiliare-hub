@@ -190,4 +190,16 @@ All colors MUST be HSL.
   .gradient-border:hover::before {
     opacity: 1;
   }
+  
+  /* Mobile optimizations */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  @media (max-width: 768px) {
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
 }

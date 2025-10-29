@@ -383,33 +383,34 @@ const ComplexDetails = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header with Back Button */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="icon"
               onClick={() => navigate("/")}
-              className="hover:bg-primary hover:text-primary-foreground transition-all shrink-0"
+              className="hover:bg-primary hover:text-primary-foreground transition-all shrink-0 h-9 w-9 sm:h-10 sm:w-10"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <div className="p-3 bg-gradient-to-br from-primary to-info rounded-xl shadow-lg shrink-0">
-              <Building2 className="h-8 w-8 text-primary-foreground" />
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-primary to-info rounded-lg sm:rounded-xl shadow-lg shrink-0">
+              <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent truncate">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent truncate">
                 {currentComplex.name}
               </h1>
-              <p className="text-sm text-muted-foreground truncate">{currentComplex.location}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">{currentComplex.location}</p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch sm:items-center">
+          <div className="flex flex-wrap gap-2 w-full md:w-auto items-stretch">
             <ThemeToggle />
             {!user && (
               <Button
                 variant="outline"
                 onClick={() => navigate('/auth')}
-                className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 min-w-0"
+                size="sm"
               >
                 Autentificare
               </Button>
@@ -421,10 +422,12 @@ const ComplexDetails = () => {
                     variant="outline"
                     onClick={handleImportComplex1Data}
                     disabled={isImporting}
-                    className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                    className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
+                    size="sm"
                   >
-                    <FileUp className="h-4 w-4" />
-                    {isImporting ? "Se importă..." : "Import complet"}
+                    <FileUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">{isImporting ? "Se importă..." : "Import complet"}</span>
+                    <span className="sm:hidden">{isImporting ? "Import..." : "Import"}</span>
                   </Button>
                 )}
                 {complexId === "complex-viilor33" && (
@@ -432,29 +435,33 @@ const ComplexDetails = () => {
                     variant="outline"
                     onClick={handleImportViilor33Data}
                     disabled={isImporting}
-                    className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                    className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
+                    size="sm"
                   >
-                    <FileUp className="h-4 w-4" />
-                    {isImporting ? "Se importă..." : "Import date"}
+                    <FileUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">{isImporting ? "Se importă..." : "Import date"}</span>
+                    <span className="sm:hidden">{isImporting ? "Import..." : "Date"}</span>
                   </Button>
                 )}
                 <Button
                   variant="outline"
                   onClick={() => setIsComplexEditOpen(true)}
-                  className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                  className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
+                  size="sm"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Editează Complex</span>
                   <span className="sm:hidden">Complex</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIsImportDialogOpen(true)}
-                  className="gap-2 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                  className="gap-2 shadow-md hover:shadow-lg transition-all flex-1 sm:flex-initial min-w-0"
+                  size="sm"
                 >
-                  <FileUp className="h-4 w-4" />
+                  <FileUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Importă Excel</span>
-                  <span className="sm:hidden">Import</span>
+                  <span className="sm:hidden">Excel</span>
                 </Button>
                 <Button
                   onClick={() => {

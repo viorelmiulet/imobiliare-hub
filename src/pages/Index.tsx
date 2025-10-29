@@ -20,8 +20,8 @@ const Index = () => {
       
       <div className="container mx-auto p-3 sm:p-6 space-y-6 sm:space-y-8 relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-center pt-2 px-4 glass-card rounded-2xl p-4 animate-fade-in">
-          <div className="text-sm font-medium">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 px-3 sm:px-4 glass-card rounded-2xl p-3 sm:p-4 animate-fade-in">
+          <div className="text-xs sm:text-sm font-medium">
             {user ? (
               <>
                 <span className="text-muted-foreground">Bine ai venit, </span>
@@ -31,29 +31,29 @@ const Index = () => {
               <span className="text-muted-foreground">Bine ai venit!</span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {user ? (
               <>
                 {profile?.role === 'admin' && (
                   <Button
                     variant="outline"
                     onClick={() => navigate('/admin')}
-                    className="gap-2 glass-hover"
+                    className="gap-2 glass-hover flex-1 sm:flex-initial"
                     size="sm"
                   >
                     <Shield className="h-4 w-4" />
-                    Admin
+                    <span className="hidden sm:inline">Admin</span>
                   </Button>
                 )}
                 <ThemeToggle />
                 <Button
                   variant="outline"
                   onClick={signOut}
-                  className="gap-2 glass-hover hover:border-destructive/50 hover:text-destructive"
+                  className="gap-2 glass-hover hover:border-destructive/50 hover:text-destructive flex-1 sm:flex-initial"
                   size="sm"
                 >
                   <LogOut className="h-4 w-4" />
-                  Deconectare
+                  <span className="hidden sm:inline">Deconectare</span>
                 </Button>
               </>
             ) : (
@@ -62,7 +62,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/auth')}
-                  className="gap-2 glass-hover"
+                  className="gap-2 glass-hover flex-1 sm:flex-initial"
                   size="sm"
                 >
                   Autentificare
@@ -72,30 +72,30 @@ const Index = () => {
           </div>
         </div>
         
-        <div className="text-center space-y-6 pb-4 animate-fade-in [animation-delay:0.1s]">
+        <div className="text-center space-y-4 sm:space-y-6 pb-4 animate-fade-in [animation-delay:0.1s]">
           <div className="flex justify-center">
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-info rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative p-4 sm:p-5 bg-gradient-to-br from-primary via-accent to-info rounded-3xl shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105">
-                <Building2 className="h-12 w-12 sm:h-14 sm:w-14 text-primary-foreground" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-info rounded-2xl sm:rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
+              <div className="relative p-3 sm:p-5 bg-gradient-to-br from-primary via-accent to-info rounded-2xl sm:rounded-3xl shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105">
+                <Building2 className="h-10 w-10 sm:h-14 sm:w-14 text-primary-foreground" />
               </div>
             </div>
           </div>
-          <div className="space-y-3">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-info bg-clip-text text-transparent px-4 animate-fade-in [animation-delay:0.2s]">
+          <div className="space-y-2 sm:space-y-3">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-info bg-clip-text text-transparent px-3 sm:px-4 animate-fade-in [animation-delay:0.2s]">
               Administrare vanzari
             </h1>
-            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4 animate-fade-in [animation-delay:0.3s]">
+            <p className="text-sm sm:text-xl text-muted-foreground max-w-2xl mx-auto px-3 sm:px-4 animate-fade-in [animation-delay:0.3s]">
               Selectează un complex pentru a gestiona proprietățile și vânzările
             </p>
           </div>
           {user && (
-            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2 animate-fade-in [animation-delay:0.4s]">
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-2 px-3 sm:px-0 animate-fade-in [animation-delay:0.4s]">
               <ClientDialog />
               <Button
                 onClick={() => navigate("/clients")}
                 variant="outline"
-                className="gap-2 glass-hover shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                className="gap-2 glass-hover shadow-lg hover:shadow-xl transition-all hover:scale-105 w-full sm:w-auto"
               >
                 <Users className="h-4 w-4" />
                 Vizualizare Clienți
@@ -105,44 +105,44 @@ const Index = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid gap-4 md:grid-cols-3 max-w-4xl mx-auto animate-fade-in [animation-delay:0.5s]">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto px-3 sm:px-0 animate-fade-in [animation-delay:0.5s]">
           <Card className="glass-card border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all hover:scale-105 gradient-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-primary" />
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
                 Total Complexe
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 {complexes.length}
               </div>
             </CardContent>
           </Card>
 
           <Card className="glass-card border-l-4 border-l-success shadow-lg hover:shadow-2xl transition-all hover:scale-105 gradient-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Home className="h-4 w-4 text-success" />
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success" />
                 Total Proprietăți
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
                 {complexes.reduce((acc, c) => acc + c.total_properties, 0)}
               </div>
             </CardContent>
           </Card>
 
           <Card className="glass-card border-l-4 border-l-warning shadow-lg hover:shadow-2xl transition-all hover:scale-105 gradient-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Home className="h-4 w-4 text-warning" />
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-warning" />
                 Disponibile
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold bg-gradient-to-r from-warning to-warning/70 bg-clip-text text-transparent">
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-warning to-warning/70 bg-clip-text text-transparent">
                 {complexes.reduce((acc, c) => acc + c.available_properties, 0)}
               </div>
             </CardContent>

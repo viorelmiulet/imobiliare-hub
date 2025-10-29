@@ -104,72 +104,74 @@ export default function ClientsOverview() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="icon"
               onClick={() => navigate("/")}
-              className="hover:bg-primary hover:text-primary-foreground transition-all shrink-0"
+              className="hover:bg-primary hover:text-primary-foreground transition-all shrink-0 h-9 w-9 sm:h-10 sm:w-10"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <div className="p-3 bg-gradient-to-br from-primary to-info rounded-xl shadow-lg shrink-0">
-              <User className="h-8 w-8 text-primary-foreground" />
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-primary to-info rounded-lg sm:rounded-xl shadow-lg shrink-0">
+              <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
                 Clienți și Proprietăți
               </h1>
-              <p className="text-sm text-muted-foreground">Vizualizare completă clienți</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Vizualizare completă clienți</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2">
             <Button
               onClick={() => navigate("/import-contacts")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-1 sm:flex-initial"
+              size="sm"
             >
-              <Upload className="h-4 w-4" />
-              Import VCF
+              <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Import VCF</span>
+              <span className="sm:hidden">Import</span>
             </Button>
             <ThemeToggle />
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="border-l-4 border-l-primary shadow-md">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Total Clienți
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{clients.length}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-2xl sm:text-3xl font-bold">{clients.length}</div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-success shadow-md">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Cu Proprietăți
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-success">
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-2xl sm:text-3xl font-bold text-success">
                 {clientsWithProperties}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-info shadow-md">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+          <Card className="border-l-4 border-l-info shadow-md sm:col-span-2 lg:col-span-1">
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Total Proprietăți Asociate
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-info">
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-2xl sm:text-3xl font-bold text-info">
                 {totalProperties}
               </div>
             </CardContent>
@@ -178,14 +180,14 @@ export default function ClientsOverview() {
 
         {/* Search */}
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
-                placeholder="Caută client după nume, telefon sau email..."
+                placeholder="Caută după nume, telefon sau email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-9 sm:pl-10 text-sm"
               />
             </div>
           </CardContent>
@@ -205,30 +207,30 @@ export default function ClientsOverview() {
               
               return (
                 <Card key={client.id} className="shadow-md hover:shadow-lg transition-all">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1 flex-1">
-                        <CardTitle className="flex items-center gap-2">
-                          <User className="h-5 w-5 text-primary" />
-                          {client.name}
+                  <CardHeader className="pb-3 p-4 sm:p-6">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1 flex-1 min-w-0">
+                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                          <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
+                          <span className="truncate">{client.name}</span>
                         </CardTitle>
-                        <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                        <div className="flex flex-col gap-1 text-xs sm:text-sm text-muted-foreground">
                           <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4" />
-                            {client.phone}
+                            <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                            <span className="truncate">{client.phone}</span>
                           </div>
                           {client.email && (
                             <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4" />
-                              {client.email}
+                              <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                              <span className="truncate">{client.email}</span>
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <div className="text-right">
-                          <div className="text-sm font-semibold">
-                            {properties.length} {properties.length === 1 ? 'Proprietate' : 'Proprietăți'}
+                          <div className="text-xs sm:text-sm font-semibold whitespace-nowrap">
+                            {properties.length} {properties.length === 1 ? 'Prop.' : 'Prop.'}
                           </div>
                         </div>
                       </div>
@@ -236,24 +238,24 @@ export default function ClientsOverview() {
                   </CardHeader>
                   
                   {properties.length > 0 && (
-                    <CardContent>
+                    <CardContent className="p-4 sm:p-6 pt-0">
                       <div className="space-y-2">
-                        <div className="text-sm font-medium text-muted-foreground mb-2">
+                        <div className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                           Proprietăți asociate:
                         </div>
                         <div className="grid gap-2 sm:grid-cols-2">
                           {properties.map((property) => (
                             <div
                               key={property.id}
-                              className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                              className="flex items-center gap-2 p-2.5 sm:p-3 rounded-lg bg-muted/50 hover:bg-muted active:bg-muted/70 transition-colors cursor-pointer touch-manipulation"
                               onClick={() => navigate(`/complex/${property.complex_id}`)}
                             >
-                              <Building2 className="h-4 w-4 text-primary shrink-0" />
+                              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium truncate">
+                                <div className="text-xs sm:text-sm font-medium truncate">
                                   {property.complex_name}
                                 </div>
-                                <div className="text-xs text-muted-foreground truncate">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground truncate">
                                   {getPropertyLabel(property)}
                                 </div>
                               </div>
