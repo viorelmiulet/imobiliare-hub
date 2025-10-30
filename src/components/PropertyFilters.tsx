@@ -8,9 +8,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Filter, X } from "lucide-react";
+import { Filter, X, Check, ChevronsUpDown } from "lucide-react";
 import { Property } from "@/types/property";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface PropertyFiltersProps {
   selectedFloor: string;
@@ -42,9 +46,17 @@ export const PropertyFilters = ({
   clients = [],
 }: PropertyFiltersProps) => {
   const isMobile = useIsMobile();
+  const [openClientCombo, setOpenClientCombo] = useState(false);
   const uniqueFloors = Array.from(new Set(properties.map((p) => p.etaj)));
   const uniqueTypes = Array.from(new Set(properties.map((p) => p.tipCom)));
   const uniqueCorps = Array.from(new Set(properties.map((p) => p.corp).filter(Boolean))) as string[];
+  
+  const getClientLabel = (value: string) => {
+    if (value === 'toti') return 'Toți clienții';
+    if (value === 'fara_client') return 'Fără client';
+    const client = clients.find(c => c.id === value);
+    return client?.name || 'Selectează client';
+  };
 
   const hasActiveFilters = selectedFloor !== 'toate' || selectedType !== 'toate' || 
                           selectedStatus !== 'toate' || selectedCorp !== 'toate' || selectedClient !== 'toti';
@@ -130,20 +142,77 @@ export const PropertyFilters = ({
 
         <div className="space-y-2">
           <Label className="text-xs font-medium text-muted-foreground">Client</Label>
-          <Select value={selectedClient} onValueChange={onClientChange}>
-            <SelectTrigger className="h-9">
-              <SelectValue placeholder="Toți clienții" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="toti">Toți clienții</SelectItem>
-              <SelectItem value="fara_client">Fără client</SelectItem>
-              {clients.map((client) => (
-                <SelectItem key={client.id} value={client.id}>
-                  {client.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={openClientCombo} onOpenChange={setOpenClientCombo}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={openClientCombo}
+                className="w-full h-9 justify-between"
+              >
+                {getClientLabel(selectedClient)}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Caută client..." />
+                <CommandList>
+                  <CommandEmpty>Nu s-au găsit clienți.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      value="toti"
+                      onSelect={() => {
+                        onClientChange('toti');
+                        setOpenClientCombo(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedClient === 'toti' ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      Toți clienții
+                    </CommandItem>
+                    <CommandItem
+                      value="fara_client"
+                      onSelect={() => {
+                        onClientChange('fara_client');
+                        setOpenClientCombo(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedClient === 'fara_client' ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      Fără client
+                    </CommandItem>
+                    {clients.map((client) => (
+                      <CommandItem
+                        key={client.id}
+                        value={client.name}
+                        onSelect={() => {
+                          onClientChange(client.id);
+                          setOpenClientCombo(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedClient === client.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {client.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -219,20 +288,77 @@ export const PropertyFilters = ({
         </SelectContent>
       </Select>
 
-      <Select value={selectedClient} onValueChange={onClientChange}>
-        <SelectTrigger className="h-10 w-[160px]">
-          <SelectValue placeholder="Client" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="toti">Toți clienții</SelectItem>
-          <SelectItem value="fara_client">Fără client</SelectItem>
-          {clients.map((client) => (
-            <SelectItem key={client.id} value={client.id}>
-              {client.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Popover open={openClientCombo} onOpenChange={setOpenClientCombo}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={openClientCombo}
+            className="h-10 w-[180px] justify-between"
+          >
+            {getClientLabel(selectedClient)}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[300px] p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Caută client..." />
+            <CommandList>
+              <CommandEmpty>Nu s-au găsit clienți.</CommandEmpty>
+              <CommandGroup>
+                <CommandItem
+                  value="toti"
+                  onSelect={() => {
+                    onClientChange('toti');
+                    setOpenClientCombo(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedClient === 'toti' ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  Toți clienții
+                </CommandItem>
+                <CommandItem
+                  value="fara_client"
+                  onSelect={() => {
+                    onClientChange('fara_client');
+                    setOpenClientCombo(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedClient === 'fara_client' ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  Fără client
+                </CommandItem>
+                {clients.map((client) => (
+                  <CommandItem
+                    key={client.id}
+                    value={client.name}
+                    onSelect={() => {
+                      onClientChange(client.id);
+                      setOpenClientCombo(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedClient === client.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {client.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
       {hasActiveFilters && (
         <Button 
