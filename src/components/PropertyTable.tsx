@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, MessageSquare, User as UserIcon, Building } from "lucide-react";
 import {
   Select,
@@ -32,6 +33,8 @@ interface PropertyTableProps {
   commissionType?: 'fixed' | 'percentage';
   commissionValue?: number;
   isAuthenticated?: boolean;
+  selectedProperties?: Set<string>;
+  onPropertySelectionChange?: (propertyId: string, selected: boolean) => void;
 }
 
 export const PropertyTable = ({
@@ -46,8 +49,11 @@ export const PropertyTable = ({
   commissionType = 'percentage',
   commissionValue = 2,
   isAuthenticated = true,
+  selectedProperties = new Set(),
+  onPropertySelectionChange,
 }: PropertyTableProps) => {
   const isUserRole = userRole === 'user';
+  const canSelect = isAuthenticated && !isUserRole && onPropertySelectionChange;
 
   const getValue = (property: Property, key: string): any => {
     const map: Record<string, string[]> = {
@@ -125,23 +131,38 @@ export const PropertyTable = ({
         return (
           <Card
             key={property.id}
-            className="group p-5 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] space-y-4"
+            className={`group p-5 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] space-y-4 ${
+              selectedProperties.has(property.id) ? 'ring-2 ring-primary' : ''
+            }`}
           >
             {/* Header */}
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    {getValue(property, 'floor')}
-                  </span>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 flex-1">
+                {canSelect && (
+                  <div className="pt-1">
+                    <Checkbox
+                      checked={selectedProperties.has(property.id)}
+                      onCheckedChange={(checked) => 
+                        onPropertySelectionChange(property.id, checked as boolean)
+                      }
+                      className="h-5 w-5"
+                    />
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {getValue(property, 'floor')}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold">
+                    Ap. {getValue(property, 'apartment')}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {getValue(property, 'type')}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold">
-                  Ap. {getValue(property, 'apartment')}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {getValue(property, 'type')}
-                </p>
               </div>
               
               <div className="flex items-center gap-1">

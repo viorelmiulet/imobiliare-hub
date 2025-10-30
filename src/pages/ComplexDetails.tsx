@@ -10,6 +10,9 @@ import { PropertyDialog } from "@/components/PropertyDialog";
 import { PropertyFilters } from "@/components/PropertyFilters";
 import { ComplexEditDialog } from "@/components/ComplexEditDialog";
 import { ExcelImportDialog } from "@/components/ExcelImportDialog";
+import { BulkActionsToolbar } from "@/components/BulkActionsToolbar";
+import { BulkPlanUploadDialog } from "@/components/BulkPlanUploadDialog";
+import { BulkCommissionDialog } from "@/components/BulkCommissionDialog";
 import { Property } from "@/types/property";
 import { Complex } from "@/types/complex";
 import { useProperties } from "@/hooks/useProperties";
@@ -63,6 +66,9 @@ const ComplexDetails = () => {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [selectedProperties, setSelectedProperties] = useState<Set<string>>(new Set());
+  const [isBulkPlanDialogOpen, setIsBulkPlanDialogOpen] = useState(false);
+  const [isBulkCommissionDialogOpen, setIsBulkCommissionDialogOpen] = useState(false);
 
   const handleImportComplex1Data = async () => {
     if (complexId !== "complex-1") return;
@@ -346,6 +352,83 @@ const ComplexDetails = () => {
     setColumns(importedColumns);
   }, [addProperty]);
 
+  const handlePropertySelectionChange = useCallback((propertyId: string, selected: boolean) => {
+    setSelectedProperties(prev => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(propertyId);
+      } else {
+        newSet.delete(propertyId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleBulkPlanUpload = useCallback(async (planUrl: string) => {
+    const selectedIds = Array.from(selectedProperties);
+    let successCount = 0;
+    
+    for (const id of selectedIds) {
+      const property = properties.find(p => p.id === id);
+      if (property) {
+        try {
+          await updateProperty({
+            ...property,
+            property_plan_url: planUrl
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`Error updating property ${id}:`, error);
+        }
+      }
+    }
+    
+    toast.success(`Plan aplicat pentru ${successCount} proprietăți`);
+    setSelectedProperties(new Set());
+  }, [selectedProperties, properties, updateProperty]);
+
+  const handleBulkCommissionSet = useCallback(async (commission: string) => {
+    const selectedIds = Array.from(selectedProperties);
+    let successCount = 0;
+    
+    for (const id of selectedIds) {
+      const property = properties.find(p => p.id === id);
+      if (property) {
+        try {
+          let finalCommission = commission;
+          
+          if (commission === 'auto') {
+            // Auto calculate based on complex settings
+            if (currentComplex?.commission_type === 'fixed') {
+              finalCommission = `${currentComplex.commission_value}€`;
+            } else {
+              const price = (property as any).pretCuTva || (property as any).avans80 || 0;
+              const priceNum = typeof price === 'number' ? price : parseFloat(String(price).replace(/[€\s]/g, '').replace(/,/g, ''));
+              if (!isNaN(priceNum)) {
+                const commissionValue = priceNum * ((currentComplex?.commission_value || 2) / 100);
+                finalCommission = `${commissionValue.toFixed(2)}€`;
+              }
+            }
+          } else {
+            finalCommission = `${commission}€`;
+          }
+          
+          await updateProperty({
+            ...property,
+            Comision: finalCommission,
+            comision: finalCommission
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`Error updating property ${id}:`, error);
+        }
+      }
+    }
+    
+    toast.success(`Comision setat pentru ${successCount} proprietăți`);
+    setSelectedProperties(new Set());
+  }, [selectedProperties, properties, updateProperty, currentComplex]);
+
   // Show loading if hooks are loading OR if we're waiting for currentComplex to be set
   const isStillLoading = complexesLoading || propertiesLoading || (!currentComplex && complexes.length > 0);
   
@@ -625,6 +708,8 @@ const ComplexDetails = () => {
                           commissionType={currentComplex?.commission_type}
                           commissionValue={currentComplex?.commission_value}
                           isAuthenticated={!!user}
+                          selectedProperties={selectedProperties}
+                          onPropertySelectionChange={handlePropertySelectionChange}
                         />
                       </TabsContent>
                     ))}
@@ -645,6 +730,8 @@ const ComplexDetails = () => {
                 commissionType={currentComplex?.commission_type}
                 commissionValue={currentComplex?.commission_value}
                 isAuthenticated={!!user}
+                selectedProperties={selectedProperties}
+                onPropertySelectionChange={handlePropertySelectionChange}
               />
           )}
         </section>
@@ -681,6 +768,32 @@ const ComplexDetails = () => {
           onOpenChange={setIsImportDialogOpen}
           complexId={complexId || ""}
           onImport={handleExcelImport}
+        />
+
+        {/* Bulk Actions Toolbar */}
+        <BulkActionsToolbar
+          selectedCount={selectedProperties.size}
+          onClearSelection={() => setSelectedProperties(new Set())}
+          onUploadPlan={() => setIsBulkPlanDialogOpen(true)}
+          onSetCommission={() => setIsBulkCommissionDialogOpen(true)}
+        />
+
+        {/* Bulk Plan Upload Dialog */}
+        <BulkPlanUploadDialog
+          open={isBulkPlanDialogOpen}
+          onOpenChange={setIsBulkPlanDialogOpen}
+          selectedCount={selectedProperties.size}
+          onUpload={handleBulkPlanUpload}
+        />
+
+        {/* Bulk Commission Dialog */}
+        <BulkCommissionDialog
+          open={isBulkCommissionDialogOpen}
+          onOpenChange={setIsBulkCommissionDialogOpen}
+          selectedCount={selectedProperties.size}
+          commissionType={currentComplex?.commission_type}
+          commissionValue={currentComplex?.commission_value}
+          onSetCommission={handleBulkCommissionSet}
         />
       </main>
     </div>
