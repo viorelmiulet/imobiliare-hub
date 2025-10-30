@@ -33,10 +33,20 @@ serve(async (req) => {
       throw new Error('No authorization header')
     }
     
-    const token = authHeader.replace('Bearer ', '')
-    console.log('Getting user from token...')
+    console.log('Creating auth client and getting user...')
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
     
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser()
     
     if (userError) {
       console.error('Error getting user:', userError)

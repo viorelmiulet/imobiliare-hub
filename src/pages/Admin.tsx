@@ -263,7 +263,8 @@ const Admin = () => {
       });
 
       if (error) {
-        throw new Error((error as any).message || 'Eroare la crearea utilizatorului');
+        const serverMsg = (data as any)?.error;
+        throw new Error(serverMsg || (error as any).message || 'Eroare la crearea utilizatorului');
       }
 
       toast.success('Utilizator creat cu succes');
