@@ -132,9 +132,116 @@ export const PropertyTable = ({
     );
   }
 
+  // Group properties by floor
+  const groupedByFloor = properties.reduce((acc, property) => {
+    const floor = getValue(property, 'floor') || 'Fără etaj';
+    if (!acc[floor]) {
+      acc[floor] = [];
+    }
+    acc[floor].push(property);
+    return acc;
+  }, {} as Record<string, Property[]>);
+
+  // Get sorted floor keys
+  const getFloorOrder = (etajStr: string): number => {
+    const etaj = String(etajStr).toUpperCase().trim();
+    
+    const floorOrder: Record<string, number> = {
+      'DEMISOL': 0,
+      'D': 0,
+      'PARTER': 1,
+      'P': 1,
+      'ETAJ 1': 2,
+      'E1': 2,
+      '1': 2,
+      'ETAJ 2': 3,
+      'E2': 3,
+      '2': 3,
+      'ETAJ 3': 4,
+      'E3': 4,
+      '3': 4,
+      'ETAJ 4': 5,
+      'E4': 5,
+      '4': 5,
+      'ETAJ 5': 6,
+      'E5': 6,
+      '5': 6,
+      'ETAJ 6': 7,
+      'E6': 7,
+      '6': 7,
+      'ETAJ 7': 8,
+      'E7': 8,
+      '7': 8,
+      'ETAJ 8': 9,
+      'E8': 9,
+      '8': 9,
+      'ETAJ 9': 10,
+      'E9': 10,
+      '9': 10,
+      'ETAJ 10': 11,
+      'E10': 11,
+      '10': 11,
+    };
+    
+    if (floorOrder[etaj] !== undefined) {
+      return floorOrder[etaj];
+    }
+    
+    const match = etaj.match(/(?:ETAJ|E)\s*(\d+)/);
+    if (match) {
+      return parseInt(match[1]) + 1;
+    }
+    
+    const numMatch = etaj.match(/^(\d+)$/);
+    if (numMatch) {
+      return parseInt(numMatch[1]) + 1;
+    }
+    
+    return 999;
+  };
+
+  const sortedFloors = Object.keys(groupedByFloor).sort((a, b) => {
+    return getFloorOrder(a) - getFloorOrder(b);
+  });
+
+  const normalizeFloorLabel = (floor: string): string => {
+    const upper = floor.toUpperCase().trim();
+    if (upper === 'D') return 'DEMISOL';
+    if (upper === 'P') return 'PARTER';
+    if (upper === 'E1' || upper === '1') return 'ETAJ 1';
+    if (upper === 'E2' || upper === '2') return 'ETAJ 2';
+    if (upper === 'E3' || upper === '3') return 'ETAJ 3';
+    if (upper === 'E4' || upper === '4') return 'ETAJ 4';
+    if (upper === 'E5' || upper === '5') return 'ETAJ 5';
+    if (upper === 'E6' || upper === '6') return 'ETAJ 6';
+    if (upper === 'E7' || upper === '7') return 'ETAJ 7';
+    if (upper === 'E8' || upper === '8') return 'ETAJ 8';
+    if (upper === 'E9' || upper === '9') return 'ETAJ 9';
+    if (upper === 'E10' || upper === '10') return 'ETAJ 10';
+    const match = upper.match(/E(\d+)/);
+    if (match) return `ETAJ ${match[1]}`;
+    return upper;
+  };
+
   return (
-    <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {properties.map((property) => {
+    <div className="space-y-8">
+      {sortedFloors.map((floor) => (
+        <div key={floor} className="space-y-4 animate-fade-in">
+          {/* Floor Header */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t-2 border-primary/20"></div>
+            </div>
+            <div className="relative flex justify-start">
+              <span className="bg-background pr-4 text-lg md:text-xl font-bold text-primary uppercase tracking-wide">
+                {normalizeFloorLabel(floor)}
+              </span>
+            </div>
+          </div>
+
+          {/* Properties Grid */}
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {groupedByFloor[floor].map((property) => {
         const status = getValue(property, 'status') || 'disponibil';
         const statusConfig = getStatusConfig(status);
         const client = clients.find(c => c.id === property.client_id);
@@ -442,9 +549,12 @@ export const PropertyTable = ({
                 )}
               </div>
             )}
-          </Card>
-        );
-      })}
+        </Card>
+            );
+          })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
