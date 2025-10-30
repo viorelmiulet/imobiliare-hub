@@ -145,7 +145,7 @@ const Index = () => {
                       >
                         {complex.image ? (
                           <img 
-                            src={complex.image} 
+                            src={complex.image.startsWith('/') ? complex.image : `/images/${complex.image}`}
                             alt={complex.name}
                             className="h-full w-full object-cover"
                           />
