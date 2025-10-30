@@ -146,7 +146,7 @@ export const PropertyTable = ({
               
               <div className="flex items-center gap-1">
                 <PropertyPlanViewer
-                  imageUrl={getValue(property, 'plan') || getValue(property, 'planUrl') || getValue(property, 'imageUrl')}
+                  imageUrl={getValue(property, 'property_plan_url') || getValue(property, 'plan') || getValue(property, 'planUrl') || getValue(property, 'imageUrl')}
                   propertyName={`Ap. ${getValue(property, 'apartment')}`}
                 />
                 {isAuthenticated && (
