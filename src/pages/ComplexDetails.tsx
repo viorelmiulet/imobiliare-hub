@@ -54,6 +54,17 @@ const ComplexDetails = () => {
         commission_type: complex.commission_type,
         commission_value: complex.commission_value,
       });
+      
+      // Use complex-specific columns if available
+      if (complex.column_schema && complex.column_schema.length > 0) {
+        setColumns(complex.column_schema);
+      } else {
+        // Default columns if no schema is defined
+        setColumns([
+          'Etaj', 'Nr. ap.', 'Tip Apartament', 'Suprafata', 'Pret Credit', 
+          'Pret Cash', 'Status', 'Client', 'Agent', 'Comision', 'Observatii'
+        ]);
+      }
     }
   }, [complexes, complexId]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -350,7 +361,12 @@ const ComplexDetails = () => {
       await addProperty(property);
     }
     setColumns(importedColumns);
-  }, [addProperty]);
+    
+    // Update complex column schema in database
+    if (complexId && importedColumns.length > 0) {
+      await updateComplex(complexId, { column_schema: importedColumns });
+    }
+  }, [addProperty, complexId, updateComplex]);
 
   const handlePropertySelectionChange = useCallback((propertyId: string, selected: boolean) => {
     setSelectedProperties(prev => {

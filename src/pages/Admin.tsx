@@ -348,17 +348,25 @@ const Admin = () => {
 
     setCreatingComplex(true);
     try {
-      await addComplex({
-        id: newComplexId,
-        name: newComplexName,
-        location: newComplexLocation,
-        description: newComplexDescription,
-        image: newComplexImage,
-        commission_type: newComplexCommissionType,
-        commission_value: parseFloat(newComplexCommissionValue) || 0,
-      });
+      // Create complex with column schema
+      const { error } = await supabase
+        .from('complexes')
+        .insert({
+          id: newComplexId,
+          name: newComplexName,
+          location: newComplexLocation,
+          description: newComplexDescription,
+          image: newComplexImage,
+          commission_type: newComplexCommissionType,
+          commission_value: parseFloat(newComplexCommissionValue) || 0,
+          column_schema: excelColumns,
+          total_properties: 0,
+          available_properties: 0,
+        });
 
-      toast.success('Complex creat cu succes');
+      if (error) throw error;
+
+      toast.success('Complex creat cu succes cu structură personalizată');
       setCreateComplexDialogOpen(false);
       setNewComplexId('');
       setNewComplexName('');
@@ -371,6 +379,7 @@ const Admin = () => {
       fetchComplexes();
     } catch (error) {
       console.error('Error creating complex:', error);
+      toast.error('Eroare la crearea complexului');
     } finally {
       setCreatingComplex(false);
     }

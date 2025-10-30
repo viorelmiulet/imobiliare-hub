@@ -47,6 +47,7 @@ export type Database = {
       complexes: {
         Row: {
           available_properties: number | null
+          column_schema: Json | null
           commission_type: Database["public"]["Enums"]["commission_type"] | null
           commission_value: number | null
           created_at: string | null
@@ -60,6 +61,7 @@ export type Database = {
         }
         Insert: {
           available_properties?: number | null
+          column_schema?: Json | null
           commission_type?:
             | Database["public"]["Enums"]["commission_type"]
             | null
@@ -75,6 +77,7 @@ export type Database = {
         }
         Update: {
           available_properties?: number | null
+          column_schema?: Json | null
           commission_type?:
             | Database["public"]["Enums"]["commission_type"]
             | null

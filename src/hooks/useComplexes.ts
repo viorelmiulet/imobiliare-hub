@@ -12,6 +12,7 @@ export interface Complex {
   image?: string;
   commission_type?: 'fixed' | 'percentage';
   commission_value?: number;
+  column_schema?: string[];
 }
 
 export const useComplexes = () => {
@@ -26,7 +27,16 @@ export const useComplexes = () => {
         .order('name');
 
       if (error) throw error;
-      setComplexes(data || []);
+      
+      // Map the data to ensure column_schema is properly typed
+      const mappedData = (data || []).map(complex => ({
+        ...complex,
+        column_schema: Array.isArray(complex.column_schema) 
+          ? complex.column_schema as string[]
+          : []
+      }));
+      
+      setComplexes(mappedData);
     } catch (error) {
       console.error('Error fetching complexes:', error);
       toast.error('Eroare la încărcarea complexurilor');
