@@ -39,12 +39,15 @@ export const useProperties = (complexId: string) => {
       if (error) throw error;
       
       // Transform from database format to Property format
-      const transformedData = (data || []).map(row => ({
-        id: row.id,
-        client_id: isAuthenticated ? row.client_id : undefined,
-        clientName: isAuthenticated ? (row as any).clients?.name : undefined,
-        ...(row.data as Record<string, any>)
-      }));
+      const transformedData = (data || []).map(row => {
+        const { id: dataId, ...restData } = (row.data as Record<string, any>) || {};
+        return {
+          id: row.id, // Use database UUID, not the id from JSONB data
+          client_id: isAuthenticated ? row.client_id : undefined,
+          clientName: isAuthenticated ? (row as any).clients?.name : undefined,
+          ...restData
+        };
+      });
       
       setProperties(transformedData);
     } catch (error) {
