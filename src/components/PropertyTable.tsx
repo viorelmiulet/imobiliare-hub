@@ -61,8 +61,9 @@ export const PropertyTable = ({
   const canSelect = isAuthenticated && !isUserRole && onPropertySelectionChange;
   const [openClientCombo, setOpenClientCombo] = useState<Record<string, boolean>>({});
   
-  // Determine if this is Renew Chiajna complex
+  // Determine complex type
   const isRenewChiajna = complexId === 'complex-3';
+  const isViilor33 = complexId === 'complex-viilor33';
 
   const getValue = (property: Property, key: string): any => {
     const map: Record<string, string[]> = {
@@ -240,7 +241,14 @@ export const PropertyTable = ({
                 <span className="font-medium">{formatArea(getValue(property, 'area'))}</span>
               </div>
               
-              {isRenewChiajna ? (
+              {isViilor33 ? (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Preț:</span>
+                  <span className="font-semibold text-primary">
+                    {formatPrice(getValue(property, 'creditPrice'))}
+                  </span>
+                </div>
+              ) : isRenewChiajna ? (
                 <>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Credit:</span>
