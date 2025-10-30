@@ -224,7 +224,7 @@ const ComplexDetails = () => {
     const lastDot = cleanStr.lastIndexOf('.');
 
     if (lastComma !== -1 && lastDot !== -1) {
-      // Decide decimal by the rightmost separator
+      // Both present -> decimal is the rightmost separator
       if (lastComma > lastDot) {
         // Comma is decimal: remove all dots (thousands), replace last comma with dot
         cleanStr = cleanStr.replace(/\./g, '');
@@ -236,9 +236,22 @@ const ComplexDetails = () => {
         cleanStr = cleanStr.replace(/,/g, '');
       }
     } else if (lastComma !== -1) {
-      // Only comma present: treat as decimal
-      cleanStr = cleanStr.replace(/,/g, '.');
-    } // else: only dot or integer
+      // Only comma present: determine thousands vs decimal
+      if (/^\d{1,3}(,\d{3})+$/.test(cleanStr)) {
+        // Thousands groups like 1,000 or 12,000 -> remove commas
+        cleanStr = cleanStr.replace(/,/g, '');
+      } else {
+        // Decimal comma
+        cleanStr = cleanStr.replace(/,/g, '.');
+      }
+    } else if (lastDot !== -1) {
+      // Only dot present: determine thousands vs decimal
+      if (/^\d{1,3}(\.\d{3})+$/.test(cleanStr)) {
+        // Thousands groups like 1.000 or 12.345.678 -> remove dots
+        cleanStr = cleanStr.replace(/\./g, '');
+      }
+      // else: treat dot as decimal separator and keep it
+    } // else: integer
 
     const parsed = parseFloat(cleanStr);
     return isNaN(parsed) ? 0 : parsed;
