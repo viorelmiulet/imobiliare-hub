@@ -486,13 +486,7 @@ export const PropertyTable = ({
             {isAuthenticated && (userRole === 'admin' || userRole === 'manager') && (
               <div className="flex gap-2 pt-2 border-t">
                 {onCommissionChange && (
-                  <Popover 
-                    open={manualCommissionOpen[property.id]}
-                    onOpenChange={(open) => {
-                      setManualCommissionOpen(prev => ({ ...prev, [property.id]: open }));
-                      if (!open) setManualCommissionValue('');
-                    }}
-                  >
+                  <div className="flex-1 flex gap-1">
                     <Select
                       value={getValue(property, 'commission') ? 'current' : ''}
                       onValueChange={(value) => {
@@ -541,48 +535,59 @@ export const PropertyTable = ({
                       </SelectContent>
                     </Select>
                     
-                    <PopoverContent className="w-72 p-4" align="start">
-                      <div className="space-y-3">
-                        <div className="space-y-1">
-                          <label className="text-sm font-medium">Introdu comision manual</label>
-                          <p className="text-xs text-muted-foreground">Exemplu: 5000 sau 5.000 €</p>
-                        </div>
-                        <Input
-                          type="text"
-                          placeholder="ex: 5000 €"
-                          value={manualCommissionValue}
-                          onChange={(e) => setManualCommissionValue(e.target.value)}
-                          className="h-9"
-                          autoFocus
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => {
-                              if (manualCommissionValue.trim()) {
-                                onCommissionChange(property.id, manualCommissionValue.trim());
+                    <Popover 
+                      open={manualCommissionOpen[property.id]}
+                      onOpenChange={(open) => {
+                        setManualCommissionOpen(prev => ({ ...prev, [property.id]: open }));
+                        if (!open) setManualCommissionValue('');
+                      }}
+                    >
+                      <PopoverTrigger asChild>
+                        <div className="hidden" />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-72 p-4" align="start">
+                        <div className="space-y-3">
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium">Introdu comision manual</label>
+                            <p className="text-xs text-muted-foreground">Exemplu: 5000 sau 5.000 €</p>
+                          </div>
+                          <Input
+                            type="text"
+                            placeholder="ex: 5000 €"
+                            value={manualCommissionValue}
+                            onChange={(e) => setManualCommissionValue(e.target.value)}
+                            className="h-9"
+                            autoFocus
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => {
+                                if (manualCommissionValue.trim()) {
+                                  onCommissionChange(property.id, manualCommissionValue.trim());
+                                  setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
+                                  setManualCommissionValue('');
+                                }
+                              }}
+                            >
+                              Salvează
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
                                 setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
                                 setManualCommissionValue('');
-                              }
-                            }}
-                          >
-                            Salvează
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
-                              setManualCommissionValue('');
-                            }}
-                          >
-                            Anulează
-                          </Button>
+                              }}
+                            >
+                              Anulează
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 )}
 
                 {onObservatiiChange && (
