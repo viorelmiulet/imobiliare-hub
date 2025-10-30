@@ -596,29 +596,17 @@ const ComplexDetails = () => {
                   )}
                   
                   {complexId === "complex-3" && (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleImportRenewChiajna2Data}
-                        disabled={isImporting}
-                      >
-                        <FileUp className="h-4 w-4" />
-                        <span className="hidden md:inline ml-2">
-                          {isImporting ? "Import..." : "Import Date"}
-                        </span>
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={handleClearRenewChiajnaData}
-                        disabled={isImporting}
-                      >
-                        <span className="hidden md:inline ml-2">
-                          {isImporting ? "Ștergere..." : "Șterge Date"}
-                        </span>
-                      </Button>
-                    </>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleImportRenewChiajna2Data}
+                      disabled={isImporting}
+                    >
+                      <FileUp className="h-4 w-4" />
+                      <span className="hidden md:inline ml-2">
+                        {isImporting ? "Import..." : "Import Date"}
+                      </span>
+                    </Button>
                   )}
                   
                   <Button
