@@ -222,8 +222,25 @@ export default function ClientsOverview() {
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
-                        onClick={() => {
-                          const phoneNumber = client.phone.replace(/[\s\-\(\)]/g, '');
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Clean phone number: remove spaces, dashes, parentheses
+                          let phoneNumber = client.phone.replace(/[\s\-\(\)]/g, '');
+                          
+                          // Remove + if present
+                          phoneNumber = phoneNumber.replace(/^\+/, '');
+                          
+                          // If starts with 0, replace with 40 (Romania code)
+                          if (phoneNumber.startsWith('0')) {
+                            phoneNumber = '40' + phoneNumber.substring(1);
+                          }
+                          
+                          // If doesn't start with country code, add 40
+                          if (!phoneNumber.startsWith('40')) {
+                            phoneNumber = '40' + phoneNumber;
+                          }
+                          
+                          console.log('Opening WhatsApp for:', phoneNumber);
                           window.open(`https://wa.me/${phoneNumber}`, '_blank');
                         }}
                       >
