@@ -235,5 +235,27 @@ All colors MUST be HSL.
     * {
       -webkit-overflow-scrolling: touch;
     }
+    
+    /* Larger touch targets for interactive elements */
+    button:not(.h-8):not(.h-9):not(.h-10) {
+      min-height: 44px;
+    }
+    
+    /* Prevent text selection on interactive elements */
+    button, [role="button"] {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    /* Improve input field experience */
+    input, textarea, select {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Better spacing for mobile */
+    .container {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
   }
 }

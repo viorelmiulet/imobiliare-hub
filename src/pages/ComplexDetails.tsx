@@ -528,39 +528,39 @@ const ComplexDetails = () => {
     <div className="min-h-screen bg-background">
       {/* Fixed Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
+        <div className="container mx-auto px-3 md:px-4 py-2.5 md:py-3">
+          <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Left side - Back button and complex info */}
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/")}
-                className="shrink-0 h-9 w-9"
+                className="shrink-0 h-8 w-8 md:h-9 md:w-9"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               
-              <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <Building2 className="h-4 w-4 text-primary-foreground" />
+              <div className="h-8 w-8 md:h-9 md:w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                <Building2 className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary-foreground" />
               </div>
               
               <div className="min-w-0">
-                <h1 className="text-sm font-bold tracking-tight truncate">
+                <h1 className="text-xs md:text-sm font-bold tracking-tight truncate">
                   {currentComplex.name}
                 </h1>
-                <p className="text-xs text-muted-foreground truncate">
+                <p className="text-[10px] md:text-xs text-muted-foreground truncate hidden sm:block">
                   {currentComplex.location}
                 </p>
               </div>
             </div>
 
             {/* Right side - Action buttons */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
               <ThemeToggle />
               
               {!user && (
-                <Button variant="default" size="sm" onClick={() => navigate('/auth')}>
+                <Button variant="default" size="sm" className="h-8 text-xs md:h-9 md:text-sm" onClick={() => navigate('/auth')}>
                   Login
                 </Button>
               )}
@@ -570,70 +570,72 @@ const ComplexDetails = () => {
                   {complexId === "complex-1" && (
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
+                      className="h-8 w-8 md:h-9 md:w-9"
                       onClick={handleImportComplex1Data}
                       disabled={isImporting}
+                      title="Import date"
                     >
-                      <FileUp className="h-4 w-4" />
-                      <span className="hidden md:inline ml-2">
-                        {isImporting ? "Import..." : "Import"}
-                      </span>
+                      <FileUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     </Button>
                   )}
                   
                   {complexId === "complex-viilor33" && (
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
+                      className="h-8 w-8 md:h-9 md:w-9"
                       onClick={handleImportViilor33Data}
                       disabled={isImporting}
+                      title="Import date"
                     >
-                      <FileUp className="h-4 w-4" />
-                      <span className="hidden md:inline ml-2">
-                        {isImporting ? "Import..." : "Date"}
-                      </span>
+                      <FileUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     </Button>
                   )}
                   
                   {complexId === "complex-3" && (
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
+                      className="h-8 w-8 md:h-9 md:w-9"
                       onClick={handleImportRenewChiajna2Data}
                       disabled={isImporting}
+                      title="Import date"
                     >
-                      <FileUp className="h-4 w-4" />
-                      <span className="hidden md:inline ml-2">
-                        {isImporting ? "Import..." : "Import Date"}
-                      </span>
+                      <FileUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     </Button>
                   )}
                   
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
+                    className="h-8 w-8 md:h-9 md:w-9"
                     onClick={() => setIsComplexEditOpen(true)}
+                    title="Setări"
                   >
-                    <Settings className="h-4 w-4" />
+                    <Settings className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   </Button>
                   
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
+                    className="h-8 w-8 md:h-9 md:w-9 hidden sm:flex"
                     onClick={() => setIsImportDialogOpen(true)}
+                    title="Import Excel"
                   >
-                    <FileUp className="h-4 w-4" />
+                    <FileUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   </Button>
                   
                   <Button
                     size="sm"
+                    className="h-8 md:h-9"
                     onClick={() => {
                       setEditingProperty(null);
                       setIsDialogOpen(true);
                     }}
                   >
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden md:inline ml-2">Adaugă</span>
+                    <Plus className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                    <span className="hidden md:inline ml-2 text-xs md:text-sm">Adaugă</span>
                   </Button>
                 </>
               )}
@@ -642,45 +644,45 @@ const ComplexDetails = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 space-y-6">
+      <main className="container mx-auto px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
         {/* Stats Cards - Minimalist Bento Style */}
-        <section className="grid gap-3 grid-cols-2 md:grid-cols-5">
-          <div className="p-4 rounded-2xl border bg-card">
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Total</p>
-              <p className="text-3xl font-bold tracking-tighter">{properties.length}</p>
+        <section className="grid gap-2.5 md:gap-3 grid-cols-2 md:grid-cols-5">
+          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+            <div className="space-y-0.5 md:space-y-1">
+              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Total</p>
+              <p className="text-2xl md:text-3xl font-bold tracking-tighter">{properties.length}</p>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl border bg-card">
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Disponibile</p>
-              <p className="text-3xl font-bold tracking-tighter text-success">
+          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+            <div className="space-y-0.5 md:space-y-1">
+              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Disponibile</p>
+              <p className="text-2xl md:text-3xl font-bold tracking-tighter text-success">
                 {statistics.availableCount}
               </p>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl border bg-card">
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Rezervate</p>
-              <p className="text-3xl font-bold tracking-tighter text-warning">
+          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+            <div className="space-y-0.5 md:space-y-1">
+              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Rezervate</p>
+              <p className="text-2xl md:text-3xl font-bold tracking-tighter text-warning">
                 {statistics.reservedCount}
               </p>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl border bg-card">
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Vândute</p>
-              <p className="text-3xl font-bold tracking-tighter text-info">{statistics.soldCount}</p>
+          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+            <div className="space-y-0.5 md:space-y-1">
+              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Vândute</p>
+              <p className="text-2xl md:text-3xl font-bold tracking-tighter text-info">{statistics.soldCount}</p>
             </div>
           </div>
 
           {(isAdmin || isManager) && (
-            <div className="p-4 rounded-2xl border bg-card col-span-2 md:col-span-1">
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Comisioane</p>
+            <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card col-span-2 md:col-span-1 touch-manipulation">
+              <div className="space-y-1.5 md:space-y-2">
+                <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Comisioane</p>
                 {statistics.corpNames.length > 1 ? (
                   <div className="space-y-1.5">
                     {statistics.corpNames.map(corp => (
@@ -696,7 +698,7 @@ const ComplexDetails = () => {
                     ))}
                     <div className="flex justify-between items-center pt-2 border-t">
                       <span className="text-xs font-medium">Total:</span>
-                      <span className="text-lg font-bold tracking-tighter text-accent">
+                      <span className="text-base md:text-lg font-bold tracking-tighter text-accent">
                         {new Intl.NumberFormat('ro-RO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -705,7 +707,7 @@ const ComplexDetails = () => {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-2xl font-bold tracking-tighter text-accent">
+                  <p className="text-xl md:text-2xl font-bold tracking-tighter text-accent">
                     {new Intl.NumberFormat('ro-RO', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -718,22 +720,22 @@ const ComplexDetails = () => {
         </section>
 
         {/* Search and Filters - Inline */}
-        <section className="space-y-4">
+        <section className="space-y-3 md:space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold tracking-tight">Proprietăți</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-base md:text-lg font-bold tracking-tight">Proprietăți</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">
               {filteredProperties.length} din {properties.length}
             </p>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col md:flex-row gap-2 md:gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Caută apartament, client, agent..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-10"
               />
             </div>
             

@@ -133,7 +133,7 @@ export const PropertyTable = ({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {properties.map((property) => {
         const status = getValue(property, 'status') || 'disponibil';
         const statusConfig = getStatusConfig(status);
@@ -142,12 +142,12 @@ export const PropertyTable = ({
         return (
           <Card
             key={property.id}
-            className={`group p-5 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] space-y-4 ${
+            className={`group p-4 md:p-5 hover:shadow-lg transition-all duration-300 active:scale-[0.98] md:hover:scale-[1.02] space-y-3 md:space-y-4 touch-manipulation ${
               selectedProperties.has(property.id) ? 'ring-2 ring-primary' : ''
             }`}
           >
             {/* Header */}
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-2 md:gap-3">
               <div className="flex items-start gap-3 flex-1">
                 {canSelect && (
                   <div className="pt-1">
