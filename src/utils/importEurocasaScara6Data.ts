@@ -114,8 +114,15 @@ export const importEurocasaScara6Data = async () => {
         continue; // Skip this row as it's just a floor marker
       }
 
-      // Process property row (only if we have an apartment number)
+      // Process property row (only if we have an apartment number and it's not a BOXA)
       if (row[1]) { // NR AP column
+        const nrAp = row[1]?.toString() || '';
+        
+        // Skip if it's a BOXA
+        if (nrAp.toUpperCase().includes('BOXA')) {
+          continue;
+        }
+        
         const creditValue = parsePrice(row[4]);
         const avans50Value = parsePrice(row[5]);
         const avans80Value = parsePrice(row[6]);
@@ -123,7 +130,7 @@ export const importEurocasaScara6Data = async () => {
         const property: Property = {
           id: `es6-${i}`,
           etaj: currentEtaj,
-          nrAp: row[1]?.toString() || '',
+          nrAp: nrAp,
           tipCom: row[2]?.toString() || '',
           mpUtili: parsePrice(row[3]), // Changed from suprafata to mpUtili for consistency
           pretCuTva: creditValue || avans50Value || avans80Value, // Use credit if available, otherwise fallback to avans values
