@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, User, Building2, Phone, Mail, Upload, MessageCircle } from "lucide-react";
+import { ArrowLeft, Search, User, Building2, Phone, Mail, Upload, MessageCircle, Trash2 } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { useComplexes } from "@/hooks/useComplexes";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface PropertyWithComplex {
   id: string;
@@ -18,10 +21,13 @@ interface PropertyWithComplex {
 
 export default function ClientsOverview() {
   const navigate = useNavigate();
-  const { clients } = useClients();
+  const { clients, deleteClient, refetch } = useClients();
   const { complexes } = useComplexes();
   const [searchTerm, setSearchTerm] = useState("");
   const [clientProperties, setClientProperties] = useState<Record<string, PropertyWithComplex[]>>({});
+  const [selectedClients, setSelectedClients] = useState<Set<string>>(new Set());
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchClientProperties = async () => {
@@ -98,6 +104,42 @@ export default function ClientsOverview() {
     label += `Ap. ${nrAp}`;
     
     return label;
+  };
+
+  const handleSelectAll = () => {
+    if (selectedClients.size === filteredClients.length) {
+      setSelectedClients(new Set());
+    } else {
+      setSelectedClients(new Set(filteredClients.map(c => c.id)));
+    }
+  };
+
+  const handleSelectClient = (clientId: string) => {
+    const newSelected = new Set(selectedClients);
+    if (newSelected.has(clientId)) {
+      newSelected.delete(clientId);
+    } else {
+      newSelected.add(clientId);
+    }
+    setSelectedClients(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    setIsDeleting(true);
+    try {
+      for (const clientId of selectedClients) {
+        await deleteClient(clientId);
+      }
+      setSelectedClients(new Set());
+      setShowDeleteDialog(false);
+      toast.success(`${selectedClients.size} clienți șterși cu succes`);
+      await refetch();
+    } catch (error) {
+      console.error('Error deleting clients:', error);
+      toast.error('Eroare la ștergerea clienților');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -187,6 +229,42 @@ export default function ClientsOverview() {
           </div>
         </section>
 
+        {/* Bulk Actions Toolbar */}
+        {selectedClients.size > 0 && (
+          <section className="sticky top-[73px] z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-y py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={selectedClients.size === filteredClients.length}
+                  onCheckedChange={handleSelectAll}
+                  className="h-5 w-5"
+                />
+                <span className="text-sm font-medium">
+                  {selectedClients.size} {selectedClients.size === 1 ? 'client selectat' : 'clienți selectați'}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedClients(new Set())}
+                >
+                  Anulează
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Șterge selectați
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Clients List */}
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredClients.length === 0 ? (
@@ -204,8 +282,17 @@ export default function ClientsOverview() {
                 >
                   {/* Client Info */}
                   <div className="space-y-2">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-lg">{client.name}</h3>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 flex-1">
+                        <Checkbox
+                          checked={selectedClients.has(client.id)}
+                          onCheckedChange={() => handleSelectClient(client.id)}
+                          className="h-5 w-5 mt-1"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{client.name}</h3>
+                        </div>
+                      </div>
                       {properties.length > 0 && (
                         <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
                           {properties.length} prop.
@@ -284,6 +371,29 @@ export default function ClientsOverview() {
             })
           )}
         </section>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmare ștergere</AlertDialogTitle>
+              <AlertDialogDescription>
+                Sigur dorești să ștergi {selectedClients.size} {selectedClients.size === 1 ? 'client' : 'clienți'}? 
+                Această acțiune nu poate fi anulată.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Anulează</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleBulkDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? 'Se șterge...' : 'Șterge'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
