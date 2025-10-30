@@ -35,12 +35,6 @@ export const initialProperties: Property[] = [
   { id: "12", etaj: "DEMISOL", nrAp: "AP 12", tipCom: "GARSONIERA", mpUtili: 32.09, pretCuTva: 0, avans50: 0, avans80: 0, nume: "", contact: "", agent: "", finisaje: "", observatii: "", status: "disponibil" },
   { id: "13", etaj: "DEMISOL", nrAp: "AP 13", tipCom: "SP COM", mpUtili: 25.91, pretCuTva: 39000, avans50: 0, avans80: 0, nume: "", contact: "", agent: "", finisaje: "", observatii: "", status: "disponibil" },
   { id: "14", etaj: "DEMISOL", nrAp: "AP 14", tipCom: "AP 2 CAMERE", mpUtili: 50.37, pretCuTva: 73500, avans50: 72000, avans80: 70500, nume: "", contact: "", agent: "", finisaje: "", observatii: "", status: "disponibil" },
-  { id: "15", etaj: "DEMISOL", nrAp: "BOXA 4", tipCom: "BOXA", mpUtili: 5.88, pretCuTva: 0, avans50: 0, avans80: 0, nume: "badea ap 34", contact: "", agent: "eugen", finisaje: "", observatii: "", status: "vandut" },
-  { id: "16", etaj: "DEMISOL", nrAp: "BOXA 5", tipCom: "BOXA", mpUtili: 6, pretCuTva: 0, avans50: 0, avans80: 0, nume: "ene andreea", contact: "", agent: "eurocasa", finisaje: "", observatii: "", status: "vandut" },
-  { id: "17", etaj: "DEMISOL", nrAp: "BOXA 6", tipCom: "BOXA", mpUtili: 6.9, pretCuTva: 0, avans50: 0, avans80: 0, nume: "ap 9 scara 5", contact: "", agent: "viorel", finisaje: "", observatii: "", status: "vandut" },
-  { id: "18", etaj: "DEMISOL", nrAp: "BOXA 1", tipCom: "BOXA", mpUtili: 4.78, pretCuTva: 0, avans50: 0, avans80: 0, nume: "dudu robert", contact: "", agent: "eugen", finisaje: "", observatii: "", status: "vandut" },
-  { id: "19", etaj: "DEMISOL", nrAp: "BOXA 2", tipCom: "BOXA", mpUtili: 4.95, pretCuTva: 0, avans50: 0, avans80: 0, nume: "cristi gae", contact: "", agent: "eurocasa", finisaje: "", observatii: "", status: "vandut" },
-  { id: "20", etaj: "DEMISOL", nrAp: "BOXA 3", tipCom: "BOXA", mpUtili: 8.3, pretCuTva: 0, avans50: 0, avans80: 0, nume: "rezervat", contact: "", agent: "", finisaje: "", observatii: "COSTI", status: "rezervat" },
   
   // PARTER
   { id: "21", etaj: "PARTER", nrAp: "AP 15", tipCom: "GARSONIERA", mpUtili: 33.38, pretCuTva: 48500, avans50: 47500, avans80: 47000, nume: "", contact: "", agent: "", finisaje: "finisaj gri", observatii: "", status: "disponibil" },
