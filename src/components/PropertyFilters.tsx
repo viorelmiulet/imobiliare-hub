@@ -47,8 +47,8 @@ export const PropertyFilters = ({
 }: PropertyFiltersProps) => {
   const isMobile = useIsMobile();
   const [openClientCombo, setOpenClientCombo] = useState(false);
-  const uniqueFloors = Array.from(new Set(properties.map((p) => p.etaj)));
-  const uniqueTypes = Array.from(new Set(properties.map((p) => p.tipCom)));
+  const uniqueFloors = Array.from(new Set(properties.map((p) => p.etaj).filter(Boolean))) as string[];
+  const uniqueTypes = Array.from(new Set(properties.map((p) => p.tipCom).filter(Boolean))) as string[];
   const uniqueCorps = Array.from(new Set(properties.map((p) => p.corp).filter(Boolean))) as string[];
   
   const getClientLabel = (value: string) => {
