@@ -386,14 +386,25 @@ export const PropertyDialog = ({
 
             <div className="space-y-2">
               <Label htmlFor="agent">Agent</Label>
-              <Input
-                id="agent"
-                value={formData.agent}
-                onChange={(e) =>
-                  setFormData({ ...formData, agent: e.target.value })
+              <Select
+                value={formData.agent || "none"}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, agent: value === "none" ? "" : value })
                 }
-                placeholder="ex: Mari Popa"
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selectează agentul" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Fără agent</SelectItem>
+                  <SelectItem value="Mari Popa">Mari Popa</SelectItem>
+                  <SelectItem value="Ion Popescu">Ion Popescu</SelectItem>
+                  <SelectItem value="Ana Maria">Ana Maria</SelectItem>
+                  <SelectItem value="George Ionescu">George Ionescu</SelectItem>
+                  <SelectItem value="Elena Dumitrescu">Elena Dumitrescu</SelectItem>
+                  <SelectItem value="Andrei Gheorghe">Andrei Gheorghe</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
