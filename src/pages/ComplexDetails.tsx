@@ -181,21 +181,44 @@ const ComplexDetails = () => {
 
   const getPropertyCommission = useCallback((property: Property): number => {
     // Extract commission from various possible keys and parse robustly
-    const synonyms = ['Comision', 'comision'];
+    const knownKeys = ['Comision', 'comision', 'COMISION', 'commission'];
     let commissionValue = '';
-    for (const key of synonyms) {
+    
+    // Try known keys first
+    for (const key of knownKeys) {
       const v = (property as any)[key];
       if (v !== undefined && v !== null && String(v).trim() !== '') {
         commissionValue = String(v);
         break;
       }
     }
+    
+    // If not found, try case-insensitive search for 'comision'
+    if (!commissionValue) {
+      for (const key in property) {
+        if (key.toLowerCase().includes('comision')) {
+          const v = (property as any)[key];
+          if (v !== undefined && v !== null && String(v).trim() !== '') {
+            commissionValue = String(v);
+            break;
+          }
+        }
+      }
+    }
+    
     if (!commissionValue) return 0;
 
-    // Normalize: remove NBSP and keep only digits, separators and minus
+    // Normalize: remove currency symbols, NBSP and spaces
     let cleanStr = commissionValue
-      .replace(/\u00A0/g, '')
-      .replace(/[^0-9,.-]/g, '');
+      .replace(/\u00A0/g, '') // Remove NBSP
+      .replace(/€/g, '')       // Remove euro symbol
+      .replace(/\s+/g, '')     // Remove all spaces
+      .trim();
+    
+    // Remove any remaining non-numeric characters except comma, dot and minus
+    cleanStr = cleanStr.replace(/[^0-9,.-]/g, '');
+
+    if (!cleanStr) return 0;
 
     const lastComma = cleanStr.lastIndexOf(',');
     const lastDot = cleanStr.lastIndexOf('.');
