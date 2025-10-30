@@ -17,11 +17,14 @@ interface PropertyFiltersProps {
   selectedType: string;
   selectedStatus: string;
   selectedCorp: string;
+  selectedClient: string;
   onFloorChange: (value: string) => void;
   onTypeChange: (value: string) => void;
   onStatusChange: (value: string) => void;
   onCorpChange: (value: string) => void;
+  onClientChange: (value: string) => void;
   properties: Property[];
+  clients?: Array<{ id: string; name: string }>;
 }
 
 export const PropertyFilters = ({
@@ -29,11 +32,14 @@ export const PropertyFilters = ({
   selectedType,
   selectedStatus,
   selectedCorp,
+  selectedClient,
   onFloorChange,
   onTypeChange,
   onStatusChange,
   onCorpChange,
+  onClientChange,
   properties,
+  clients = [],
 }: PropertyFiltersProps) => {
   const isMobile = useIsMobile();
   const uniqueFloors = Array.from(new Set(properties.map((p) => p.etaj)));
@@ -41,18 +47,19 @@ export const PropertyFilters = ({
   const uniqueCorps = Array.from(new Set(properties.map((p) => p.corp).filter(Boolean))) as string[];
 
   const hasActiveFilters = selectedFloor !== 'toate' || selectedType !== 'toate' || 
-                          selectedStatus !== 'toate' || selectedCorp !== 'toate';
+                          selectedStatus !== 'toate' || selectedCorp !== 'toate' || selectedClient !== 'toti';
 
   const resetFilters = () => {
     onFloorChange('toate');
     onTypeChange('toate');
     onStatusChange('toate');
     onCorpChange('toate');
+    onClientChange('toti');
   };
 
   const filterContent = (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {uniqueCorps.length > 0 && (
           <div className="space-y-2">
             <Label className="text-xs font-medium text-muted-foreground">Corp</Label>
@@ -117,6 +124,24 @@ export const PropertyFilters = ({
               <SelectItem value="disponibil">Disponibil</SelectItem>
               <SelectItem value="rezervat">Rezervat</SelectItem>
               <SelectItem value="vandut">Vândut</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-xs font-medium text-muted-foreground">Client</Label>
+          <Select value={selectedClient} onValueChange={onClientChange}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Toți clienții" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="toti">Toți clienții</SelectItem>
+              <SelectItem value="fara_client">Fără client</SelectItem>
+              {clients.map((client) => (
+                <SelectItem key={client.id} value={client.id}>
+                  {client.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -191,6 +216,21 @@ export const PropertyFilters = ({
           <SelectItem value="disponibil">Disponibil</SelectItem>
           <SelectItem value="rezervat">Rezervat</SelectItem>
           <SelectItem value="vandut">Vândut</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={selectedClient} onValueChange={onClientChange}>
+        <SelectTrigger className="h-10 w-[160px]">
+          <SelectValue placeholder="Client" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="toti">Toți clienții</SelectItem>
+          <SelectItem value="fara_client">Fără client</SelectItem>
+          {clients.map((client) => (
+            <SelectItem key={client.id} value={client.id}>
+              {client.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

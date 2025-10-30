@@ -72,6 +72,7 @@ const ComplexDetails = () => {
   const [selectedType, setSelectedType] = useState<string>("toate");
   const [selectedStatus, setSelectedStatus] = useState<string>("toate");
   const [selectedCorp, setSelectedCorp] = useState<string>("toate");
+  const [selectedClient, setSelectedClient] = useState<string>("toti");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isComplexEditOpen, setIsComplexEditOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -196,7 +197,12 @@ const ComplexDetails = () => {
         const matchesCorp =
           selectedCorp === "toate" || property.corp === selectedCorp || property.CORP === selectedCorp;
 
-        return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp;
+        const matchesClient =
+          selectedClient === "toti" || 
+          (selectedClient === "fara_client" && !property.client_id) ||
+          property.client_id === selectedClient;
+
+        return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp && matchesClient;
       })
       .sort((a, b) => {
         // Sort by floor order
@@ -236,7 +242,7 @@ const ComplexDetails = () => {
 
         return getApNumber(a) - getApNumber(b);
       });
-  }, [properties, searchTerm, selectedFloor, selectedType, selectedStatus, selectedCorp]);
+  }, [properties, searchTerm, selectedFloor, selectedType, selectedStatus, selectedCorp, selectedClient]);
 
   // Memoized statistics
   const statistics = useMemo(() => {
@@ -678,11 +684,14 @@ const ComplexDetails = () => {
               selectedType={selectedType}
               selectedStatus={selectedStatus}
               selectedCorp={selectedCorp}
+              selectedClient={selectedClient}
               onFloorChange={setSelectedFloor}
               onTypeChange={setSelectedType}
               onStatusChange={setSelectedStatus}
               onCorpChange={setSelectedCorp}
+              onClientChange={setSelectedClient}
               properties={properties}
+              clients={clients}
             />
           </div>
         </section>
