@@ -110,8 +110,13 @@ export const PropertyTable = ({
     return `${area.toFixed(2)} m²`;
   };
 
-  const calculatePricePerSqm = (property: Property, priceType: 'credit' | 'cash' = 'credit'): number | null => {
-    const price = getValue(property, priceType === 'credit' ? 'creditPrice' : 'cashPrice');
+  const calculatePricePerSqm = (property: Property, priceType: 'credit' | 'cash' | 'avans50' = 'credit'): number | null => {
+    let price;
+    if (priceType === 'avans50') {
+      price = getValue(property, 'avans50');
+    } else {
+      price = getValue(property, priceType === 'credit' ? 'creditPrice' : 'cashPrice');
+    }
     const area = getValue(property, 'area');
     
     const priceNum = typeof price === 'number' ? price : parseFloat(String(price).replace(/[€\s]/g, '').replace(/,/g, ''));
@@ -534,7 +539,7 @@ export const PropertyTable = ({
                         {formatPricePerSqm(calculatePricePerSqm(property, 'credit'))}
                       </span>
                     </div>
-                  ) : (
+                  ) : isRenewChiajna ? (
                     <>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Preț/m² Credit:</span>
@@ -544,6 +549,27 @@ export const PropertyTable = ({
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Preț/m² Cash:</span>
+                        <span className="font-semibold text-accent">
+                          {formatPricePerSqm(calculatePricePerSqm(property, 'cash'))}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Preț/m² Credit:</span>
+                        <span className="font-semibold text-accent">
+                          {formatPricePerSqm(calculatePricePerSqm(property, 'credit'))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Preț/m² Avans 50%:</span>
+                        <span className="font-semibold text-accent">
+                          {formatPricePerSqm(calculatePricePerSqm(property, 'avans50'))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Preț/m² Avans 80%:</span>
                         <span className="font-semibold text-accent">
                           {formatPricePerSqm(calculatePricePerSqm(property, 'cash'))}
                         </span>
