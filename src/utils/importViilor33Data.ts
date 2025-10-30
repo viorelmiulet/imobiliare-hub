@@ -12,6 +12,8 @@ interface RawProperty {
   'Agent'?: string;
   'Observatii'?: string;
   'Observații'?: string;
+  'Comision'?: string | number;
+  'COMISION'?: string | number;
   [key: string]: any;
 }
 
@@ -103,6 +105,33 @@ const extractArea = (row: RawProperty): number => {
   return 0;
 };
 
+const extractCommission = (row: RawProperty): number => {
+  const knownKeys = [
+    'Comision',
+    'COMISION',
+    'comision'
+  ];
+  
+  for (const key of knownKeys) {
+    const val = row[key];
+    if (val !== undefined && val !== null && String(val).trim() !== '') {
+      return parsePrice(val);
+    }
+  }
+  
+  // Try case-insensitive search for 'comision'
+  for (const key in row) {
+    if (key.toLowerCase().includes('comision')) {
+      const val = row[key];
+      if (val !== undefined && val !== null && String(val).trim() !== '') {
+        return parsePrice(val);
+      }
+    }
+  }
+  
+  return 0;
+};
+
 const determineStatus = (row: RawProperty): string => {
   const client = String(row.Client || '').trim().toLowerCase();
   const agent = String(row.Agent || '').trim().toLowerCase();
@@ -153,8 +182,9 @@ export const importViilor33Data = async () => {
         
         const suprafata = extractArea(row);
         const pret = extractPrice(row);
+        const comision = extractCommission(row);
         
-        console.log(`Processing AP ${nrAp}: suprafata=${suprafata}, pret=${pret}`);
+        console.log(`Processing AP ${nrAp}: suprafata=${suprafata}, pret=${pret}, comision=${comision}`);
         
         // Skip only if both are missing
         if (suprafata === 0 && pret === 0) return;
@@ -165,6 +195,7 @@ export const importViilor33Data = async () => {
           nrAp: nrAp,
           suprafata: suprafata,
           pret: pret,
+          Comision: comision > 0 ? `${comision}€` : '',
           client: String(row.Client || '').trim(),
           agent: String(row.Agent || '').trim(),
           observatii: String(row.Observatii || row['Observații'] || '').trim(),
