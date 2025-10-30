@@ -285,7 +285,7 @@ export const PropertyTable = ({
               <div className="w-full border-t-2 border-primary/20"></div>
             </div>
             <div className="relative flex justify-start">
-              <span className="bg-background pr-4 text-lg md:text-xl font-bold text-accent uppercase tracking-wide">
+              <span className="bg-background pr-4 text-lg md:text-xl font-bold text-warning uppercase tracking-wide">
                 {normalizeFloorLabel(floor)}
               </span>
             </div>
