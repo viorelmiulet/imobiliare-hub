@@ -69,8 +69,8 @@ export const importEurocasaScara6Data = async () => {
             { key: "etaj", label: "Etaj", type: "text" },
             { key: "nrAp", label: "Nr. Apartament", type: "text" },
             { key: "tipCom", label: "Tip Compartiment", type: "text" },
-            { key: "suprafata", label: "Suprafață (mp)", type: "number" },
-            { key: "credit", label: "Credit", type: "number" },
+            { key: "mpUtili", label: "Suprafață (mp)", type: "number" },
+            { key: "pretCuTva", label: "Preț Credit", type: "number" },
             { key: "avans50", label: "Avans 50%", type: "number" },
             { key: "avans80", label: "Avans 80%", type: "number" },
             { key: "nume", label: "Nume Client", type: "text" },
@@ -116,15 +116,20 @@ export const importEurocasaScara6Data = async () => {
 
       // Process property row (only if we have an apartment number)
       if (row[1]) { // NR AP column
+        const creditValue = parsePrice(row[4]);
+        const avans50Value = parsePrice(row[5]);
+        const avans80Value = parsePrice(row[6]);
+        
         const property: Property = {
           id: `es6-${i}`,
           etaj: currentEtaj,
           nrAp: row[1]?.toString() || '',
           tipCom: row[2]?.toString() || '',
-          suprafata: parsePrice(row[3]),
-          credit: parsePrice(row[4]),
-          avans50: parsePrice(row[5]),
-          avans80: parsePrice(row[6]),
+          mpUtili: parsePrice(row[3]), // Changed from suprafata to mpUtili for consistency
+          pretCuTva: creditValue || avans50Value || avans80Value, // Use credit if available, otherwise fallback to avans values
+          credit: creditValue,
+          avans50: avans50Value,
+          avans80: avans80Value,
           nume: row[7]?.toString() || '',
           agent: row[8]?.toString() || '',
           status: determineStatus(row[7]?.toString() || '')

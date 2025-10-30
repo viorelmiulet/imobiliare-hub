@@ -65,7 +65,7 @@ export const PropertyTable = ({
       apartment: ['Nr. ap.', 'nrAp', 'nr_ap', 'Nr Ap', 'nr ap'],
       type: ['Tip Apartament', 'tipCom', 'TIP COM', 'tip_apartament'],
       area: ['Suprafata', 'mpUtili', 'suprafata', 'mp'],
-      creditPrice: ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit'],
+      creditPrice: ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit', 'credit'],
       cashPrice: ['Pret Cash', 'pretCash', 'pret_cash', 'avans80'],
       status: ['Status', 'status', 'STATUS'],
       agent: ['Agent', 'agent'],
