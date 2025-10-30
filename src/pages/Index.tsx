@@ -139,13 +139,21 @@ const Index = () => {
                     {/* Header */}
                     <div className="flex items-start justify-between">
                       <div 
-                        className="h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                        style={{ backgroundColor: `hsl(var(--complex-${colorIndex}) / 0.1)` }}
+                        className="h-12 w-12 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110"
+                        style={{ backgroundColor: complex.image ? 'transparent' : `hsl(var(--complex-${colorIndex}) / 0.1)` }}
                       >
-                        <Building2 
-                          className="h-6 w-6"
-                          style={{ color: `hsl(var(--complex-${colorIndex}))` }}
-                        />
+                        {complex.image ? (
+                          <img 
+                            src={complex.image} 
+                            alt={complex.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <Building2 
+                            className="h-6 w-6"
+                            style={{ color: `hsl(var(--complex-${colorIndex}))` }}
+                          />
+                        )}
                       </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                     </div>
