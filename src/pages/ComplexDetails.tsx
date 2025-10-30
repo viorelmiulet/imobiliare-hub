@@ -23,6 +23,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { importComplex1Data } from "@/utils/importComplex1Data";
 import { importViilor33Data } from "@/utils/importViilor33Data";
+import { clearRenewChiajnaData } from "@/utils/clearRenewChiajnaData";
 import { toast } from "sonner";
 
 const ComplexDetails = () => {
@@ -113,6 +114,29 @@ const ComplexDetails = () => {
     } catch (error) {
       console.error("Import error:", error);
       toast.error("Eroare la importul datelor");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleClearRenewChiajnaData = async () => {
+    if (complexId !== "complex-3") return;
+    
+    if (!confirm("Sigur doriți să ștergeți toate proprietățile din Renew Chiajna?")) {
+      return;
+    }
+    
+    setIsImporting(true);
+    try {
+      await clearRenewChiajnaData();
+      toast.success("Toate datele au fost șterse cu succes din Renew Chiajna!");
+      // Refresh the page to reload all data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Clear error:", error);
+      toast.error("Eroare la ștergerea datelor");
     } finally {
       setIsImporting(false);
     }
@@ -547,6 +571,19 @@ const ComplexDetails = () => {
                       <FileUp className="h-4 w-4" />
                       <span className="hidden md:inline ml-2">
                         {isImporting ? "Import..." : "Date"}
+                      </span>
+                    </Button>
+                  )}
+                  
+                  {complexId === "complex-3" && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleClearRenewChiajnaData}
+                      disabled={isImporting}
+                    >
+                      <span className="hidden md:inline ml-2">
+                        {isImporting ? "Ștergere..." : "Șterge Date"}
                       </span>
                     </Button>
                   )}
