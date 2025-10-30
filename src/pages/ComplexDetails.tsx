@@ -249,29 +249,71 @@ const ComplexDetails = () => {
         return matchesSearch && matchesFloor && matchesType && matchesStatus && matchesCorp && matchesClient;
       })
       .sort((a, b) => {
-        // Sort by floor order
-        const floorOrder: Record<string, number> = {
-          'DEMISOL': 0,
-          'PARTER': 1,
-          'P': 1,
-          'ETAJ 1': 2,
-          'E1': 2,
-          'ETAJ 2': 3,
-          'E2': 3,
-          'ETAJ 3': 4,
-          'E3': 4,
-          'ETAJ 4': 5,
-          'E4': 5,
-          'ETAJ 5': 6,
-          'E5': 6,
-          'ETAJ 6': 7,
-          'E6': 7,
+        // Sort by floor order - comprehensive mapping
+        const getFloorOrder = (etajStr: string): number => {
+          const etaj = String(etajStr).toUpperCase().trim();
+          
+          // Direct mappings
+          const floorOrder: Record<string, number> = {
+            'DEMISOL': 0,
+            'D': 0,
+            'PARTER': 1,
+            'P': 1,
+            'ETAJ 1': 2,
+            'E1': 2,
+            '1': 2,
+            'ETAJ 2': 3,
+            'E2': 3,
+            '2': 3,
+            'ETAJ 3': 4,
+            'E3': 4,
+            '3': 4,
+            'ETAJ 4': 5,
+            'E4': 5,
+            '4': 5,
+            'ETAJ 5': 6,
+            'E5': 6,
+            '5': 6,
+            'ETAJ 6': 7,
+            'E6': 7,
+            '6': 7,
+            'ETAJ 7': 8,
+            'E7': 8,
+            '7': 8,
+            'ETAJ 8': 9,
+            'E8': 9,
+            '8': 9,
+            'ETAJ 9': 10,
+            'E9': 10,
+            '9': 10,
+            'ETAJ 10': 11,
+            'E10': 11,
+            '10': 11,
+          };
+          
+          if (floorOrder[etaj] !== undefined) {
+            return floorOrder[etaj];
+          }
+          
+          // Try to extract numeric floor from patterns like "ETAJ 11", "E11"
+          const match = etaj.match(/(?:ETAJ|E)\s*(\d+)/);
+          if (match) {
+            return parseInt(match[1]) + 1; // +1 to account for DEMISOL and PARTER
+          }
+          
+          // If it's just a number
+          const numMatch = etaj.match(/^(\d+)$/);
+          if (numMatch) {
+            return parseInt(numMatch[1]) + 1;
+          }
+          
+          return 999; // Unknown floors go to end
         };
 
-        const etajA = (a.etaj || a.ETAJ || a.Etaj || '').toUpperCase();
-        const etajB = (b.etaj || b.ETAJ || b.Etaj || '').toUpperCase();
-        const floorA = floorOrder[etajA] ?? 999;
-        const floorB = floorOrder[etajB] ?? 999;
+        const etajA = a.etaj || a.ETAJ || a.Etaj || '';
+        const etajB = b.etaj || b.ETAJ || b.Etaj || '';
+        const floorA = getFloorOrder(etajA);
+        const floorB = getFloorOrder(etajB);
 
         if (floorA !== floorB) {
           return floorA - floorB;
