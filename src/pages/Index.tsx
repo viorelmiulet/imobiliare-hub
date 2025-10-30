@@ -139,7 +139,7 @@ const Index = () => {
                     {/* Header */}
                     <div className="flex items-start justify-between">
                       <div 
-                        className="h-12 w-12 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110"
+                        className="h-20 w-20 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110"
                         style={{ backgroundColor: complex.image ? 'transparent' : `hsl(var(--complex-${colorIndex}) / 0.1)` }}
                       >
                         {complex.image ? (
