@@ -294,6 +294,25 @@ export const PropertyTable = ({
     return colors[order % colors.length] || 'bg-card';
   };
 
+  const getFloorBorderColor = (floor: string): string => {
+    const order = getFloorOrder(floor);
+    const colors = [
+      'border-primary/30',      // Demisol
+      'border-success/30',      // Parter
+      'border-info/30',         // Etaj 1
+      'border-warning/30',      // Etaj 2
+      'border-complex-2/30',    // Etaj 3
+      'border-complex-4/30',    // Etaj 4
+      'border-complex-5/30',    // Etaj 5
+      'border-complex-6/30',    // Etaj 6
+      'border-primary/30',      // Etaj 7
+      'border-success/30',      // Etaj 8
+      'border-info/30',         // Etaj 9
+      'border-warning/30',      // Etaj 10
+    ];
+    return colors[order % colors.length] || 'border-border';
+  };
+
   return (
     <div className="space-y-8">
       {sortedFloors.map((floor) => (
@@ -320,7 +339,7 @@ export const PropertyTable = ({
         return (
           <Card
             key={property.id}
-            className={`group p-4 md:p-5 hover:shadow-lg transition-all duration-300 active:scale-[0.98] md:hover:scale-[1.02] space-y-3 md:space-y-4 touch-manipulation ${getFloorColor(floor)} ${
+            className={`group p-4 md:p-5 hover:shadow-lg transition-all duration-300 active:scale-[0.98] md:hover:scale-[1.02] space-y-3 md:space-y-4 touch-manipulation border-2 ${getFloorColor(floor)} ${getFloorBorderColor(floor)} ${
               selectedProperties.has(property.id) ? 'ring-2 ring-primary' : ''
             }`}
           >
