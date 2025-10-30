@@ -63,6 +63,7 @@ const Admin = () => {
   const [newComplexCommissionType, setNewComplexCommissionType] = useState<'fixed' | 'percentage'>('percentage');
   const [newComplexCommissionValue, setNewComplexCommissionValue] = useState('0');
   const [creatingComplex, setCreatingComplex] = useState(false);
+  const [excelColumns, setExcelColumns] = useState<string[]>([]);
 
   const newUserSchema = z.object({
     email: z.string().trim().email({ message: 'Email invalid' }).max(255),
@@ -310,9 +311,38 @@ const Admin = () => {
     }
   };
 
+  const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const XLSX = await import('xlsx');
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as any[][];
+      
+      if (jsonData.length > 0) {
+        const headers = jsonData[0].filter((col: any) => col && col.toString().trim() !== '');
+        setExcelColumns(headers.map(String));
+        toast.success(`${headers.length} coloane detectate din Excel`);
+      } else {
+        toast.error('Fișierul Excel este gol');
+      }
+    } catch (error) {
+      console.error('Error reading Excel:', error);
+      toast.error('Eroare la citirea fișierului Excel');
+    }
+  };
+
   const handleCreateComplex = async () => {
     if (!newComplexId || !newComplexName || !newComplexLocation) {
       toast.error('ID, nume și locație sunt obligatorii');
+      return;
+    }
+
+    if (excelColumns.length === 0) {
+      toast.error('Încarcă un fișier Excel pentru a defini structura coloanelor');
       return;
     }
 
@@ -337,6 +367,7 @@ const Admin = () => {
       setNewComplexImage('');
       setNewComplexCommissionType('percentage');
       setNewComplexCommissionValue('0');
+      setExcelColumns([]);
       fetchComplexes();
     } catch (error) {
       console.error('Error creating complex:', error);
@@ -872,6 +903,36 @@ const Admin = () => {
             </DialogHeader>
 
             <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="excel-upload">
+                  Încarcă Excel pentru structură coloane *
+                </Label>
+                <Input
+                  id="excel-upload"
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleExcelUpload}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Prima linie din Excel va fi folosită ca antet de coloane
+                </p>
+                {excelColumns.length > 0 && (
+                  <div className="mt-2 p-3 bg-muted/50 rounded-lg border">
+                    <p className="text-xs font-medium mb-2">
+                      Coloane detectate ({excelColumns.length}):
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {excelColumns.map((col, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {col}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="complex-id">ID Complex *</Label>
                 <Input
