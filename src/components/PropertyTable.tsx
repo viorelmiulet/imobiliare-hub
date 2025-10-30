@@ -110,6 +110,39 @@ export const PropertyTable = ({
     return `${area.toFixed(2)} m²`;
   };
 
+  const calculatePricePerSqm = (property: Property): number | null => {
+    const price = getValue(property, 'creditPrice');
+    const area = getValue(property, 'area');
+    
+    const priceNum = typeof price === 'number' ? price : parseFloat(String(price).replace(/[€\s]/g, '').replace(/,/g, ''));
+    const areaNum = typeof area === 'number' ? area : parseFloat(String(area));
+    
+    if (isNaN(priceNum) || isNaN(areaNum) || areaNum === 0) return null;
+    
+    return priceNum / areaNum;
+  };
+
+  const formatPricePerSqm = (pricePerSqm: number | null): string => {
+    if (!pricePerSqm) return '-';
+    return new Intl.NumberFormat('ro-RO', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(pricePerSqm) + '/m²';
+  };
+
+  const calculateAveragePricePerSqm = (propertiesList: Property[]): number | null => {
+    const validPrices = propertiesList
+      .map(p => calculatePricePerSqm(p))
+      .filter((p): p is number => p !== null);
+    
+    if (validPrices.length === 0) return null;
+    
+    const sum = validPrices.reduce((acc, price) => acc + price, 0);
+    return sum / validPrices.length;
+  };
+
   const getStatusConfig = (status: string) => {
     const s = status?.toLowerCase();
     if (s === 'disponibil') return { label: 'Disponibil', color: 'bg-success/10 text-success border-success/20', dot: 'bg-success' };
@@ -322,10 +355,15 @@ export const PropertyTable = ({
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t-2 border-primary/20"></div>
             </div>
-            <div className="relative flex justify-start">
+            <div className="relative flex justify-between items-center">
               <span className="bg-background pr-4 text-lg md:text-xl font-bold text-warning uppercase tracking-wide">
                 {normalizeFloorLabel(floor)}
               </span>
+              {isAuthenticated && (
+                <span className="bg-background pl-4 text-sm md:text-base font-medium text-muted-foreground">
+                  Medie: {formatPricePerSqm(calculateAveragePricePerSqm(groupedByFloor[floor]))}
+                </span>
+              )}
             </div>
           </div>
 
@@ -484,6 +522,16 @@ export const PropertyTable = ({
                     </span>
                   </div>
                 </>
+              )}
+              
+              {/* Price per sqm - only for authenticated users */}
+              {isAuthenticated && (
+                <div className="flex justify-between text-sm pt-1 border-t border-muted/20">
+                  <span className="text-muted-foreground">Preț/m²:</span>
+                  <span className="font-semibold text-accent">
+                    {formatPricePerSqm(calculatePricePerSqm(property))}
+                  </span>
+                </div>
               )}
             </div>
 
