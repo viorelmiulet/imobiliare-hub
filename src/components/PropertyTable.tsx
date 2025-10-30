@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pencil, MessageSquare, User as UserIcon, Building } from "lucide-react";
+import { Pencil, MessageSquare, User as UserIcon, Building, Check, ChevronsUpDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,9 +16,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { Property } from "@/types/property";
 import { Client } from "@/hooks/useClients";
 import { PropertyPlanViewer } from "./PropertyPlanViewer";
+import { useState } from "react";
 
 interface PropertyTableProps {
   properties: Property[];
@@ -54,6 +57,7 @@ export const PropertyTable = ({
 }: PropertyTableProps) => {
   const isUserRole = userRole === 'user';
   const canSelect = isAuthenticated && !isUserRole && onPropertySelectionChange;
+  const [openClientCombo, setOpenClientCombo] = useState<Record<string, boolean>>({});
 
   const getValue = (property: Property, key: string): any => {
     const map: Record<string, string[]> = {
@@ -251,25 +255,69 @@ export const PropertyTable = ({
                 {onClientChange && (
                   <div className="space-y-1">
                     <label className="text-xs text-muted-foreground">Client:</label>
-                    <Select
-                      value={property.client_id || 'none'}
-                      onValueChange={(value) => onClientChange(property.id, value === 'none' ? null : value)}
-                      disabled={isUserRole}
+                    <Popover 
+                      open={openClientCombo[property.id]} 
+                      onOpenChange={(open) => setOpenClientCombo(prev => ({ ...prev, [property.id]: open }))}
                     >
-                      <SelectTrigger className="w-full h-9 text-sm">
-                        <SelectValue placeholder="Selectează client" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">
-                          <span className="text-muted-foreground">Fără client</span>
-                        </SelectItem>
-                        {clients.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openClientCombo[property.id]}
+                          className="w-full h-9 justify-between text-sm"
+                          disabled={isUserRole}
+                        >
+                          {property.client_id 
+                            ? clients.find(c => c.id === property.client_id)?.name || 'Selectează client'
+                            : 'Fără client'
+                          }
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[280px] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Caută client..." />
+                          <CommandList>
+                            <CommandEmpty>Nu s-au găsit clienți.</CommandEmpty>
+                            <CommandGroup>
+                              <CommandItem
+                                value="none"
+                                onSelect={() => {
+                                  onClientChange(property.id, null);
+                                  setOpenClientCombo(prev => ({ ...prev, [property.id]: false }));
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    !property.client_id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                <span className="text-muted-foreground">Fără client</span>
+                              </CommandItem>
+                              {clients.map((c) => (
+                                <CommandItem
+                                  key={c.id}
+                                  value={c.name}
+                                  onSelect={() => {
+                                    onClientChange(property.id, c.id);
+                                    setOpenClientCombo(prev => ({ ...prev, [property.id]: false }));
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      property.client_id === c.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {c.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 )}
 
