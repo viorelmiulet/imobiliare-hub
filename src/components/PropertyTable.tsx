@@ -278,18 +278,18 @@ export const PropertyTable = ({
   const getFloorColor = (floor: string): string => {
     const order = getFloorOrder(floor);
     const colors = [
-      'bg-primary/5',      // Demisol
-      'bg-success/5',      // Parter
-      'bg-info/5',         // Etaj 1
-      'bg-warning/5',      // Etaj 2
-      'bg-complex-2/5',    // Etaj 3
-      'bg-complex-4/5',    // Etaj 4
-      'bg-complex-5/5',    // Etaj 5
-      'bg-complex-6/5',    // Etaj 6
-      'bg-primary/5',      // Etaj 7
-      'bg-success/5',      // Etaj 8
-      'bg-info/5',         // Etaj 9
-      'bg-warning/5',      // Etaj 10
+      'bg-primary/10',      // Demisol
+      'bg-success/10',      // Parter
+      'bg-info/10',         // Etaj 1
+      'bg-warning/10',      // Etaj 2
+      'bg-complex-2/10',    // Etaj 3
+      'bg-complex-4/10',    // Etaj 4
+      'bg-complex-5/10',    // Etaj 5
+      'bg-complex-6/10',    // Etaj 6
+      'bg-primary/10',      // Etaj 7
+      'bg-success/10',      // Etaj 8
+      'bg-info/10',         // Etaj 9
+      'bg-warning/10',      // Etaj 10
     ];
     return colors[order % colors.length] || 'bg-card';
   };
