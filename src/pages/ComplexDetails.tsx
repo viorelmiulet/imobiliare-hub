@@ -24,6 +24,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { importComplex1Data } from "@/utils/importComplex1Data";
 import { importViilor33Data } from "@/utils/importViilor33Data";
 import { clearRenewChiajnaData } from "@/utils/clearRenewChiajnaData";
+import { importRenewChiajna2Data } from "@/utils/importRenewChiajna2Data";
 import { toast } from "sonner";
 
 const ComplexDetails = () => {
@@ -137,6 +138,25 @@ const ComplexDetails = () => {
     } catch (error) {
       console.error("Clear error:", error);
       toast.error("Eroare la ștergerea datelor");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleImportRenewChiajna2Data = async () => {
+    if (complexId !== "complex-3") return;
+    
+    setIsImporting(true);
+    try {
+      const result = await importRenewChiajna2Data();
+      toast.success(`Importul a fost finalizat cu succes! ${result.count} proprietăți au fost încărcate (${result.available} disponibile).`);
+      // Refresh the page to reload all data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error("Eroare la importul datelor");
     } finally {
       setIsImporting(false);
     }
@@ -576,16 +596,29 @@ const ComplexDetails = () => {
                   )}
                   
                   {complexId === "complex-3" && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleClearRenewChiajnaData}
-                      disabled={isImporting}
-                    >
-                      <span className="hidden md:inline ml-2">
-                        {isImporting ? "Ștergere..." : "Șterge Date"}
-                      </span>
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleImportRenewChiajna2Data}
+                        disabled={isImporting}
+                      >
+                        <FileUp className="h-4 w-4" />
+                        <span className="hidden md:inline ml-2">
+                          {isImporting ? "Import..." : "Import Date"}
+                        </span>
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleClearRenewChiajnaData}
+                        disabled={isImporting}
+                      >
+                        <span className="hidden md:inline ml-2">
+                          {isImporting ? "Ștergere..." : "Șterge Date"}
+                        </span>
+                      </Button>
+                    </>
                   )}
                   
                   <Button
