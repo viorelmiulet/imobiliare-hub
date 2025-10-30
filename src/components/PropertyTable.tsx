@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Pencil, MessageSquare, User as UserIcon, Building, Check, ChevronsUpDown } from "lucide-react";
 import {
   Select,
@@ -60,6 +61,8 @@ export const PropertyTable = ({
   const isUserRole = userRole === 'user';
   const canSelect = isAuthenticated && !isUserRole && onPropertySelectionChange;
   const [openClientCombo, setOpenClientCombo] = useState<Record<string, boolean>>({});
+  const [manualCommissionOpen, setManualCommissionOpen] = useState<Record<string, boolean>>({});
+  const [manualCommissionValue, setManualCommissionValue] = useState<string>('');
   
   // Determine complex type
   const isRenewChiajna = complexId === 'complex-3';
@@ -483,48 +486,103 @@ export const PropertyTable = ({
             {isAuthenticated && (userRole === 'admin' || userRole === 'manager') && (
               <div className="flex gap-2 pt-2 border-t">
                 {onCommissionChange && (
-                  <Select
-                    value={getValue(property, 'commission') ? 'current' : ''}
-                    onValueChange={(value) => {
-                      if (value === 'credit' || value === 'cash') {
-                        const commission = calculateCommission(property, value as 'credit' | 'cash');
-                        onCommissionChange(property.id, commission);
-                      } else if (value === 'remove') {
-                        onCommissionChange(property.id, '');
-                      }
+                  <Popover 
+                    open={manualCommissionOpen[property.id]}
+                    onOpenChange={(open) => {
+                      setManualCommissionOpen(prev => ({ ...prev, [property.id]: open }));
+                      if (!open) setManualCommissionValue('');
                     }}
                   >
-                    <SelectTrigger className="flex-1 h-9 text-xs">
-                      <SelectValue placeholder="Comision">
-                        {getValue(property, 'commission') ? (
-                          <span className="text-success font-medium">{getValue(property, 'commission')}</span>
+                    <Select
+                      value={getValue(property, 'commission') ? 'current' : ''}
+                      onValueChange={(value) => {
+                        if (value === 'credit' || value === 'cash') {
+                          const commission = calculateCommission(property, value as 'credit' | 'cash');
+                          onCommissionChange(property.id, commission);
+                        } else if (value === 'remove') {
+                          onCommissionChange(property.id, '');
+                        } else if (value === 'manual') {
+                          setManualCommissionOpen(prev => ({ ...prev, [property.id]: true }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="flex-1 h-9 text-xs">
+                        <SelectValue placeholder="Comision">
+                          {getValue(property, 'commission') ? (
+                            <span className="text-success font-medium">{getValue(property, 'commission')}</span>
+                          ) : (
+                            "Calc. comision"
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {commissionType === 'percentage' ? (
+                          <>
+                            <SelectItem value="credit">
+                              Credit: {calculateCommission(property, 'credit')}
+                            </SelectItem>
+                            <SelectItem value="cash">
+                              Cash: {calculateCommission(property, 'cash')}
+                            </SelectItem>
+                          </>
                         ) : (
-                          "Calc. comision"
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {commissionType === 'percentage' ? (
-                        <>
                           <SelectItem value="credit">
-                            Credit: {calculateCommission(property, 'credit')}
+                            Fix: {calculateCommission(property, 'credit')}
                           </SelectItem>
-                          <SelectItem value="cash">
-                            Cash: {calculateCommission(property, 'cash')}
+                        )}
+                        <SelectItem value="manual">
+                          Manual...
+                        </SelectItem>
+                        {getValue(property, 'commission') && (
+                          <SelectItem value="remove" className="text-destructive">
+                            Șterge
                           </SelectItem>
-                        </>
-                      ) : (
-                        <SelectItem value="credit">
-                          Fix: {calculateCommission(property, 'credit')}
-                        </SelectItem>
-                      )}
-                      {getValue(property, 'commission') && (
-                        <SelectItem value="remove" className="text-destructive">
-                          Șterge
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    
+                    <PopoverContent className="w-72 p-4" align="start">
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium">Introdu comision manual</label>
+                          <p className="text-xs text-muted-foreground">Exemplu: 5000 sau 5.000 €</p>
+                        </div>
+                        <Input
+                          type="text"
+                          placeholder="ex: 5000 €"
+                          value={manualCommissionValue}
+                          onChange={(e) => setManualCommissionValue(e.target.value)}
+                          className="h-9"
+                          autoFocus
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              if (manualCommissionValue.trim()) {
+                                onCommissionChange(property.id, manualCommissionValue.trim());
+                                setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
+                                setManualCommissionValue('');
+                              }
+                            }}
+                          >
+                            Salvează
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
+                              setManualCommissionValue('');
+                            }}
+                          >
+                            Anulează
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 )}
 
                 {onObservatiiChange && (
