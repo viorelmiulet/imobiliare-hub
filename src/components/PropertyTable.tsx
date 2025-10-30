@@ -127,6 +127,54 @@ export const PropertyTable = ({
     return formatPrice(priceNum * (commissionValue / 100));
   };
 
+  // Parse free-text commission (e.g., "5.000", "5,000 €") into a number
+  const parseCommissionInput = (value: string): number => {
+    if (!value) return 0;
+    let s = String(value)
+      .replace(/\u00A0/g, '')
+      .replace(/€/g, '')
+      .replace(/\s+/g, '')
+      .trim();
+
+    if (!s) return 0;
+
+    const lastComma = s.lastIndexOf(',');
+    const lastDot = s.lastIndexOf('.');
+
+    if (lastComma !== -1 && lastDot !== -1) {
+      if (lastComma > lastDot) {
+        s = s.replace(/\./g, '');
+        const parts = s.split(',');
+        const dec = parts.pop();
+        s = parts.join('') + '.' + (dec ?? '0');
+      } else {
+        s = s.replace(/,/g, '');
+      }
+    } else if (lastComma !== -1) {
+      if (/^\d{1,3}(,\d{3})+$/.test(s)) {
+        s = s.replace(/,/g, '');
+      } else {
+        s = s.replace(/,/g, '.');
+      }
+    } else if (lastDot !== -1) {
+      if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
+        s = s.replace(/\./g, '');
+      }
+    }
+
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  };
+
+  // Format number into EUR string for storage/display consistency
+  const formatCommissionEUR = (num: number): string => {
+    if (!num) return '';
+    return new Intl.NumberFormat('ro-RO', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(num) + ' €';
+  };
+
   if (properties.length === 0) {
     return (
       <div className="text-center py-12">
@@ -564,8 +612,10 @@ export const PropertyTable = ({
                               size="sm"
                               className="flex-1"
                               onClick={() => {
-                                if (manualCommissionValue.trim()) {
-                                  onCommissionChange(property.id, manualCommissionValue.trim());
+                                const raw = manualCommissionValue.trim();
+                                const num = parseCommissionInput(raw);
+                                if (num > 0) {
+                                  onCommissionChange(property.id, formatCommissionEUR(num));
                                   setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
                                   setManualCommissionValue('');
                                 }
