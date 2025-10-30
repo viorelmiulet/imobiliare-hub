@@ -161,18 +161,21 @@ export type Database = {
       }
       user_complex_access: {
         Row: {
+          access_level: Database["public"]["Enums"]["access_level"]
           complex_id: string
           created_at: string | null
           id: string
           user_id: string
         }
         Insert: {
+          access_level?: Database["public"]["Enums"]["access_level"]
           complex_id: string
           created_at?: string | null
           id?: string
           user_id: string
         }
         Update: {
+          access_level?: Database["public"]["Enums"]["access_level"]
           complex_id?: string
           created_at?: string | null
           id?: string
@@ -233,8 +236,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_write_access: {
+        Args: { _complex_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      access_level: "read" | "write"
       app_role: "user" | "manager" | "admin"
       commission_type: "fixed" | "percentage"
     }
@@ -364,6 +372,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      access_level: ["read", "write"],
       app_role: ["user", "manager", "admin"],
       commission_type: ["fixed", "percentage"],
     },

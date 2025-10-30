@@ -29,6 +29,11 @@ interface ComplexInfo {
   name: string;
 }
 
+interface ComplexAccess {
+  complex_id: string;
+  access_level: 'read' | 'write';
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
@@ -39,6 +44,7 @@ const Admin = () => {
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [selectedComplexes, setSelectedComplexes] = useState<string[]>([]);
+  const [complexAccess, setComplexAccess] = useState<Record<string, 'read' | 'write'>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
@@ -136,11 +142,18 @@ const Admin = () => {
     try {
       const { data, error } = await supabase
         .from('user_complex_access')
-        .select('complex_id')
+        .select('complex_id, access_level')
         .eq('user_id', user.id);
 
       if (error) throw error;
       setSelectedComplexes(data.map(d => d.complex_id));
+      
+      // Build access level map
+      const accessMap: Record<string, 'read' | 'write'> = {};
+      data.forEach(d => {
+        accessMap[d.complex_id] = d.access_level as 'read' | 'write';
+      });
+      setComplexAccess(accessMap);
     } catch (error) {
       console.error('Error fetching user access:', error);
     }
@@ -196,7 +209,7 @@ const Admin = () => {
 
       if (deleteError) throw deleteError;
 
-      // Insert new access
+      // Insert new access with access levels
       if (selectedComplexes.length > 0) {
         const { error: insertError } = await supabase
           .from('user_complex_access')
@@ -204,6 +217,7 @@ const Admin = () => {
             selectedComplexes.map(complexId => ({
               user_id: selectedUser.id,
               complex_id: complexId,
+              access_level: complexAccess[complexId] || 'read',
             }))
           );
 
@@ -774,29 +788,67 @@ const Admin = () => {
                         Niciun complex disponibil
                       </p>
                     ) : (
-                      complexes.map((complex) => (
-                        <div key={complex.id} className="flex items-center space-x-3 p-2 rounded hover:bg-background transition-colors">
-                          <Checkbox
-                            id={complex.id}
-                            checked={selectedComplexes.includes(complex.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedComplexes([...selectedComplexes, complex.id]);
-                              } else {
-                                setSelectedComplexes(
-                                  selectedComplexes.filter((id) => id !== complex.id)
-                                );
-                              }
-                            }}
-                          />
-                          <Label htmlFor={complex.id} className="cursor-pointer flex-1 font-medium">
-                            <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-muted-foreground" />
-                              {complex.name}
+                      complexes.map((complex) => {
+                        const isChecked = selectedComplexes.includes(complex.id);
+                        const accessLevel = complexAccess[complex.id] || 'read';
+                        
+                        return (
+                          <div key={complex.id} className="border rounded-lg p-3 space-y-2 bg-background">
+                            <div className="flex items-center space-x-3">
+                              <Checkbox
+                                id={complex.id}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedComplexes([...selectedComplexes, complex.id]);
+                                    if (!complexAccess[complex.id]) {
+                                      setComplexAccess({ ...complexAccess, [complex.id]: 'read' });
+                                    }
+                                  } else {
+                                    setSelectedComplexes(
+                                      selectedComplexes.filter((id) => id !== complex.id)
+                                    );
+                                    const newAccess = { ...complexAccess };
+                                    delete newAccess[complex.id];
+                                    setComplexAccess(newAccess);
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={complex.id} className="cursor-pointer flex-1 font-medium">
+                                <div className="flex items-center gap-2">
+                                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                                  {complex.name}
+                                </div>
+                              </Label>
                             </div>
-                          </Label>
-                        </div>
-                      ))
+                            
+                            {isChecked && (
+                              <div className="ml-8 flex gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                  <input
+                                    type="radio"
+                                    name={`access-${complex.id}`}
+                                    checked={accessLevel === 'read'}
+                                    onChange={() => setComplexAccess({ ...complexAccess, [complex.id]: 'read' })}
+                                    className="text-primary"
+                                  />
+                                  <span className="text-sm text-muted-foreground">Doar vizualizare</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                  <input
+                                    type="radio"
+                                    name={`access-${complex.id}`}
+                                    checked={accessLevel === 'write'}
+                                    onChange={() => setComplexAccess({ ...complexAccess, [complex.id]: 'write' })}
+                                    className="text-primary"
+                                  />
+                                  <span className="text-sm text-muted-foreground">Editare</span>
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
                 </div>
