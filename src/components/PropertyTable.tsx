@@ -144,16 +144,22 @@ export const PropertyTable = ({
                 </p>
               </div>
               
-              {isAuthenticated && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(property)}
-                  className="h-8 w-8"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              )}
+              <div className="flex items-center gap-1">
+                <PropertyPlanViewer
+                  imageUrl={getValue(property, 'plan') || getValue(property, 'planUrl') || getValue(property, 'imageUrl')}
+                  propertyName={`Ap. ${getValue(property, 'apartment')}`}
+                />
+                {isAuthenticated && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(property)}
+                    className="h-8 w-8"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
 
             {/* Status Badge */}
