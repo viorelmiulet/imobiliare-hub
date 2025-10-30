@@ -136,6 +136,78 @@ export const PropertyFilters = ({
     </div>
   );
 
+  const desktopFilters = (
+    <div className="flex items-center gap-2">
+      {uniqueCorps.length > 0 && (
+        <Select value={selectedCorp} onValueChange={onCorpChange}>
+          <SelectTrigger className="h-10 w-[140px]">
+            <SelectValue placeholder="Toate" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="toate">Toate corpurile</SelectItem>
+            {uniqueCorps.map((corp) => (
+              <SelectItem key={corp} value={corp}>
+                {corp}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      <Select value={selectedFloor} onValueChange={onFloorChange}>
+        <SelectTrigger className="h-10 w-[140px]">
+          <SelectValue placeholder="Etaj" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="toate">Toate etajele</SelectItem>
+          {uniqueFloors.map((floor, index) => (
+            <SelectItem key={`floor-${floor}-${index}`} value={floor}>
+              {floor}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={selectedType} onValueChange={onTypeChange}>
+        <SelectTrigger className="h-10 w-[140px]">
+          <SelectValue placeholder="Tip" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="toate">Toate tipurile</SelectItem>
+          {uniqueTypes.map((type, index) => (
+            <SelectItem key={`type-${type}-${index}`} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={selectedStatus} onValueChange={onStatusChange}>
+        <SelectTrigger className="h-10 w-[160px]">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="toate">Toate statusurile</SelectItem>
+          <SelectItem value="disponibil">Disponibil</SelectItem>
+          <SelectItem value="rezervat">Rezervat</SelectItem>
+          <SelectItem value="vandut">Vândut</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {hasActiveFilters && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={resetFilters}
+          className="h-10 w-10"
+          title="Resetează filtre"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  );
+
   if (isMobile) {
     return (
       <Sheet>
@@ -157,5 +229,5 @@ export const PropertyFilters = ({
     );
   }
 
-  return filterContent;
+  return desktopFilters;
 };
