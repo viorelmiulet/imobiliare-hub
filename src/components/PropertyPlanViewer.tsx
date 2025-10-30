@@ -5,8 +5,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { FileImage } from "lucide-react";
+import { FileImage, Download } from "lucide-react";
 
 interface PropertyPlanViewerProps {
   imageUrl?: string;
@@ -15,6 +16,23 @@ interface PropertyPlanViewerProps {
 
 export const PropertyPlanViewer = ({ imageUrl, propertyName }: PropertyPlanViewerProps) => {
   const [open, setOpen] = useState(false);
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `schita-${propertyName}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+    }
+  };
 
   if (!imageUrl) return null;
 
@@ -42,6 +60,15 @@ export const PropertyPlanViewer = ({ imageUrl, propertyName }: PropertyPlanViewe
               className="w-full h-auto rounded-lg"
             />
           </div>
+          <DialogFooter>
+            <Button
+              onClick={handleDownload}
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              <span>Descarcă schița</span>
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
