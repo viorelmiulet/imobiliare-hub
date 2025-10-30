@@ -66,7 +66,8 @@ export const PropertyTable = ({
       type: ['Tip Apartament', 'tipCom', 'TIP COM', 'tip_apartament'],
       area: ['Suprafata', 'mpUtili', 'suprafata', 'mp'],
       creditPrice: ['Pret Credit', 'pretCuTva', 'pret', 'pret_credit', 'credit'],
-      cashPrice: ['Pret Cash', 'pretCash', 'pret_cash', 'avans80'],
+      avans50: ['Avans 50%', 'avans50', 'avans_50'],
+      cashPrice: ['Pret Cash', 'pretCash', 'pret_cash', 'avans80', 'avans_80'],
       status: ['Status', 'status', 'STATUS'],
       agent: ['Agent', 'agent'],
       commission: ['Comision', 'comision'],
@@ -235,14 +236,21 @@ export const PropertyTable = ({
               </div>
               
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Preț Credit:</span>
+                <span className="text-muted-foreground">Credit:</span>
                 <span className="font-semibold text-primary">
                   {formatPrice(getValue(property, 'creditPrice'))}
                 </span>
               </div>
               
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Preț Cash:</span>
+                <span className="text-muted-foreground">Avans 50%:</span>
+                <span className="font-semibold">
+                  {formatPrice(getValue(property, 'avans50'))}
+                </span>
+              </div>
+              
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Avans 80%:</span>
                 <span className="font-semibold">
                   {formatPrice(getValue(property, 'cashPrice'))}
                 </span>
