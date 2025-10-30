@@ -805,6 +805,7 @@ const ComplexDetails = () => {
                           isAuthenticated={!!user}
                           selectedProperties={selectedProperties}
                           onPropertySelectionChange={handlePropertySelectionChange}
+                          complexId={complexId}
                         />
                       </TabsContent>
                     ))}
@@ -827,6 +828,7 @@ const ComplexDetails = () => {
                 isAuthenticated={!!user}
                 selectedProperties={selectedProperties}
                 onPropertySelectionChange={handlePropertySelectionChange}
+                complexId={complexId}
               />
           )}
         </section>
