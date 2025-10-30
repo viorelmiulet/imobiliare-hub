@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, User, Building2, Phone, Mail, Upload } from "lucide-react";
+import { ArrowLeft, Search, User, Building2, Phone, Mail, Upload, MessageCircle } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { useComplexes } from "@/hooks/useComplexes";
 import { supabase } from "@/integrations/supabase/client";
@@ -213,9 +213,22 @@ export default function ClientsOverview() {
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Phone className="h-3.5 w-3.5" />
-                      <span>{client.phone}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Phone className="h-3.5 w-3.5" />
+                        <span>{client.phone}</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+                        onClick={() => {
+                          const phoneNumber = client.phone.replace(/[\s\-\(\)]/g, '');
+                          window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                        }}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </Button>
                     </div>
                     
                     {client.email && (
