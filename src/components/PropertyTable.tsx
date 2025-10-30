@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Pencil, MessageSquare, User as UserIcon, Building, Check, ChevronsUpDown } from "lucide-react";
 import {
   Select,
@@ -582,23 +583,19 @@ export const PropertyTable = ({
                         )}
                       </SelectContent>
                     </Select>
-                    
-                    <Popover 
+                    <Dialog
                       open={manualCommissionOpen[property.id]}
                       onOpenChange={(open) => {
                         setManualCommissionOpen(prev => ({ ...prev, [property.id]: open }));
                         if (!open) setManualCommissionValue('');
                       }}
                     >
-                      <PopoverTrigger asChild>
-                        <div className="hidden" />
-                      </PopoverTrigger>
-                      <PopoverContent className="w-72 p-4" align="start">
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Introdu comision manual</DialogTitle>
+                        </DialogHeader>
                         <div className="space-y-3">
-                          <div className="space-y-1">
-                            <label className="text-sm font-medium">Introdu comision manual</label>
-                            <p className="text-xs text-muted-foreground">Exemplu: 5000 sau 5.000 €</p>
-                          </div>
+                          <p className="text-xs text-muted-foreground">Exemplu: 5000 sau 5.000 €</p>
                           <Input
                             type="text"
                             placeholder="ex: 5000 €"
@@ -607,36 +604,38 @@ export const PropertyTable = ({
                             className="h-9"
                             autoFocus
                           />
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              className="flex-1"
-                              onClick={() => {
-                                const raw = manualCommissionValue.trim();
-                                const num = parseCommissionInput(raw);
-                                if (num > 0) {
-                                  onCommissionChange(property.id, formatCommissionEUR(num));
+                          <DialogFooter>
+                            <div className="flex gap-2 w-full">
+                              <Button
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => {
+                                  const raw = manualCommissionValue.trim();
+                                  const num = parseCommissionInput(raw);
+                                  if (num > 0) {
+                                    onCommissionChange(property.id, formatCommissionEUR(num));
+                                    setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
+                                    setManualCommissionValue('');
+                                  }
+                                }}
+                              >
+                                Salvează
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
                                   setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
                                   setManualCommissionValue('');
-                                }
-                              }}
-                            >
-                              Salvează
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setManualCommissionOpen(prev => ({ ...prev, [property.id]: false }));
-                                setManualCommissionValue('');
-                              }}
-                            >
-                              Anulează
-                            </Button>
-                          </div>
+                                }}
+                              >
+                                Anulează
+                              </Button>
+                            </div>
+                          </DialogFooter>
                         </div>
-                      </PopoverContent>
-                    </Popover>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 )}
 
