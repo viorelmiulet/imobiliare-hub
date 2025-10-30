@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Image } from "lucide-react";
+import { FileImage } from "lucide-react";
 
 interface PropertyPlanViewerProps {
   imageUrl?: string;
@@ -21,13 +21,13 @@ export const PropertyPlanViewer = ({ imageUrl, propertyName }: PropertyPlanViewe
   return (
     <>
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        className="gap-2"
+        className="gap-2 border-primary/20 hover:bg-primary/10 hover:border-primary/40"
       >
-        <Image className="h-4 w-4" />
-        <span className="hidden sm:inline">Plan</span>
+        <FileImage className="h-4 w-4" />
+        <span>Vezi schița</span>
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
