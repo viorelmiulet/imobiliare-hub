@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Plus, Search, ArrowLeft, Settings, FileUp } from "lucide-react";
+import { Building2, Plus, Search, ArrowLeft, Settings, FileUp, Download } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropertyTable } from "@/components/PropertyTable";
 import { PropertyDialog } from "@/components/PropertyDialog";
@@ -26,6 +26,7 @@ import { importViilor33Data } from "@/utils/importViilor33Data";
 import { clearRenewChiajnaData } from "@/utils/clearRenewChiajnaData";
 import { importRenewChiajna2Data } from "@/utils/importRenewChiajna2Data";
 import { toast } from "sonner";
+import * as XLSX from 'xlsx';
 
 const ComplexDetails = () => {
   const { complexId } = useParams<{ complexId: string }>();
@@ -479,6 +480,51 @@ const ComplexDetails = () => {
     }
   }, [properties, updateProperty]);
 
+  const handleExportToExcel = useCallback(() => {
+    if (filteredProperties.length === 0) {
+      toast.error("Nu există proprietăți de exportat");
+      return;
+    }
+
+    // Prepare data for export
+    const exportData = filteredProperties.map(property => {
+      const row: any = {};
+      
+      // Export all columns from the schema
+      columns.forEach(column => {
+        // Try different case variations of the column name
+        const value = (property as any)[column] || 
+                     (property as any)[column.toLowerCase()] || 
+                     (property as any)[column.toUpperCase()] || '';
+        
+        // Special handling for client name
+        if (column.toLowerCase() === 'client') {
+          row[column] = property.clientName || '';
+        } else {
+          row[column] = value;
+        }
+      });
+      
+      return row;
+    });
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, currentComplex?.name || 'Proprietati');
+    
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `${currentComplex?.name || 'Complex'}_${timestamp}.xlsx`;
+    
+    // Save file
+    XLSX.writeFile(workbook, filename);
+    
+    toast.success(`Exportul a fost finalizat: ${filteredProperties.length} proprietăți`);
+  }, [filteredProperties, columns, currentComplex]);
+
   const openEditDialog = useCallback((property: Property) => {
     setEditingProperty(property);
     setIsDialogOpen(true);
@@ -683,6 +729,16 @@ const ComplexDetails = () => {
                       <FileUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     </Button>
                   )}
+                  
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 md:h-9 md:w-9"
+                    onClick={handleExportToExcel}
+                    title="Export Excel"
+                  >
+                    <Download className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  </Button>
                   
                   <Button
                     variant="ghost"
