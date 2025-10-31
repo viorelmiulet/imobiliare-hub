@@ -486,65 +486,98 @@ const ComplexDetails = () => {
       return;
     }
 
-    // Prepare data for export
+    // Define known aliases between headers and internal keys
+    const aliasMap: Record<string, string[]> = {
+      'Etaj': ['etaj', 'ETAJ'],
+      'Nr. ap.': ['nrAp', 'nr ap', 'nr_ap', 'nr.ap', 'apartament', 'numar apartament'],
+      'Tip Apartament': ['tipCom', 'tip', 'tip_apartament'],
+      'Suprafata': ['mpUtili', 'suprafata', 'mp_utili', 'mp utili'],
+      'Pret Credit': ['pretCuTva', 'pret_credit', 'pret credit', 'pret cu tva'],
+      'Pret Cash': ['pretCash', 'pret_cash', 'pret cash'],
+      'Status': ['status', 'STATUS'],
+      'Client': ['clientName', 'nume', 'client'],
+      'Agent': ['agent'],
+      'Comision': ['Comision', 'comision', 'COMISION'],
+      'Observatii': ['Observatii', 'observatii', 'OBSERVATII'],
+      'Corp': ['corp', 'CORP']
+    };
+
+    const normalize = (s: string) => s.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    const buildLookup = (obj: Record<string, any> = {}) => {
+      const map = new Map<string, any>();
+      Object.entries(obj).forEach(([k, v]) => {
+        const keys = [k, k.toLowerCase(), k.toUpperCase(), normalize(k)];
+        keys.forEach(key => map.set(key, v));
+      });
+      return map;
+    };
+
+    // Determine headers to export
+    const headers = (columns && columns.length > 0)
+      ? columns
+      : Array.from(new Set(
+          filteredProperties.flatMap(p => Object.keys(p as any))
+        ));
+
     const exportData = filteredProperties.map(property => {
-      const row: any = {};
-      
-      // Export all columns from the schema
-      columns.forEach(column => {
-        // Properties store data in multiple ways - check all possible locations
-        let value = '';
-        
-        // Special handling for client name
-        if (column.toLowerCase() === 'client') {
-          value = property.clientName || '';
-        } else {
-          // Try to get value from different possible locations
-          // Direct property access
-          value = (property as any)[column] || 
-                 (property as any)[column.toLowerCase()] || 
-                 (property as any)[column.toUpperCase()];
-          
-          // If not found and property has data field (jsonb), try there
-          if (!value && (property as any).data) {
-            const data = (property as any).data;
-            value = data[column] || 
-                   data[column.toLowerCase()] || 
-                   data[column.toUpperCase()];
-          }
-          
-          // If still not found, try all keys in property
-          if (!value) {
-            const allKeys = Object.keys(property);
-            const matchingKey = allKeys.find(k => 
-              k.toLowerCase() === column.toLowerCase()
-            );
-            if (matchingKey) {
-              value = (property as any)[matchingKey];
-            }
+      const row: Record<string, any> = {};
+      const flatMap = buildLookup(property as any);
+      const dataMap = buildLookup((property as any).data || {});
+
+      headers.forEach(header => {
+        let value: any = '';
+        // Special case: Client
+        if (header.toLowerCase() === 'client') {
+          value = (property as any).clientName || (property as any).nume || '';
+        }
+
+        if (!value) {
+          // Try direct header matches
+          const keysToTry = [header, header.toLowerCase(), header.toUpperCase(), normalize(header)];
+          for (const k of keysToTry) {
+            value = flatMap.get(k) ?? dataMap.get(k) ?? '';
+            if (value !== '' && value !== undefined && value !== null) break;
           }
         }
-        
-        row[column] = value || '';
+
+        if (!value) {
+          // Try aliases
+          const aliases = aliasMap[header] || [];
+          for (const alias of aliases) {
+            const k = [alias, alias.toLowerCase(), alias.toUpperCase(), normalize(alias)];
+            for (const kk of k) {
+              value = flatMap.get(kk) ?? dataMap.get(kk) ?? '';
+              if (value !== '' && value !== undefined && value !== null) break;
+            }
+            if (value) break;
+          }
+        }
+
+        if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+          value = JSON.stringify(value);
+        }
+        row[header] = value ?? '';
       });
-      
+
       return row;
     });
 
-    // Create worksheet
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    
+    // Create worksheet with forced headers order
+    const worksheet = XLSX.utils.json_to_sheet(exportData, { header: headers as any });
+
     // Create workbook
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, currentComplex?.name || 'Proprietati');
-    
+
     // Generate filename with timestamp
     const timestamp = new Date().toISOString().split('T')[0];
-    const filename = `${currentComplex?.name || 'Complex'}_${timestamp}.xlsx`;
-    
+    const safeName = (currentComplex?.name || 'Complex').replace(/[^a-zA-Z0-9-_ ]/g, '');
+    const filename = `${safeName}_${timestamp}.xlsx`;
+
     // Save file
     XLSX.writeFile(workbook, filename);
-    
+
     toast.success(`Exportul a fost finalizat: ${filteredProperties.length} proprietăți`);
   }, [filteredProperties, columns, currentComplex]);
 
