@@ -603,9 +603,9 @@ const ComplexDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Fixed Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/95 border-b-2 border-primary/20 shadow-lg">
         <div className="container mx-auto px-3 md:px-4 py-2.5 md:py-3">
           <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Left side - Back button and complex info */}
@@ -614,17 +614,17 @@ const ComplexDetails = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/")}
-                className="shrink-0 h-8 w-8 md:h-9 md:w-9"
+                className="shrink-0 h-8 w-8 md:h-9 md:w-9 hover:scale-110 transition-transform"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               
-              <div className="h-8 w-8 md:h-9 md:w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
+              <div className="h-8 w-8 md:h-9 md:w-9 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0 shadow-lg">
                 <Building2 className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary-foreground" />
               </div>
               
               <div className="min-w-0">
-                <h1 className="text-xs md:text-sm font-bold tracking-tight truncate">
+                <h1 className="text-xs md:text-sm font-bold tracking-tight truncate bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {currentComplex.name}
                 </h1>
                 <p className="text-[10px] md:text-xs text-muted-foreground truncate hidden sm:block">
@@ -723,16 +723,18 @@ const ComplexDetails = () => {
       </header>
 
       <main className="container mx-auto px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
-        {/* Stats Cards - Minimalist Bento Style */}
-        <section className="grid gap-2.5 md:gap-3 grid-cols-2 md:grid-cols-5">
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+        {/* Stats Cards - Modern Style with Gradients */}
+        <section className="grid gap-2.5 md:gap-3 grid-cols-2 md:grid-cols-5 animate-fade-in">
+          <div className="group relative p-3 md:p-4 rounded-xl md:rounded-2xl border-2 border-primary/20 bg-card touch-manipulation hover:scale-105 transition-all duration-300 hover:shadow-xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             <div className="space-y-0.5 md:space-y-1">
               <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Total</p>
-              <p className="text-2xl md:text-3xl font-bold tracking-tighter">{properties.length}</p>
+              <p className="text-2xl md:text-3xl font-bold tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">{properties.length}</p>
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+          <div className="group relative p-3 md:p-4 rounded-xl md:rounded-2xl border-2 border-success/20 bg-card touch-manipulation hover:scale-105 transition-all duration-300 hover:shadow-xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-success/10 to-success/5 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             <div className="space-y-0.5 md:space-y-1">
               <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Disponibile</p>
               <p className="text-2xl md:text-3xl font-bold tracking-tighter text-success">
@@ -741,7 +743,8 @@ const ComplexDetails = () => {
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+          <div className="group relative p-3 md:p-4 rounded-xl md:rounded-2xl border-2 border-warning/20 bg-card touch-manipulation hover:scale-105 transition-all duration-300 hover:shadow-xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-warning/10 to-warning/5 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             <div className="space-y-0.5 md:space-y-1">
               <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Rezervate</p>
               <p className="text-2xl md:text-3xl font-bold tracking-tighter text-warning">
@@ -750,7 +753,8 @@ const ComplexDetails = () => {
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
+          <div className="group relative p-3 md:p-4 rounded-xl md:rounded-2xl border-2 border-info/20 bg-card touch-manipulation hover:scale-105 transition-all duration-300 hover:shadow-xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-info/10 to-info/5 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             <div className="space-y-0.5 md:space-y-1">
               <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Vândute</p>
               <p className="text-2xl md:text-3xl font-bold tracking-tighter text-info">{statistics.soldCount}</p>
@@ -758,7 +762,8 @@ const ComplexDetails = () => {
           </div>
 
           {(isAdmin || isManager) && (
-            <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card col-span-2 md:col-span-1 touch-manipulation">
+            <div className="group relative p-3 md:p-4 rounded-xl md:rounded-2xl border-2 border-accent/20 bg-card col-span-2 md:col-span-1 touch-manipulation hover:scale-105 transition-all duration-300 hover:shadow-xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
               <div className="space-y-1.5 md:space-y-2">
                 <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Comisioane</p>
                 {statistics.corpNames.length > 1 ? (
@@ -797,45 +802,47 @@ const ComplexDetails = () => {
           )}
         </section>
 
-        {/* Search and Filters - Inline */}
-        <section className="space-y-3 md:space-y-4">
+        {/* Search and Filters - Modern Style */}
+        <section className="space-y-3 md:space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="text-base md:text-lg font-bold tracking-tight">Proprietăți</h2>
+            <h2 className="text-base md:text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Proprietăți</h2>
             <p className="text-xs md:text-sm text-muted-foreground">
-              {filteredProperties.length} din {properties.length}
+              <span className="font-bold text-primary">{filteredProperties.length}</span> din {properties.length}
             </p>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-2 md:gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Caută apartament, client, agent..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-10"
+          <div className="glass-card p-3 md:p-4 rounded-xl border-2 border-primary/20 space-y-3">
+            <div className="flex flex-col md:flex-row gap-2 md:gap-3">
+              <div className="relative flex-1 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder="Caută apartament, client, agent..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-11 border-2 border-transparent focus:border-primary bg-background/50 backdrop-blur-sm"
+                />
+              </div>
+              
+              <PropertyFilters
+                selectedFloor={selectedFloor}
+                selectedType={selectedType}
+                selectedStatus={selectedStatus}
+                selectedCorp={selectedCorp}
+                selectedClient={selectedClient}
+                onFloorChange={setSelectedFloor}
+                onTypeChange={setSelectedType}
+                onStatusChange={setSelectedStatus}
+                onCorpChange={setSelectedCorp}
+                onClientChange={setSelectedClient}
+                properties={properties}
+                clients={clients}
               />
             </div>
-            
-            <PropertyFilters
-              selectedFloor={selectedFloor}
-              selectedType={selectedType}
-              selectedStatus={selectedStatus}
-              selectedCorp={selectedCorp}
-              selectedClient={selectedClient}
-              onFloorChange={setSelectedFloor}
-              onTypeChange={setSelectedType}
-              onStatusChange={setSelectedStatus}
-              onCorpChange={setSelectedCorp}
-              onClientChange={setSelectedClient}
-              properties={properties}
-              clients={clients}
-            />
           </div>
         </section>
 
         {/* Properties Table with Corps Tabs (conditional) */}
-        <section className="rounded-2xl border bg-card p-6">
+        <section className="rounded-2xl border-2 border-primary/20 glass-card p-4 md:p-6 shadow-xl animate-fade-in">
             {properties.some(p => (p as any).corp || (p as any).CORP) ? (
               (() => {
                 const corpNames = Array.from(

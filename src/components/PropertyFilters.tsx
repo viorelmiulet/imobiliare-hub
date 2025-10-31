@@ -231,10 +231,10 @@ export const PropertyFilters = ({
   );
 
   const desktopFilters = (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       {uniqueCorps.length > 0 && (
         <Select value={selectedCorp} onValueChange={onCorpChange}>
-          <SelectTrigger className="h-10 w-[140px]">
+          <SelectTrigger className="h-11 w-[140px] border-2 hover:border-primary transition-colors">
             <SelectValue placeholder="Toate" />
           </SelectTrigger>
           <SelectContent>
@@ -249,7 +249,7 @@ export const PropertyFilters = ({
       )}
 
       <Select value={selectedFloor} onValueChange={onFloorChange}>
-        <SelectTrigger className="h-10 w-[140px]">
+        <SelectTrigger className="h-11 w-[140px] border-2 hover:border-primary transition-colors">
           <SelectValue placeholder="Etaj" />
         </SelectTrigger>
         <SelectContent>
@@ -263,7 +263,7 @@ export const PropertyFilters = ({
       </Select>
 
       <Select value={selectedType} onValueChange={onTypeChange}>
-        <SelectTrigger className="h-10 w-[140px]">
+        <SelectTrigger className="h-11 w-[140px] border-2 hover:border-primary transition-colors">
           <SelectValue placeholder="Tip" />
         </SelectTrigger>
         <SelectContent>
@@ -277,7 +277,7 @@ export const PropertyFilters = ({
       </Select>
 
       <Select value={selectedStatus} onValueChange={onStatusChange}>
-        <SelectTrigger className="h-10 w-[160px]">
+        <SelectTrigger className="h-11 w-[160px] border-2 hover:border-primary transition-colors">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -294,7 +294,7 @@ export const PropertyFilters = ({
             variant="outline"
             role="combobox"
             aria-expanded={openClientCombo}
-            className="h-10 w-[180px] justify-between"
+            className="h-11 w-[180px] justify-between border-2 hover:border-primary transition-colors"
           >
             {getClientLabel(selectedClient)}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -365,10 +365,10 @@ export const PropertyFilters = ({
           variant="ghost" 
           size="icon"
           onClick={resetFilters}
-          className="h-10 w-10"
+          className="h-11 w-11 hover:bg-destructive/10 hover:text-destructive transition-colors"
           title="Resetează filtre"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5" />
         </Button>
       )}
     </div>
