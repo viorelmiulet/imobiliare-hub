@@ -355,23 +355,19 @@ export const PropertyTable = ({
     <div className="space-y-8">
       {sortedFloors.map((floor) => (
         <div key={floor} className="space-y-4 animate-fade-in">
-          {/* Modern Floor Header */}
-          <div className="relative mb-6">
+          {/* Floor Header */}
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-30"></div>
+              <div className="w-full border-t-2 border-primary/20"></div>
             </div>
             <div className="relative flex justify-between items-center">
-              <div className="glass-card px-6 py-3 rounded-full border-2 border-primary/30">
-                <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary via-warning to-secondary bg-clip-text text-transparent uppercase tracking-wide">
-                  {normalizeFloorLabel(floor)}
-                </span>
-              </div>
+              <span className="bg-background pr-4 text-lg md:text-xl font-bold text-warning uppercase tracking-wide">
+                {normalizeFloorLabel(floor)}
+              </span>
               {isAuthenticated && (
-                <div className="glass-card px-4 py-2 rounded-full border-2 border-primary/20">
-                  <span className="text-sm md:text-base font-medium text-muted-foreground">
-                    Medie: <span className="text-primary font-bold">{formatPricePerSqm(calculateAveragePricePerSqm(groupedByFloor[floor]))}</span>
-                  </span>
-                </div>
+                <span className="bg-background pl-4 text-sm md:text-base font-medium text-muted-foreground">
+                  Medie: {formatPricePerSqm(calculateAveragePricePerSqm(groupedByFloor[floor]))}
+                </span>
               )}
             </div>
           </div>
@@ -386,9 +382,9 @@ export const PropertyTable = ({
         return (
           <Card
             key={property.id}
-            className={`group relative p-4 md:p-5 glass-card hover:shadow-2xl transition-all duration-300 active:scale-[0.98] md:hover:scale-[1.03] space-y-3 md:space-y-4 touch-manipulation border-2 ${getFloorColor(floor)} ${getFloorBorderColor(floor)} ${
-              selectedProperties.has(property.id) ? 'ring-2 ring-primary shadow-primary/50' : ''
-            } overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary/5 before:to-secondary/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:-z-10`}
+            className={`group p-4 md:p-5 hover:shadow-lg transition-all duration-300 active:scale-[0.98] md:hover:scale-[1.02] space-y-3 md:space-y-4 touch-manipulation border-2 ${getFloorColor(floor)} ${getFloorBorderColor(floor)} ${
+              selectedProperties.has(property.id) ? 'ring-2 ring-primary' : ''
+            }`}
           >
             {/* Header */}
             <div className="flex items-start justify-between gap-2 md:gap-3">
