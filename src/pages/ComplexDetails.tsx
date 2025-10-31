@@ -492,17 +492,40 @@ const ComplexDetails = () => {
       
       // Export all columns from the schema
       columns.forEach(column => {
-        // Try different case variations of the column name
-        const value = (property as any)[column] || 
-                     (property as any)[column.toLowerCase()] || 
-                     (property as any)[column.toUpperCase()] || '';
+        // Properties store data in multiple ways - check all possible locations
+        let value = '';
         
         // Special handling for client name
         if (column.toLowerCase() === 'client') {
-          row[column] = property.clientName || '';
+          value = property.clientName || '';
         } else {
-          row[column] = value;
+          // Try to get value from different possible locations
+          // Direct property access
+          value = (property as any)[column] || 
+                 (property as any)[column.toLowerCase()] || 
+                 (property as any)[column.toUpperCase()];
+          
+          // If not found and property has data field (jsonb), try there
+          if (!value && (property as any).data) {
+            const data = (property as any).data;
+            value = data[column] || 
+                   data[column.toLowerCase()] || 
+                   data[column.toUpperCase()];
+          }
+          
+          // If still not found, try all keys in property
+          if (!value) {
+            const allKeys = Object.keys(property);
+            const matchingKey = allKeys.find(k => 
+              k.toLowerCase() === column.toLowerCase()
+            );
+            if (matchingKey) {
+              value = (property as any)[matchingKey];
+            }
+          }
         }
+        
+        row[column] = value || '';
       });
       
       return row;
