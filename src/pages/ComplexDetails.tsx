@@ -680,11 +680,15 @@ const ComplexDetails = () => {
   
   if (isStillLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="p-8 rounded-2xl border bg-card">
+      <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+        <div className="fixed inset-0 bg-mesh pointer-events-none" />
+        <div className="p-8 rounded-3xl glass border shadow-2xl">
           <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
-            <p className="text-sm text-muted-foreground">Se încarcă...</p>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-50 animate-pulse" />
+              <div className="relative h-12 w-12 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Se încarcă...</p>
           </div>
         </div>
       </div>
@@ -693,10 +697,11 @@ const ComplexDetails = () => {
 
   if (!currentComplex) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="p-8 rounded-2xl border bg-card space-y-4 text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+        <div className="fixed inset-0 bg-mesh pointer-events-none" />
+        <div className="p-8 rounded-3xl glass border shadow-2xl space-y-4 text-center">
           <p className="text-sm text-muted-foreground">Complex negăsit</p>
-          <Button onClick={() => navigate("/")} size="sm">
+          <Button onClick={() => navigate("/")} size="sm" className="rounded-xl">
             Înapoi la Dashboard
           </Button>
         </div>
@@ -705,9 +710,13 @@ const ComplexDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="fixed inset-0 bg-dot-pattern opacity-20 pointer-events-none" />
+      
       {/* Fixed Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b">
+      <header className="sticky top-0 z-50 glass border-b">
         <div className="container mx-auto px-3 md:px-4 py-2.5 md:py-3">
           <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Left side - Back button and complex info */}
@@ -716,20 +725,20 @@ const ComplexDetails = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/")}
-                className="shrink-0 h-8 w-8 md:h-9 md:w-9"
+                className="shrink-0 h-9 w-9 rounded-xl hover:bg-primary/10"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               
-              <div className="h-8 w-8 md:h-9 md:w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <Building2 className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary-foreground" />
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0 shadow-lg">
+                <Building2 className="h-5 w-5 text-white" />
               </div>
               
               <div className="min-w-0">
-                <h1 className="text-xs md:text-sm font-bold tracking-tight truncate">
+                <h1 className="text-sm md:text-base font-bold tracking-tight truncate">
                   {currentComplex.name}
                 </h1>
-                <p className="text-[10px] md:text-xs text-muted-foreground truncate hidden sm:block">
+                <p className="text-xs text-muted-foreground truncate hidden sm:block">
                   {currentComplex.location}
                 </p>
               </div>
@@ -834,47 +843,47 @@ const ComplexDetails = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
-        {/* Stats Cards - Minimalist Bento Style */}
-        <section className="grid gap-2.5 md:gap-3 grid-cols-2 md:grid-cols-5">
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
-            <div className="space-y-0.5 md:space-y-1">
-              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Total</p>
-              <p className="text-2xl md:text-3xl font-bold tracking-tighter">{properties.length}</p>
+      <main className="container mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8 relative z-10">
+        {/* Stats Cards - Modern Glass Style */}
+        <section className="grid gap-4 grid-cols-2 md:grid-cols-5 stagger-children">
+          <div className="p-5 rounded-2xl glass border hover:border-primary/30 transition-all duration-300 group">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Total</p>
+              <p className="text-3xl md:text-4xl font-bold tracking-tight group-hover:text-primary transition-colors">{properties.length}</p>
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
-            <div className="space-y-0.5 md:space-y-1">
-              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Disponibile</p>
-              <p className="text-2xl md:text-3xl font-bold tracking-tighter text-success">
+          <div className="p-5 rounded-2xl glass border hover:border-success/30 transition-all duration-300 group">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Disponibile</p>
+              <p className="text-3xl md:text-4xl font-bold tracking-tight text-success">
                 {statistics.availableCount}
               </p>
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
-            <div className="space-y-0.5 md:space-y-1">
-              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Rezervate</p>
-              <p className="text-2xl md:text-3xl font-bold tracking-tighter text-warning">
+          <div className="p-5 rounded-2xl glass border hover:border-warning/30 transition-all duration-300 group">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Rezervate</p>
+              <p className="text-3xl md:text-4xl font-bold tracking-tight text-warning">
                 {statistics.reservedCount}
               </p>
             </div>
           </div>
 
-          <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card touch-manipulation">
-            <div className="space-y-0.5 md:space-y-1">
-              <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Vândute</p>
-              <p className="text-2xl md:text-3xl font-bold tracking-tighter text-info">{statistics.soldCount}</p>
+          <div className="p-5 rounded-2xl glass border hover:border-info/30 transition-all duration-300 group">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Vândute</p>
+              <p className="text-3xl md:text-4xl font-bold tracking-tight text-info">{statistics.soldCount}</p>
             </div>
           </div>
 
           {(isAdmin || isManager) && (
-            <div className="p-3 md:p-4 rounded-xl md:rounded-2xl border bg-card col-span-2 md:col-span-1 touch-manipulation">
-              <div className="space-y-1.5 md:space-y-2">
-                <p className="text-[10px] md:text-xs font-medium text-muted-foreground">Comisioane</p>
+            <div className="p-5 rounded-2xl glass border hover:border-accent/30 col-span-2 md:col-span-1 transition-all duration-300 group">
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Comisioane</p>
                 {statistics.corpNames.length > 1 ? (
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {statistics.corpNames.map(corp => (
                       <div key={corp} className="flex justify-between items-center text-xs">
                         <span className="text-muted-foreground">{corp}:</span>
@@ -886,9 +895,9 @@ const ComplexDetails = () => {
                         </span>
                       </div>
                     ))}
-                    <div className="flex justify-between items-center pt-2 border-t">
+                    <div className="flex justify-between items-center pt-2 border-t border-border/50">
                       <span className="text-xs font-medium">Total:</span>
-                      <span className="text-base md:text-lg font-bold tracking-tighter text-accent">
+                      <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                         {new Intl.NumberFormat('ro-RO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -897,7 +906,7 @@ const ComplexDetails = () => {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xl md:text-2xl font-bold tracking-tighter text-accent">
+                  <p className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     {new Intl.NumberFormat('ro-RO', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -909,8 +918,8 @@ const ComplexDetails = () => {
           )}
         </section>
 
-        {/* Search and Filters - Inline */}
-        <section className="space-y-3 md:space-y-4">
+        {/* Search and Filters */}
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base md:text-lg font-bold tracking-tight">Proprietăți</h2>
             <p className="text-xs md:text-sm text-muted-foreground">
@@ -947,7 +956,7 @@ const ComplexDetails = () => {
         </section>
 
         {/* Properties Table with Corps Tabs (conditional) */}
-        <section className="rounded-2xl border bg-card p-6">
+        <section className="rounded-3xl glass border p-6 md:p-8">
             {properties.some(p => (p as any).corp || (p as any).CORP) ? (
               (() => {
                 const corpNames = Array.from(
